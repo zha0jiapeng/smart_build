@@ -51,7 +51,7 @@ public class PeopleLocationController {
             parse.put("msg","map_id必传");
             return parse;
         }
-        HttpResponse execute = HttpRequest.post("http://192.168.30.207:9501/push/list")
+        HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501/push/list")
                 .body(JSON.toJSONString(request), "application/json")
                 .execute();
         String body = execute.body();
@@ -64,7 +64,7 @@ public class PeopleLocationController {
   //  @Scheduled(cron = "0 */5 * * * *")
     private void pushSwzkIn() {
         String now = DateUtil.now();
-        HttpResponse execute = HttpRequest.post("http://192.168.1.200:9501/push/list")
+        HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501/push/list")
                 .body(JSON.toJSONString(new Object()), "application/json")
                 .execute();
         String body = execute.body();
@@ -130,7 +130,7 @@ public class PeopleLocationController {
 
    // @Scheduled(cron = "0 */5 * * * *")
     private void pushSwzkOut() {
-        HttpResponse execute = HttpRequest.post("http://192.168.30.207:9501/push/list")
+        HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501:9501/push/list")
                 .body(JSON.toJSONString(new Object()), "application/json")
                 .execute();
 

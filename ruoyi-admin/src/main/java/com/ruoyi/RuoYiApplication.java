@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * 
  * @author ruoyi
  */
-@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class },scanBasePackages = { "com.ruoyi.*" })
 @EnableScheduling
 public class RuoYiApplication
 {

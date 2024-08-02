@@ -1,6 +1,7 @@
 package com.ruoyi.iot.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.domain.AdmissionEducationUser;
@@ -9,6 +10,7 @@ import com.ruoyi.iot.service.IAdmissionEducationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -32,7 +34,7 @@ public class AdmissionEducationUserServiceImpl extends ServiceImpl<AdmissionEduc
      */
     @Override
     public AdmissionEducationUser selectAdmissionEducationUserById(Long id) {
-        return admissionEducationUserMapper.selectAdmissionEducationUserById(id);
+        return admissionEducationUserMapper.selectById(id);
     }
 
     /**
@@ -43,7 +45,7 @@ public class AdmissionEducationUserServiceImpl extends ServiceImpl<AdmissionEduc
      */
     @Override
     public List<AdmissionEducationUser> selectAdmissionEducationUserList(AdmissionEducationUser admissionEducationUser) {
-        return admissionEducationUserMapper.selectAdmissionEducationUserList(admissionEducationUser);
+        return admissionEducationUserMapper.selectList(new LambdaQueryWrapper<>());
     }
 
     /**
@@ -55,7 +57,7 @@ public class AdmissionEducationUserServiceImpl extends ServiceImpl<AdmissionEduc
     @Override
     public int insertAdmissionEducationUser(AdmissionEducationUser admissionEducationUser) {
         admissionEducationUser.setCreateTime(DateUtils.getNowDate());
-        return admissionEducationUserMapper.insertAdmissionEducationUser(admissionEducationUser);
+        return admissionEducationUserMapper.insert(admissionEducationUser);
     }
 
     /**
@@ -67,7 +69,7 @@ public class AdmissionEducationUserServiceImpl extends ServiceImpl<AdmissionEduc
     @Override
     public int updateAdmissionEducationUser(AdmissionEducationUser admissionEducationUser) {
         admissionEducationUser.setUpdateTime(DateUtils.getNowDate());
-        return admissionEducationUserMapper.updateAdmissionEducationUser(admissionEducationUser);
+        return admissionEducationUserMapper.updateById(admissionEducationUser);
     }
 
     /**
@@ -78,7 +80,7 @@ public class AdmissionEducationUserServiceImpl extends ServiceImpl<AdmissionEduc
      */
     @Override
     public int deleteAdmissionEducationUserByIds(Long[] ids) {
-        return admissionEducationUserMapper.deleteAdmissionEducationUserByIds(ids);
+        return admissionEducationUserMapper.deleteBatchIds(Arrays.asList(ids));
     }
 
     /**
@@ -89,6 +91,6 @@ public class AdmissionEducationUserServiceImpl extends ServiceImpl<AdmissionEduc
      */
     @Override
     public int deleteAdmissionEducationUserById(Long id) {
-        return admissionEducationUserMapper.deleteAdmissionEducationUserById(id);
+        return admissionEducationUserMapper.deleteById(id);
     }
 }

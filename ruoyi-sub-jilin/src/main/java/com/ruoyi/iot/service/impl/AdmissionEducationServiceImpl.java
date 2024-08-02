@@ -25,10 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -63,7 +60,7 @@ public class AdmissionEducationServiceImpl extends ServiceImpl<AdmissionEducatio
     @Override
     public AdmissionEducation selectAdmissionEducationById(Long id)
     {
-        AdmissionEducation admissionEducation = admissionEducationMapper.selectAdmissionEducationById(id);
+        AdmissionEducation admissionEducation = admissionEducationMapper.selectById(id);
         List<AdmissionEducationUser> list = admissionEducationUserService.list(new LambdaQueryWrapper<AdmissionEducationUser>().eq(AdmissionEducationUser::getAdmissionEducationId, id));
         for (AdmissionEducationUser admissionEducationUser : list) {
             SysWorkPeople workPeople = sysWorkPeopleService.getById(admissionEducationUser.getUserId());
@@ -148,7 +145,7 @@ public class AdmissionEducationServiceImpl extends ServiceImpl<AdmissionEducatio
             admissionEducationUserService.update(queryWrapper);
         }
         pushSwzk(admissionEducation);
-        return admissionEducationMapper.updateAdmissionEducation(admissionEducation);
+        return admissionEducationMapper.updateById(admissionEducation);
     }
 
     private void pushSwzk(AdmissionEducation admissionEducation) {
@@ -232,7 +229,7 @@ public class AdmissionEducationServiceImpl extends ServiceImpl<AdmissionEducatio
     public int deleteAdmissionEducationByIds(Long[] ids)
     {
         admissionEducationUserService.remove(new LambdaQueryWrapper<AdmissionEducationUser>().in(AdmissionEducationUser::getAdmissionEducationId, ids));
-        return admissionEducationMapper.deleteAdmissionEducationByIds(ids);
+        return admissionEducationMapper.deleteBatchIds(Arrays.asList(ids));
     }
 
     /**
@@ -245,6 +242,6 @@ public class AdmissionEducationServiceImpl extends ServiceImpl<AdmissionEducatio
     public int deleteAdmissionEducationById(Long id)
     {
         admissionEducationUserService.remove(new LambdaQueryWrapper<AdmissionEducationUser>().eq(AdmissionEducationUser::getAdmissionEducationId, id));
-        return admissionEducationMapper.deleteAdmissionEducationById(id);
+        return admissionEducationMapper.deleteById(id);
     }
 }

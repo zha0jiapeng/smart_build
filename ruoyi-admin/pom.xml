@@ -57,6 +57,13 @@
 
         <dependency>
             <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-sub-jilin</artifactId>
+            <version>${ruoyi.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-assessment</artifactId>
             <version>${ruoyi.version}</version>
         </dependency>

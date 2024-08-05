@@ -6,6 +6,7 @@ import com.ruoyi.iot.domain.DustMonitoringDevice;
 import com.ruoyi.iot.service.IDustMonitoringDeviceService;
 import com.ruoyi.iot.utils.HdyHttpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,93 +51,74 @@ public class TCPController {
     @Autowired
     private IDustMonitoringDeviceService dustMonitoringDeviceService;
 
-    @PostConstruct
-    public void init() {
-        // 启动服务器
-        new Thread(() -> {
-            try {
-                server4321();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-        new Thread(() -> {
-            try {
-                server4322();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
 
     @GetMapping("/server4322")
+    @Scheduled(fixedRate = 35 * 1000)
     public void server4322() throws IOException {
         ServerSocket serverSocket = new ServerSocket(4322);
-        System.out.println("服务器启动，等待连接：");
-        while (true) {
-            Socket socket = serverSocket.accept();
+//        System.out.println("服务器启动，等待连接：");
+        Socket socket = serverSocket.accept();
 //            System.out.println("客户端已连接");
 //            sendMap = new HashMap<>();
-            for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
-                String command = entry.getKey();
-                BiConsumer<byte[], Integer> handler = entry.getValue();
+        for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
+            String command = entry.getKey();
+            BiConsumer<byte[], Integer> handler = entry.getValue();
 
-                // 发送数据到客户端
-                OutputStream outputStream = socket.getOutputStream();
-                byte[] initialData = hexStringToByteArray(command);
-                outputStream.write(initialData);
-                outputStream.flush();
+            // 发送数据到客户端
+            OutputStream outputStream = socket.getOutputStream();
+            byte[] initialData = hexStringToByteArray(command);
+            outputStream.write(initialData);
+            outputStream.flush();
 //                System.out.println("发送数据：" + bytesToHex(initialData, initialData.length));
 
-                // 接收客户端反馈的数据
-                InputStream inputStream = socket.getInputStream();
-                byte[] receivedBytes = new byte[1024];
-                int read = inputStream.read(receivedBytes);
-                String receivedMessage = bytesToHex(receivedBytes, read);
+            // 接收客户端反馈的数据
+            InputStream inputStream = socket.getInputStream();
+            byte[] receivedBytes = new byte[1024];
+            int read = inputStream.read(receivedBytes);
+            String receivedMessage = bytesToHex(receivedBytes, read);
 //                System.out.println("收到客户端反馈数据：" + receivedMessage);
 
-                // 调用对应的处理方法
-                handler.accept(receivedBytes, read);
-            }
-            DustMonitoringDevice dustMonitoringDevice = new DustMonitoringDevice();
-            sendMap.put("deviceCode", "2407052002LXY-02");
-            dustMonitoringDevice.setDeviceCode("2407052002LXY-02");
-            sendMap.put("workStatus", "在线");
-            dustMonitoringDevice.setWorkStatus("在线");
-            dustMonitoringDevice.setPm25(sendMap.get("pm25"));
-            dustMonitoringDevice.setPm10(sendMap.get("pm10"));
-            dustMonitoringDevice.setNoise(sendMap.get("noise"));
-            dustMonitoringDevice.setWindSpeed(sendMap.get(""));
-            sendMap.put("windSpeed", "");
-            dustMonitoringDevice.setWindDirection(sendMap.get(""));
-            sendMap.put("windDirection", "");
-            dustMonitoringDevice.setTemperature(sendMap.get("temperature"));
-            dustMonitoringDevice.setHumidity(sendMap.get("humidity"));
-            dustMonitoringDevice.setPressure(sendMap.get("pressure"));
-            dustMonitoringDevice.setRainfall(sendMap.get("rainfall"));
-            dustMonitoringDevice.setStatus(sendMap.get("在线"));
-            sendMap.put("status", "在线");
-            // 获取当前时间
-            LocalDateTime now = LocalDateTime.now();
-
-            // 定义时间格式
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-            // 格式化当前时间
-            String formattedNow = now.format(formatter);
-            sendMap.put("pushTime",formattedNow);
-            dustMonitoringDevice.setPushTime(sendMap.get("pushTime"));
-            sendMap.put("other","");
-            dustMonitoringDevice.setOther(sendMap.get("other"));
-            dustMonitoringDevice.setProtalId("1751847977770553345");
-            dustMonitoringDevice.setSubProjectId("1763492186013306882");
-            hdyHttpUtils.pushIOT(sendMap);
-            dustMonitoringDeviceService.insertDustMonitoringDevice(dustMonitoringDevice);
-            // 关闭流和套接字
-            socket.close();
+            // 调用对应的处理方法
+            handler.accept(receivedBytes, read);
         }
+        DustMonitoringDevice dustMonitoringDevice = new DustMonitoringDevice();
+        sendMap.put("deviceCode", "2407052002LXY-02");
+        dustMonitoringDevice.setDeviceCode("2407052002LXY-02");
+        sendMap.put("workStatus", "在线");
+        dustMonitoringDevice.setWorkStatus("在线");
+        dustMonitoringDevice.setPm25(sendMap.get("pm25"));
+        dustMonitoringDevice.setPm10(sendMap.get("pm10"));
+        dustMonitoringDevice.setNoise(sendMap.get("noise"));
+        dustMonitoringDevice.setWindSpeed(sendMap.get(""));
+        sendMap.put("windSpeed", "");
+        dustMonitoringDevice.setWindDirection(sendMap.get(""));
+        sendMap.put("windDirection", "");
+        dustMonitoringDevice.setTemperature(sendMap.get("temperature"));
+        dustMonitoringDevice.setHumidity(sendMap.get("humidity"));
+        dustMonitoringDevice.setPressure(sendMap.get("pressure"));
+        dustMonitoringDevice.setRainfall(sendMap.get("rainfall"));
+        dustMonitoringDevice.setStatus(sendMap.get("在线"));
+        sendMap.put("status", "在线");
+        // 获取当前时间
+        LocalDateTime now = LocalDateTime.now();
+
+        // 定义时间格式
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 格式化当前时间
+        String formattedNow = now.format(formatter);
+        sendMap.put("pushTime", formattedNow);
+        dustMonitoringDevice.setPushTime(sendMap.get("pushTime"));
+        sendMap.put("other", "");
+        dustMonitoringDevice.setOther(sendMap.get("other"));
+        dustMonitoringDevice.setProtalId("1751847977770553345");
+        dustMonitoringDevice.setSubProjectId("1763492186013306882");
+//        hdyHttpUtils.pushIOT(sendMap);
+        String jsonString = JSON.toJSONString(sendMap);
+        System.out.println("扬尘JSON：" + jsonString);
+        dustMonitoringDeviceService.insertDustMonitoringDevice(dustMonitoringDevice);
+        // 关闭流和套接字
+        socket.close();
     }
 
     // 处理温度响应的方法
@@ -260,43 +242,41 @@ public class TCPController {
      * server
      */
     @GetMapping("/server4321")
+    @Scheduled(fixedRate = 30 * 1000)
     public void server4321() throws IOException {
         ServerSocket serverSocket = new ServerSocket(4321);
         System.out.println("服务器4321启动，等待连接：");
-
-        while (true) {
-            Socket socket = serverSocket.accept();
+        Socket socket = serverSocket.accept();
 //            System.out.println("客户端已连接4321");
 
-            // 发送数据到客户端
-            OutputStream outputStream = socket.getOutputStream();
-            byte[] initialData = hexStringToByteArray("25 03 00 00 00 02 C2 EF");
-            outputStream.write(initialData);
-            outputStream.flush();
+        // 发送数据到客户端
+        OutputStream outputStream = socket.getOutputStream();
+        byte[] initialData = hexStringToByteArray("25 03 00 00 00 02 C2 EF");
+        outputStream.write(initialData);
+        outputStream.flush();
 
-            // 接收客户端反馈的数据
-            InputStream inputStream = socket.getInputStream();
-            byte[] receivedBytes = new byte[1024];
-            int read = inputStream.read(receivedBytes);
-            String receivedMessage = bytesToHex(receivedBytes, read);
+        // 接收客户端反馈的数据
+        InputStream inputStream = socket.getInputStream();
+        byte[] receivedBytes = new byte[1024];
+        int read = inputStream.read(receivedBytes);
+        String receivedMessage = bytesToHex(receivedBytes, read);
 //            System.out.println("收到客户端反馈数据：" + receivedMessage);
 
-            // 提取并计算特定字节的数据
-            if (read >= 8) { // 确保接收到的字节数足够
-                int value1 = receivedBytes[4] & 0xFF; // 取第五个字节
-                int value2 = receivedBytes[6] & 0xFF; // 取第七个字节
-                int result = (value1 * 256) + value2;
-                double resultDouble = result / 10.0;
-                if (sendMap == null){
-                    System.out.println("sendMap为null");
-                    sendMap = new HashMap<>();
-                }
-                sendMap.put("rainfall", resultDouble + "mm");
+        // 提取并计算特定字节的数据
+        if (read >= 8) { // 确保接收到的字节数足够
+            int value1 = receivedBytes[4] & 0xFF; // 取第五个字节
+            int value2 = receivedBytes[6] & 0xFF; // 取第七个字节
+            int result = (value1 * 256) + value2;
+            double resultDouble = result / 10.0;
+            if (sendMap == null) {
+                System.out.println("sendMap为null");
+                sendMap = new HashMap<>();
             }
-            // 关闭流和套接字
-            inputStream.close();
-            outputStream.close();
-            socket.close();
+            sendMap.put("rainfall", resultDouble + "mm");
         }
+        // 关闭流和套接字
+        inputStream.close();
+        outputStream.close();
+        socket.close();
     }
 }

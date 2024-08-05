@@ -198,10 +198,10 @@ public class TCPController {
         dustMonitoringDevice.setPm25(sendMap.get("pm25"));
         dustMonitoringDevice.setPm10(sendMap.get("pm10"));
         dustMonitoringDevice.setNoise(sendMap.get("noise"));
-        dustMonitoringDevice.setWindSpeed(sendMap.get(""));
         sendMap.put("windSpeed", "");
-        dustMonitoringDevice.setWindDirection(sendMap.get(""));
+        dustMonitoringDevice.setWindSpeed(sendMap.get(""));
         sendMap.put("windDirection", "");
+        dustMonitoringDevice.setWindDirection(sendMap.get(""));
         dustMonitoringDevice.setTemperature(sendMap.get("temperature"));
         dustMonitoringDevice.setHumidity(sendMap.get("humidity"));
         dustMonitoringDevice.setPressure(sendMap.get("pressure"));

@@ -1,5 +1,6 @@
 package com.ruoyi.iot.controller;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.iot.domain.DustMonitoringDevice;
@@ -20,7 +21,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 @RestController
@@ -67,7 +70,7 @@ public class TCPController {
     }
 
     @GetMapping("/server4322")
-    @Scheduled(fixedRate = 35 * 1000)
+    @Scheduled(fixedRate = 10 * 60000)
     public void server4322() throws IOException {
         new Thread(this::handleConnection4322).start();
     }
@@ -107,12 +110,28 @@ public class TCPController {
             DustMonitoringDevice dustMonitoringDevice = new DustMonitoringDevice();
             setDustMonitoringDeviceData(dustMonitoringDevice);
 
-             hdyHttpUtils.pushIOT(sendMap);
-//            String jsonString = JSON.toJSONString(sendMap);
-//            System.out.println("扬尘JSON：" + jsonString);
-
             // 插入数据库
             dustMonitoringDeviceService.insertDustMonitoringDevice(dustMonitoringDevice);
+
+            // 创建value的Map
+            Map<String, Object> valueMap = new HashMap<>();
+            valueMap.put("body", sendMap);
+            valueMap.put("facturer", "深圳市蓝川科技有限公司/洞内气体检测仪");
+            String now = DateUtil.now();
+            valueMap.put("push_time", now);
+
+            // 创建values的List并添加valueMap
+            List<Map<String, Object>> valuesList = new ArrayList<>();
+            valuesList.add(valueMap);
+
+            // 创建根Map
+            Map<String, Object> rootMap = new HashMap<>();
+            rootMap.put("values", valuesList);
+//            hdyHttpUtils.pushIOT(rootMap);
+            String jsonString = JSON.toJSONString(sendMap);
+            System.out.println("扬尘JSON：" + jsonString);
+
+
 
             // 关闭流和套接字
             socket.close();
@@ -122,7 +141,7 @@ public class TCPController {
     }
 
     @GetMapping("/server4321")
-    @Scheduled(fixedRate = 30 * 1000)
+    @Scheduled(fixedRate = 9 * 60000)
     public void server4321() throws IOException {
         new Thread(this::handleConnection4321).start();
     }

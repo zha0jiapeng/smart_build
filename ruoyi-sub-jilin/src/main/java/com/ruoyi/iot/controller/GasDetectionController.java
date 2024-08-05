@@ -30,14 +30,14 @@ import java.util.concurrent.TimeUnit;
 public class GasDetectionController {
 
     @Resource
-    HdyHttpUtils swzkHttpUtils;
+    HdyHttpUtils hdyHttpUtils;
     @Autowired
     RedisCache redisCache;
     @RequestMapping("/listByThingsBoard")
-    public Map getGasGasDetection2(){
+    public Map getGasGasDetection(){
         Object thingsboardToken = redisCache.getCacheObject("thingsboard_token");
         if(thingsboardToken==null) {
-            String url = "192.168.1.201:8080/api/auth/login";
+            String url = "10.1.3.201:8080/api/auth/login";
             Map<String, Object> map = new HashMap();
             map.put("username", "1939291579@qq.com");
             map.put("password", "zhao521a.");
@@ -46,7 +46,7 @@ public class GasDetectionController {
             Object token = jsonObject.get("token");
             redisCache.setCacheObject("thingsboard_token",token,2, TimeUnit.HOURS);
         }
-        String url = "http://192.168.1.201:8080/api/plugins/telemetry/DEVICE/915b16e0-3069-11ef-b890-e5136757558e/values/timeseries";
+        String url = "http://10.1.3.201:8080/api/plugins/telemetry/DEVICE/8e018740-4b26-11ef-8d02-a5729e1018f3/values/timeseries";
         HttpResponse execute = HttpRequest.get(url).bearerAuth(thingsboardToken.toString()).execute();
         String body = execute.body();
         return JSON.parseObject(body,Map.class);
@@ -54,9 +54,10 @@ public class GasDetectionController {
 
     @Scheduled(cron = "0 */10 * * * *")
     private void pushSwzk() {
+        String now = DateUtil.now();
         Object thingsboardToken = redisCache.getCacheObject("thingsboard_token");
         if(thingsboardToken==null) {
-            String url = "192.168.1.201:8080/api/auth/login";
+            String url = "10.1.3.201:8080/api/auth/login";
             Map<String, Object> map = new HashMap();
             map.put("username", "1939291579@qq.com");
             map.put("password", "zhao521a.");
@@ -65,59 +66,42 @@ public class GasDetectionController {
             Object token = jsonObject.get("token");
             redisCache.setCacheObject("thingsboard_token",token,2, TimeUnit.HOURS);
         }
-        String url = "http://192.168.1.201:8080/api/plugins/telemetry/DEVICE/915b16e0-3069-11ef-b890-e5136757558e/values/timeseries";
+        String url = "http://10.1.3.201:8080/api/plugins/telemetry/DEVICE/8e018740-4b26-11ef-8d02-a5729e1018f3/values/timeseries";
         HttpResponse execute = HttpRequest.get(url).bearerAuth(thingsboardToken.toString()).execute();
         String body = execute.body();
+        Map map = JSON.parseObject(body, Map.class);
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("deviceCode", "5414A7750BBF");
+        dataMap.put("workStatus", "在线");
+        dataMap.put("status", "在线");
+        dataMap.put("so2", ((List<Map<String, Object>>)map.get("sulfur_dioxide")).get(0).get("value"));
+        dataMap.put("no2", ((List<Map<String, Object>>)map.get("nitrogen_dioxide")).get(0).get("value"));
+        dataMap.put("co", ((List<Map<String, Object>>)map.get("carbon_monoxide")).get(0).get("value"));
+        dataMap.put("co2", ((List<Map<String, Object>>)map.get("carbon_dioxide")).get(0).get("value"));
+        dataMap.put("o2", ((List<Map<String, Object>>)map.get("oxygen")).get(0).get("value"));
+        dataMap.put("ch4", ((List<Map<String, Object>>)map.get("methane")).get(0).get("value"));
+        dataMap.put("h2s", ((List<Map<String, Object>>)map.get("phosphine")).get(0).get("value"));
+        //dataMap.put("tvoc", "1");
+        dataMap.put("nh3", ((List<Map<String, Object>>)map.get("ammonia")).get(0).get("value"));
+        dataMap.put("dust", ((List<Map<String, Object>>)map.get("dust")).get(0).get("value"));
+        dataMap.put("dataTime", now);
+        dataMap.put("pushTime", now);
+        dataMap.put("other", "");
 
+        // 创建value的Map
+        Map<String, Object> valueMap = new HashMap<>();
+        valueMap.put("body", dataMap);
+        valueMap.put("facturer", "深圳市蓝川科技有限公司/洞内气体检测仪");
+        valueMap.put("push_time", now);
 
-        Map map1 = JSON.parseObject(body, Map.class);
-        List<Object> valus = new ArrayList<>();
-        List<Map<String,Object>> oxygen = (List<Map<String, Object>>) map1.get("oxygen");
-        Long ts = (Long) oxygen.get(0).get("ts");
-        Object value = oxygen.get(0).get("value");
-        Map swzkParam = new HashMap();
-        swzkParam.put("SN","youduyouhai1");
-        swzkParam.put("dataType","200300025"); //有毒有害气体
-        swzkParam.put("deviceType","2001000060"); //有毒有害气体
-        swzkParam.put("workAreaCode","YJBH-SSZGX_GQ-08"); //鸡冠河
-        Map<String,Object> map = new HashMap<>();
-        Map<String,Object> profile = new HashMap<>();
-        map.put("reportTs", DateUtil.currentSeconds());
-        profile.put("appType","environment");
-        profile.put("modelId","2055");
-        profile.put("poiCode","w0907001");
-        profile.put("name","8#支洞内有毒有害气体监测");
-        profile.put("model","型号");
-        profile.put("manufacture","");
-        profile.put("owner","");
-        profile.put("makeDate","2024-06-25");
-        profile.put("validYear","2024-06-25");
-        profile.put("status","01");
-        profile.put("installPosition","");
-        profile.put("x","112");
-        profile.put("y","112");
-        profile.put("z","110");
-        map.put("profile", profile);
-        Map<String,Object> properties = new HashMap<>();
-        properties.put("monitorTime",DateUtil.format(DateUtil.date(ts),"yyyy-MM-dd HH:mm:ss"));
+        // 创建values的List并添加valueMap
+        List<Map<String, Object>> valuesList = new ArrayList<>();
+        valuesList.add(valueMap);
 
-        properties.put("co",value);
-        properties.put("co2",((List<Map<String, Object>>)map1.get("carbon_dioxide")).get(0).get("value"));
-        properties.put("so2",((List<Map<String, Object>>)map1.get("sulfur_dioxide")).get(0).get("value"));
-        properties.put("so",0); //无指标
-        properties.put("ch4",((List<Map<String, Object>>)map1.get("methane")).get(0).get("value"));
-        properties.put("location","1");
-        properties.put("x","0");
-        properties.put("y","0");
-        properties.put("z","0");
-        map.put("properties",properties);
-        map.put("events",new Object());
-        map.put("services",new Object());
-
-        valus.add(map);
-        swzkParam.put("values",valus);
-
-        swzkHttpUtils.pushIOT(swzkParam);
+        // 创建根Map
+        Map<String, Object> rootMap = new HashMap<>();
+        rootMap.put("values", valuesList);
+        hdyHttpUtils.pushIOT(rootMap);
     }
 
 }

@@ -13,7 +13,7 @@ import com.ruoyi.iot.domain.AdmissionEducationUser;
 import com.ruoyi.iot.mapper.AdmissionEducationMapper;
 import com.ruoyi.iot.service.IAdmissionEducationService;
 import com.ruoyi.iot.service.IAdmissionEducationUserService;
-import com.ruoyi.iot.utils.SwzkHttpUtils;
+//import com.ruoyi.iot.utils.SwzkHttpUtils;
 import com.ruoyi.system.domain.SysWorkPeople;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysUserService;
@@ -49,8 +49,8 @@ public class AdmissionEducationServiceImpl extends ServiceImpl<AdmissionEducatio
     @Autowired
     private IAdmissionEducationUserService admissionEducationUserService;
 
-    @Resource
-    SwzkHttpUtils swzkHttpUtils;
+//    @Resource
+//    SwzkHttpUtils swzkHttpUtils;
     /**
      * 查询入场三级教育
      * 
@@ -217,7 +217,7 @@ public class AdmissionEducationServiceImpl extends ServiceImpl<AdmissionEducatio
         values.add(value);
         root.put("values", values);
 
-        swzkHttpUtils.pushIOT(root);
+      //  swzkHttpUtils.pushIOT(root);
     }
     /**
      * 批量删除入场三级教育

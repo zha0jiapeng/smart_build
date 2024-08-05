@@ -6,7 +6,6 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.ruoyi.iot.utils.SwzkHttpUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,8 +23,8 @@ import java.util.Map;
 @RequestMapping("/peopleLocation")
 public class PeopleLocationController {
 
-    @Resource
-    SwzkHttpUtils swzkHttpUtils;
+//    @Resource
+//    SwzkHttpUtils swzkHttpUtils;
 
 
     @PostMapping("/outTunnelLocation")
@@ -44,12 +43,13 @@ public class PeopleLocationController {
     }
 
 
-    @Scheduled(cron = "0 */1 * * * *")
+    //@Scheduled(cron = "0 */1 * * * *")
     private void pushSwzkOut() {
-        HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501:9501/push/list")
-                .body(JSON.toJSONString(new Object()), "application/json")
+        Map<String,Object> req = new HashMap();
+        req.put("map_id","1");
+        HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501/push/list")
+                .body(JSON.toJSONString(req), "application/json")
                 .execute();
-
         String body = execute.body();
         Map parse = JSONObject.parseObject(body, Map.class);
         Map<String, String> bodyMap = new HashMap<>();

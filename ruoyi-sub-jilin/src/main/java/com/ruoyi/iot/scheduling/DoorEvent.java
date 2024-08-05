@@ -41,7 +41,7 @@ public class DoorEvent {
 //    @Resource
 //    SwzkHttpUtils swzkHttpUtils;
 
-    @Scheduled(cron = "0 */10 * * * ?")
+   // @Scheduled(cron = "0 */10 * * * ?")
     public void execute() {
         DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
         Map<String,Object> map = new HashMap<String, Object>();

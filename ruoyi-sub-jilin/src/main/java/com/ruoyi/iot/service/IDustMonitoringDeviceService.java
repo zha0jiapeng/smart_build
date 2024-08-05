@@ -60,4 +60,7 @@ public interface IDustMonitoringDeviceService  extends IService<DustMonitoringDe
      * @return 结果
      */
     public int deleteDustMonitoringDeviceById(Long id);
+
+
+    public DustMonitoringDevice selectDustMonitoringDeviceNow();
 }

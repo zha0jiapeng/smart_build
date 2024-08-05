@@ -1,5 +1,6 @@
 package com.ruoyi.iot.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
@@ -95,4 +96,13 @@ public class DustMonitoringDeviceServiceImpl extends ServiceImpl<DustMonitoringD
     {
         return dustMonitoringDeviceMapper.deleteDustMonitoringDeviceById(id);
     }
+
+    @Override
+    public DustMonitoringDevice selectDustMonitoringDeviceNow()
+    {
+        QueryWrapper<DustMonitoringDevice> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("id").last("LIMIT 1");
+        return dustMonitoringDeviceMapper.selectOne(queryWrapper);
+    }
+
 }

@@ -115,4 +115,15 @@ public class DustMonitoringDeviceController extends BaseController
     {
         return toAjax(dustMonitoringDeviceService.deleteDustMonitoringDeviceByIds(ids));
     }
+
+
+    /**
+     * 查询最新一条记录扬尘监测仪
+     */
+    @GetMapping("/latestRecord")
+    @ApiOperation("查询最新一条记录扬尘监测仪")
+    public AjaxResult latestRecord()
+    {
+        return success(dustMonitoringDeviceService.selectDustMonitoringDeviceNow());
+    }
 }

@@ -8,9 +8,9 @@ import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.core.redis.RedisCache;
 
 import com.ruoyi.iot.enums.IndexType;
+import com.ruoyi.iot.utils.HdyHttpUtils;
 import com.ruoyi.iot.utils.Modbus4jReadUtil;
 import com.ruoyi.iot.utils.ModbusTcpMaster;
-import com.ruoyi.iot.utils.SwzkHttpUtils;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.code.DataType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class GasDetectionController {
 
     @Resource
-    SwzkHttpUtils swzkHttpUtils;
+    HdyHttpUtils swzkHttpUtils;
     @RequestMapping("/list")
     public List<Map<String,Object>> getGasGasDetection(){
         ModbusMaster master = new ModbusTcpMaster().getSlave("192.168.103.178", 6066);

@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSON;
 import com.ruoyi.iot.bean.Staff;
-import com.ruoyi.iot.utils.SwzkHttpUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,8 +19,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/people")
 public class PeopleController {
-    @Resource
-    SwzkHttpUtils swzkHttpUtils;
+//    @Resource
+//    SwzkHttpUtils swzkHttpUtils;
     @RequestMapping("/import")
     public Map<String,Object> excelImport(@RequestParam("file") MultipartFile file ){
         try {
@@ -97,7 +96,7 @@ public class PeopleController {
         // 将 valuesList 加入到顶层结构
         dataMap.put("values", valuesList);
 
-        swzkHttpUtils.pushIOT(dataMap);
+      //  swzkHttpUtils.pushIOT(dataMap);
     }
 
 }

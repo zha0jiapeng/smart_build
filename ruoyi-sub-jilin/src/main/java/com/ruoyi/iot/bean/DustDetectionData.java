@@ -1,4 +1,4 @@
-package com.ruoyi.iot.controller;
+package com.ruoyi.iot.bean;
 
 import lombok.Data;
 

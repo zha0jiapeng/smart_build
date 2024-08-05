@@ -2,7 +2,6 @@ package com.ruoyi.iot.controller;
 
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
-import com.ruoyi.iot.utils.SwzkHttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +22,8 @@ public class CarGateController {
     @Resource
     RedisTemplate redisTemplate;
 
-    @Resource
-    SwzkHttpUtils swzkHttpUtils;
+//    @Resource
+//    SwzkHttpUtils swzkHttpUtils;
 
 
 
@@ -99,7 +98,7 @@ public class CarGateController {
         rootMap.put("values", new Map[]{valuesItem});
 
         // Now rootMap contains the structured data
-        swzkHttpUtils.pushIOT(rootMap);
+       // swzkHttpUtils.pushIOT(rootMap);
 
     }
 

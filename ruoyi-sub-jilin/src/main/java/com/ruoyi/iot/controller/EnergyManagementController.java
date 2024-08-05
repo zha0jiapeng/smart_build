@@ -9,7 +9,6 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.iot.utils.SwzkHttpUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -48,9 +47,9 @@ public class EnergyManagementController {
 
     @Value("${em.python}")
     String pythonPath;
-
-    @Resource
-    SwzkHttpUtils swzkHttpUtils;
+//
+//    @Resource
+//    SwzkHttpUtils swzkHttpUtils;
 
 
     @GetMapping("ammeterDataSummary")
@@ -166,7 +165,7 @@ public class EnergyManagementController {
         valuesList.add(valuesMap);
 
         rootMap.put("values", valuesList);
-        swzkHttpUtils.pushIOT(rootMap);
+      //  swzkHttpUtils.pushIOT(rootMap);
     }
 
     /**

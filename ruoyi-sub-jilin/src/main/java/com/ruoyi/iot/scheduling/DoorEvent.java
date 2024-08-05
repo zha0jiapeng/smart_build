@@ -8,7 +8,6 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.iot.bean.DoorFunctionApi;
 import com.ruoyi.iot.bean.EventsRequest;
-import com.ruoyi.iot.utils.SwzkHttpUtils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,8 +38,8 @@ public class DoorEvent {
     private static final int WELINK_MODEL_ID = 200362;
     private static final Logger logger = LogManager.getLogger(DoorEvent.class);
 
-    @Resource
-    SwzkHttpUtils swzkHttpUtils;
+//    @Resource
+//    SwzkHttpUtils swzkHttpUtils;
 
     @Scheduled(cron = "0 */10 * * * ?")
     public void execute() {
@@ -139,7 +138,7 @@ public class DoorEvent {
        }
        mainMap.put("values", valuesList);
        logger.info("门禁推送：{}",JSON.toJSONString(mainMap));
-       swzkHttpUtils.pushIOT(mainMap);
+    //   swzkHttpUtils.pushIOT(mainMap);
    }
 
     public static void main(String[] args) {

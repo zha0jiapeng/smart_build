@@ -107,9 +107,9 @@ public class TCPController {
             DustMonitoringDevice dustMonitoringDevice = new DustMonitoringDevice();
             setDustMonitoringDeviceData(dustMonitoringDevice);
 
-            // hdyHttpUtils.pushIOT(sendMap);
-            String jsonString = JSON.toJSONString(sendMap);
-            System.out.println("扬尘JSON：" + jsonString);
+             hdyHttpUtils.pushIOT(sendMap);
+//            String jsonString = JSON.toJSONString(sendMap);
+//            System.out.println("扬尘JSON：" + jsonString);
 
             // 插入数据库
             dustMonitoringDeviceService.insertDustMonitoringDevice(dustMonitoringDevice);
@@ -187,8 +187,8 @@ public class TCPController {
         dustMonitoringDevice.setHumidity(sendMap.get("humidity"));
         dustMonitoringDevice.setPressure(sendMap.get("pressure"));
         dustMonitoringDevice.setRainfall(sendMap.get("rainfall"));
-        dustMonitoringDevice.setStatus(sendMap.get("在线"));
         sendMap.put("status", "在线");
+        dustMonitoringDevice.setStatus(sendMap.get("在线"));
 
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -244,6 +244,7 @@ public class TCPController {
             int lowByte = receivedBytes[4] & 0xFF;
             int noise = (highByte << 8) | lowByte;
             double actualNoise = noise / 10.0;
+            sendMap.put("noise", actualNoise + "dB");
         }
     }
 
@@ -253,7 +254,7 @@ public class TCPController {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int PM2_5 = (highByte << 8) | lowByte;
-            sendMap.put("PM25", PM2_5 + "ug/m³");
+            sendMap.put("pm25", PM2_5 + "ug/m³");
         }
     }
 
@@ -263,7 +264,7 @@ public class TCPController {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int PM10 = (highByte << 8) | lowByte;
-            sendMap.put("PM10", PM10 + "ug/m³");
+            sendMap.put("pm10", PM10 + "ug/m³");
         }
     }
 

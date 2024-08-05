@@ -35,5 +35,5 @@ public class TcpClient {
             e.printStackTrace();
         }
         return "";
-    }//18058518487
+    }
 }

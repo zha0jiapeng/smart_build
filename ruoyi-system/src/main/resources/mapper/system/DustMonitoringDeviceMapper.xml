@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.iot.mapper.DustMonitoringDeviceMapper">
+    
+    <resultMap type="DustMonitoringDevice" id="DustMonitoringDeviceResult">
+        <result property="id"    column="id"    />
+        <result property="protalId"    column="protal_id"    />
+        <result property="subProjectId"    column="sub_project_id"    />
+        <result property="deviceCode"    column="device_code"    />
+        <result property="workStatus"    column="work_status"    />
+        <result property="pm25"    column="pm25"    />
+        <result property="pm10"    column="pm10"    />
+        <result property="noise"    column="noise"    />
+        <result property="windSpeed"    column="wind_speed"    />
+        <result property="windDirection"    column="wind_direction"    />
+        <result property="temperature"    column="temperature"    />
+        <result property="humidity"    column="humidity"    />
+        <result property="pressure"    column="pressure"    />
+        <result property="rainfall"    column="rainfall"    />
+        <result property="status"    column="status"    />
+        <result property="other"    column="other"    />
+        <result property="pushTime"    column="push_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectDustMonitoringDeviceVo">
+        select id, protal_id, sub_project_id, device_code, work_status, pm25, pm10, noise, wind_speed, wind_direction, temperature, humidity, pressure, rainfall, status, other, push_time, create_by, create_time, update_by, update_time, remark from dust_monitoring_device
+    </sql>
+
+    <select id="selectDustMonitoringDeviceList" parameterType="DustMonitoringDevice" resultMap="DustMonitoringDeviceResult">
+        <include refid="selectDustMonitoringDeviceVo"/>
+        <where>  
+            <if test="protalId != null  and protalId != ''"> and protal_id = #{protalId}</if>
+            <if test="subProjectId != null  and subProjectId != ''"> and sub_project_id = #{subProjectId}</if>
+            <if test="deviceCode != null  and deviceCode != ''"> and device_code = #{deviceCode}</if>
+            <if test="workStatus != null  and workStatus != ''"> and work_status = #{workStatus}</if>
+            <if test="pm25 != null  and pm25 != ''"> and pm25 = #{pm25}</if>
+            <if test="pm10 != null  and pm10 != ''"> and pm10 = #{pm10}</if>
+            <if test="noise != null  and noise != ''"> and noise = #{noise}</if>
+            <if test="windSpeed != null  and windSpeed != ''"> and wind_speed = #{windSpeed}</if>
+            <if test="windDirection != null  and windDirection != ''"> and wind_direction = #{windDirection}</if>
+            <if test="temperature != null  and temperature != ''"> and temperature = #{temperature}</if>
+            <if test="humidity != null  and humidity != ''"> and humidity = #{humidity}</if>
+            <if test="pressure != null  and pressure != ''"> and pressure = #{pressure}</if>
+            <if test="rainfall != null  and rainfall != ''"> and rainfall = #{rainfall}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="other != null  and other != ''"> and other = #{other}</if>
+            <if test="pushTime != null  and pushTime != ''"> and push_time = #{pushTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectDustMonitoringDeviceById" parameterType="Long" resultMap="DustMonitoringDeviceResult">
+        <include refid="selectDustMonitoringDeviceVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDustMonitoringDevice" parameterType="DustMonitoringDevice">
+        insert into dust_monitoring_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="protalId != null">protal_id,</if>
+            <if test="subProjectId != null">sub_project_id,</if>
+            <if test="deviceCode != null">device_code,</if>
+            <if test="workStatus != null">work_status,</if>
+            <if test="pm25 != null">pm25,</if>
+            <if test="pm10 != null">pm10,</if>
+            <if test="noise != null">noise,</if>
+            <if test="windSpeed != null">wind_speed,</if>
+            <if test="windDirection != null">wind_direction,</if>
+            <if test="temperature != null">temperature,</if>
+            <if test="humidity != null">humidity,</if>
+            <if test="pressure != null">pressure,</if>
+            <if test="rainfall != null">rainfall,</if>
+            <if test="status != null">status,</if>
+            <if test="other != null">other,</if>
+            <if test="pushTime != null">push_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="protalId != null">#{protalId},</if>
+            <if test="subProjectId != null">#{subProjectId},</if>
+            <if test="deviceCode != null">#{deviceCode},</if>
+            <if test="workStatus != null">#{workStatus},</if>
+            <if test="pm25 != null">#{pm25},</if>
+            <if test="pm10 != null">#{pm10},</if>
+            <if test="noise != null">#{noise},</if>
+            <if test="windSpeed != null">#{windSpeed},</if>
+            <if test="windDirection != null">#{windDirection},</if>
+            <if test="temperature != null">#{temperature},</if>
+            <if test="humidity != null">#{humidity},</if>
+            <if test="pressure != null">#{pressure},</if>
+            <if test="rainfall != null">#{rainfall},</if>
+            <if test="status != null">#{status},</if>
+            <if test="other != null">#{other},</if>
+            <if test="pushTime != null">#{pushTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDustMonitoringDevice" parameterType="DustMonitoringDevice">
+        update dust_monitoring_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="protalId != null">protal_id = #{protalId},</if>
+            <if test="subProjectId != null">sub_project_id = #{subProjectId},</if>
+            <if test="deviceCode != null">device_code = #{deviceCode},</if>
+            <if test="workStatus != null">work_status = #{workStatus},</if>
+            <if test="pm25 != null">pm25 = #{pm25},</if>
+            <if test="pm10 != null">pm10 = #{pm10},</if>
+            <if test="noise != null">noise = #{noise},</if>
+            <if test="windSpeed != null">wind_speed = #{windSpeed},</if>
+            <if test="windDirection != null">wind_direction = #{windDirection},</if>
+            <if test="temperature != null">temperature = #{temperature},</if>
+            <if test="humidity != null">humidity = #{humidity},</if>
+            <if test="pressure != null">pressure = #{pressure},</if>
+            <if test="rainfall != null">rainfall = #{rainfall},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="other != null">other = #{other},</if>
+            <if test="pushTime != null">push_time = #{pushTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDustMonitoringDeviceById" parameterType="Long">
+        delete from dust_monitoring_device where id = #{id}
+    </delete>
+
+    <delete id="deleteDustMonitoringDeviceByIds" parameterType="String">
+        delete from dust_monitoring_device where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

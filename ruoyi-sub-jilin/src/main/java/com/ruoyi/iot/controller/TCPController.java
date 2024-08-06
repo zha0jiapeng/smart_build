@@ -116,7 +116,7 @@ public class TCPController {
             // 创建value的Map
             Map<String, Object> valueMap = new HashMap<>();
             valueMap.put("body", sendMap);
-            valueMap.put("facturer", "深圳市蓝川科技有限公司/洞内气体检测仪");
+            valueMap.put("facturer", "山东万象环境科技有限公司/洞外扬尘噪音监测");
             String now = DateUtil.now();
             valueMap.put("push_time", now);
 

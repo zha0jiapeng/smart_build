@@ -13,12 +13,12 @@ import java.util.Map;
 @Component
 public class HdyHttpUtils {
 
-    public String pushIOT(Map param){
-        param.put("portalId", "1751847977770553345");
-        param.put("subProjectId", "1763492186013306882");
-        log.info("push hdy request:{}", JSON.toJSONString(param, SerializerFeature.WriteMapNullValue));
-        HttpResponse execute = HttpRequest.put("https://iot.ecidihdjg.com:18443/sdata/rest/dataservice/rest/standard/0828707d-f9ea-41fe-a2ba-fa7ac8741a77")
+    public String pushIOT(Map param,String rid){
+        //param.put("subProjectId", "1763492186013306882");
+        log.info("push hdy url:{} , request:{}", "http://10.0.100.23:18080/sdata/rest/dataservice/rest/standard/"+rid ,JSON.toJSONString(param, SerializerFeature.WriteMapNullValue));
+        HttpResponse execute = HttpRequest.put("http://10.0.100.23:18080/sdata/rest/dataservice/rest/standard/"+rid)
                 .body(JSON.toJSONString(param, SerializerFeature.WriteMapNullValue), "application/json").execute();
+        log.info("push hdy url:{} , response:{}", "http://10.0.100.23:18080/sdata/rest/dataservice/rest/standard/"+rid ,execute.body());
         return execute.body();
     }
 }

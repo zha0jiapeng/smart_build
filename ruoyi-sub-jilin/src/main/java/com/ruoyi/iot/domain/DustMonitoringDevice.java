@@ -49,19 +49,19 @@ private static final long serialVersionUID=1L;
 
     /** PM2.5 */
     @ApiModelProperty(value = "PM2.5")
-    private String pm25;
+    private BigDecimal pm25;
 
     /** PM10 */
     @ApiModelProperty(value = "PM10")
-    private String pm10;
+    private BigDecimal pm10;
 
     /** 噪音 */
     @ApiModelProperty(value = "噪音")
-    private String noise;
+    private BigDecimal noise;
 
     /** 风速 */
     @ApiModelProperty(value = "风速")
-    private String windSpeed;
+    private BigDecimal windSpeed;
 
     /** 风向 */
     @ApiModelProperty(value = "风向")
@@ -69,19 +69,19 @@ private static final long serialVersionUID=1L;
 
     /** 温度 */
     @ApiModelProperty(value = "温度")
-    private String temperature;
+    private BigDecimal temperature;
 
     /** 湿度 */
     @ApiModelProperty(value = "湿度")
-    private String humidity;
+    private BigDecimal humidity;
 
     /** 气压 */
     @ApiModelProperty(value = "气压")
-    private String pressure;
+    private BigDecimal pressure;
 
     /** 雨量 */
     @ApiModelProperty(value = "雨量")
-    private String rainfall;
+    private BigDecimal rainfall;
 
     /** 状态 */
     @ApiModelProperty(value = "状态")

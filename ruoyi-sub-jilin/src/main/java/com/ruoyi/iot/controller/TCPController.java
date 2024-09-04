@@ -3,6 +3,7 @@ package com.ruoyi.iot.controller;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.iot.domain.DustMonitoringDevice;
 import com.ruoyi.iot.service.IDustMonitoringDeviceService;
 import com.ruoyi.iot.utils.HdyHttpUtils;
@@ -17,6 +18,8 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
@@ -45,7 +48,7 @@ public class TCPController {
 //        commandHandlers.put("02 03 00 01 00 01 D5 F9", TCPController::handleWinSpeedResponse);
     }
 
-    private static Map<String, String> sendMap = new HashMap<>();
+    private static Map<String, Object> sendMap = new HashMap<>();
 
     @Resource
     HdyHttpUtils hdyHttpUtils;
@@ -70,7 +73,7 @@ public class TCPController {
     }
 
     @GetMapping("/server4322")
-    @Scheduled(fixedRate = 10 * 60000)
+    @Scheduled(cron = "0 */1 * * * *")
     public void server4322() throws IOException {
         new Thread(this::handleConnection4322).start();
     }
@@ -113,23 +116,15 @@ public class TCPController {
             // 插入数据库
             dustMonitoringDeviceService.insertDustMonitoringDevice(dustMonitoringDevice);
 
-            // 创建value的Map
-            Map<String, Object> valueMap = new HashMap<>();
-            valueMap.put("body", sendMap);
-            valueMap.put("facturer", "山东万象环境科技有限公司/洞外扬尘噪音监测");
-            String now = DateUtil.now();
-            valueMap.put("push_time", now);
 
             // 创建values的List并添加valueMap
             List<Map<String, Object>> valuesList = new ArrayList<>();
-            valuesList.add(valueMap);
+            valuesList.add(sendMap);
 
             // 创建根Map
             Map<String, Object> rootMap = new HashMap<>();
             rootMap.put("values", valuesList);
-//            hdyHttpUtils.pushIOT(rootMap);
-            String jsonString = JSON.toJSONString(sendMap);
-            System.out.println("扬尘JSON：" + jsonString);
+            hdyHttpUtils.pushIOT(rootMap,"f69f70f2-9fe6-49e6-bfcf-a062421cb1d2");
 
 
 
@@ -141,7 +136,7 @@ public class TCPController {
     }
 
     @GetMapping("/server4321")
-    @Scheduled(fixedRate = 9 * 60000)
+    @Scheduled(cron = "0 */1 * * * *")
     public void server4321() throws IOException {
         new Thread(this::handleConnection4321).start();
     }
@@ -178,7 +173,7 @@ public class TCPController {
                 if (sendMap == null) {
                     sendMap = new HashMap<>();
                 }
-                sendMap.put("rainfall", resultDouble + "mm");
+                sendMap.put("rainfall", resultDouble);
             }
 
             // 关闭流和套接字
@@ -191,36 +186,42 @@ public class TCPController {
     }
 
     private void setDustMonitoringDeviceData(DustMonitoringDevice dustMonitoringDevice) {
-        sendMap.put("deviceCode", "2407052002LXY-02");
+        String now = DateUtil.now();
+        sendMap.put("device_code", "2407052002LXY-02");
         dustMonitoringDevice.setDeviceCode("2407052002LXY-02");
-        sendMap.put("workStatus", "在线");
         dustMonitoringDevice.setWorkStatus("在线");
-        dustMonitoringDevice.setPm25(sendMap.get("pm25"));
-        dustMonitoringDevice.setPm10(sendMap.get("pm10"));
-        dustMonitoringDevice.setNoise(sendMap.get("noise"));
-        sendMap.put("windSpeed", "");
-        dustMonitoringDevice.setWindSpeed(sendMap.get(""));
-        sendMap.put("windDirection", "");
-        dustMonitoringDevice.setWindDirection(sendMap.get(""));
-        dustMonitoringDevice.setTemperature(sendMap.get("temperature"));
-        dustMonitoringDevice.setHumidity(sendMap.get("humidity"));
-        dustMonitoringDevice.setPressure(sendMap.get("pressure"));
-        dustMonitoringDevice.setRainfall(sendMap.get("rainfall"));
+        dustMonitoringDevice.setPm25(new BigDecimal(sendMap.get("pm25").toString()));
+        dustMonitoringDevice.setPm10(new BigDecimal(sendMap.get("pm10").toString()));
+        dustMonitoringDevice.setNoise(new BigDecimal(sendMap.get("noise").toString()));
+        sendMap.put("wind_speed", "0");
+        dustMonitoringDevice.setWindSpeed(new BigDecimal(sendMap.get("wind_speed").toString()));
+        sendMap.put("wind_direction", "");
+        dustMonitoringDevice.setWindDirection(sendMap.get("wind_direction").toString());
+        dustMonitoringDevice.setTemperature(new BigDecimal(sendMap.get("temperature").toString()));
+        dustMonitoringDevice.setHumidity(new BigDecimal(sendMap.get("humidity").toString()));
+        dustMonitoringDevice.setPressure(new BigDecimal(sendMap.get("pressure").toString()));
+        dustMonitoringDevice.setRainfall(new BigDecimal(sendMap.get("rainfall").toString()));
+        DustMonitoringDevice lastMonitor = dustMonitoringDeviceService.getOne(new LambdaQueryWrapper<DustMonitoringDevice>()
+                        .eq(DustMonitoringDevice::getDeviceCode, dustMonitoringDevice.getDeviceCode())
+                        .orderByDesc(DustMonitoringDevice::getCreateTime).last("limit 1")
+                , false);
+        if(lastMonitor!=null){
+            sendMap.put("rainfall", new BigDecimal(sendMap.get("rainfall").toString()).subtract(lastMonitor.getRainfall()).setScale(2, RoundingMode.HALF_UP).toString());
+        }else {
+            sendMap.put("rainfall", new BigDecimal(sendMap.get("rainfall").toString()));
+        }
         sendMap.put("status", "在线");
-        dustMonitoringDevice.setStatus(sendMap.get("在线"));
-
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedNow = now.format(formatter);
-        sendMap.put("pushTime", formattedNow);
-        dustMonitoringDevice.setPushTime(sendMap.get("pushTime"));
+        dustMonitoringDevice.setStatus(sendMap.get("status").toString());
+        sendMap.put("date_time", now);
+        sendMap.put("push_time", now);
+        sendMap.put("portal_id", "1751847977770553345");
+        dustMonitoringDevice.setPushTime(sendMap.get("push_time").toString());
         sendMap.put("other", "");
-        dustMonitoringDevice.setOther(sendMap.get("other"));
+        dustMonitoringDevice.setOther(sendMap.get("other").toString());
         dustMonitoringDevice.setProtalId("1751847977770553345");
         dustMonitoringDevice.setSubProjectId("1763492186013306882");
 
-        String jsonString = JSON.toJSONString(sendMap);
-        System.out.println("扬尘JSON：" + jsonString);
+
     }
 
     // 处理温度响应的方法
@@ -230,7 +231,7 @@ public class TCPController {
             int lowByte = receivedBytes[4] & 0xFF;
             int temperature = (highByte << 8) | lowByte;
             double actualTemperature = temperature / 100.0;
-            sendMap.put("temperature", actualTemperature + "°C");
+            sendMap.put("temperature", actualTemperature);
         }
     }
 
@@ -241,7 +242,7 @@ public class TCPController {
             int lowByte = receivedBytes[4] & 0xFF;
             int humidity = (highByte << 8) | lowByte;
             double actualHumidity = humidity / 100.0;
-            sendMap.put("humidity", actualHumidity + "%RH");
+            sendMap.put("humidity", actualHumidity);
         }
     }
 
@@ -252,7 +253,7 @@ public class TCPController {
             int lowByte = receivedBytes[4] & 0xFF;
             int pressure = (highByte << 8) | lowByte;
             double actualPressure = pressure / 100.0;
-            sendMap.put("pressure", actualPressure + "Kpa");
+            sendMap.put("pressure", actualPressure );
         }
     }
 
@@ -263,7 +264,7 @@ public class TCPController {
             int lowByte = receivedBytes[4] & 0xFF;
             int noise = (highByte << 8) | lowByte;
             double actualNoise = noise / 10.0;
-            sendMap.put("noise", actualNoise + "dB");
+            sendMap.put("noise", actualNoise );
         }
     }
 
@@ -273,7 +274,7 @@ public class TCPController {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int PM2_5 = (highByte << 8) | lowByte;
-            sendMap.put("pm25", PM2_5 + "ug/m³");
+            sendMap.put("pm25", PM2_5);
         }
     }
 
@@ -283,7 +284,7 @@ public class TCPController {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int PM10 = (highByte << 8) | lowByte;
-            sendMap.put("pm10", PM10 + "ug/m³");
+            sendMap.put("pm10", PM10 );
         }
     }
 

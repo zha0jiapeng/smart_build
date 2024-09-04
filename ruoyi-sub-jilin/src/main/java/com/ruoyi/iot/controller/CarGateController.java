@@ -4,10 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -28,15 +25,8 @@ public class CarGateController {
 
 
     @PostMapping("/carAccess")
-    public Map<String,Object> carAccess(Map<String,Object> request) {
+    public Map<String,Object> carAccess(@RequestBody Map<String,Object> request) {
         log.info("carAccess:{}",JSON.toJSONString(request));
-        Object type = request.get("type");
-        if(!"online".equals(type.toString())) return null;
-        redisTemplate.opsForValue().set("carAccess",JSON.toJSONString(request));
-        String dateKey = DateUtil.format(new Date(Long.parseLong(request.get("start_time").toString())), "yyyy-MM-dd");
-        // Generate a unique hash key for the record, e.g., using the timestamp
-        String hashKey = DateUtil.now();
-        redisTemplate.opsForHash().put(dateKey, hashKey, dateKey);
         return request;
     }
 

@@ -6,6 +6,8 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.iot.utils.HdyHttpUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,8 +25,8 @@ import java.util.Map;
 @RequestMapping("/peopleLocation")
 public class PeopleLocationController {
 
-//    @Resource
-//    SwzkHttpUtils swzkHttpUtils;
+    @Resource
+    HdyHttpUtils hdyHttpUtils;
 
 
     @PostMapping("/outTunnelLocation")
@@ -39,47 +41,62 @@ public class PeopleLocationController {
                 .body(JSON.toJSONString(request), "application/json")
                 .execute();
         String body = execute.body();
-        return JSONObject.parseObject(body, Map.class);
+        Map map = JSONObject.parseObject(body, Map.class);
+        return map;
     }
 
 
-    //@Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     private void pushSwzkOut() {
-        Map<String,Object> req = new HashMap();
-        req.put("map_id","1");
+        Map<String,Object> request = new HashMap();
         HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501/push/list")
-                .body(JSON.toJSONString(req), "application/json")
+                .body(JSON.toJSONString(request), "application/json")
                 .execute();
         String body = execute.body();
         Map parse = JSONObject.parseObject(body, Map.class);
-        Map<String, String> bodyMap = new HashMap<>();
-        bodyMap.put("deviceNumber", parse.get("tid").toString());
-        bodyMap.put("tabWorkStatus", "在线");
-        bodyMap.put("positionX", parse.get("result_x").toString());
-        bodyMap.put("positionY", parse.get("result_y").toString());
-        bodyMap.put("positionZ", parse.get("result_z").toString());
-        bodyMap.put("power", parse.get("bat").toString());
-        bodyMap.put("tabStatus", parse.get("speed").toString());
-        bodyMap.put("sosStatus", "");
-        bodyMap.put("positionTime",  parse.get("time").toString());
-        bodyMap.put("localStation","");
-        bodyMap.put("deviceCode", "jizhan1");
-        bodyMap.put("InOrOut", "洞外");
-        bodyMap.put("pushTime", DateUtil.now());
-        bodyMap.put("other", "");
+        List<Map<String, Object>> datee = (List<Map<String, Object>>) parse.get("data");
+        String now = DateUtil.now();
+        for (Map<String, Object> map : datee) {
+            // 创建存储设备数据的 Map
+            Map<String, Object> deviceData = new HashMap<>();
+            deviceData.put("device_id", "1");
+            deviceData.put("sub_project_id", "1801194524869922817");
+            deviceData.put("device_code", "3009f9b0bb24");
+            deviceData.put("work_status", "1");
+            deviceData.put("power_on_status", "1");
+            double[] doubles = XYToCoordinates(Double.parseDouble(map.get("result_x").toString()), Double.parseDouble(map.get("result_y").toString()));
+            deviceData.put("position_x", doubles[0]);
+            deviceData.put("position_y", doubles[1]);
+            deviceData.put("position_z", map.get("result_z") );
+            deviceData.put("sos_status", "0");
+            deviceData.put("distance", 0.0);
+            deviceData.put("data_time",  DateUtil.date(Long.parseLong(map.get("time").toString())*1000).toString("yyyy-MM-dd HH:mm:ss"));
+            deviceData.put("push_time", now);
+            deviceData.put("other", "");
 
-        // 创建values部分
-        Map<String, Object> valuesMap = new HashMap<>();
-        valuesMap.put("body", bodyMap);
-        valuesMap.put("facturer", "人员定位基站");
-        valuesMap.put("push_time",DateUtil.now());
+            // 将设备数据放入 List 中
+            List<Map<String, Object>> values = new ArrayList<>();
+            values.add(deviceData);
 
-        // 创建最外层的Map
-        Map<String, Object> mainMap = new HashMap<>();
-        mainMap.put("values", new Map[] { valuesMap });
+            // 创建总的 Map 并将 List 放入其中
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("values", values);
+            hdyHttpUtils.pushIOT(resultMap,"199a5516-f4c3-45d0-ac7b-e30d73ffa595");
+        }
 
+    }
+    public static double[] XYToCoordinates(double resultX, double resultY) {
+        double[] center = {14002825, -5164160};  // 中心坐标
 
+        // x 坐标计算
+        double x = ((resultX * 1.34 + center[0]) / 20037508.342789) * 180;
 
+        // y 坐标计算
+        double y = ((resultY * 1.34 + center[1]) / 20037508.342789) * 180;
+        y = (-180 / Math.PI) * (2 * Math.atan(Math.exp((y * Math.PI) / 180)) - Math.PI / 2);
+
+        // 返回转换后的 x, y 坐标
+        return new double[] {x, y};
     }
 
 

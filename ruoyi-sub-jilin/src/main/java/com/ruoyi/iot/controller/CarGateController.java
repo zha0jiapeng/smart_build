@@ -21,6 +21,7 @@ public class CarGateController {
     @PostMapping("/carAccess")
     public Map<String,Object> carAccess(@RequestBody Map<String,Object> request) {
         log.info("carAccess:{}",JSON.toJSONString(request));
+
         return request;
     }
 

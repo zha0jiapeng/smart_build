@@ -4,9 +4,15 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.domain.DustMonitoringDevice;
 import com.ruoyi.iot.service.IDustMonitoringDeviceService;
 import com.ruoyi.iot.utils.HdyHttpUtils;
+import com.ruoyi.system.domain.basic.IotTsp;
+import com.ruoyi.system.domain.basic.Rain;
+import com.ruoyi.system.mapper.IotTspMapper;
+import com.ruoyi.system.service.IRainService;
+import com.ruoyi.system.service.IotTspService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,8 +59,11 @@ public class TCPController {
     @Resource
     HdyHttpUtils hdyHttpUtils;
 
+    @Resource
+    private IotTspService iotTspService;
+
     @Autowired
-    private IDustMonitoringDeviceService dustMonitoringDeviceService;
+    private IRainService rainService;
 
     private static ServerSocket serverSocket4322;
     private static ServerSocket serverSocket4321;
@@ -109,13 +118,17 @@ public class TCPController {
                 handler.accept(receivedBytes, read);
             }
 
-            DustMonitoringDevice dustMonitoringDevice = new DustMonitoringDevice();
-            setDustMonitoringDeviceData(dustMonitoringDevice);
-            System.out.println("执行插入数据库操作：insertDustMonitoringDevice");
+            IotTsp iotTsp = new IotTsp();
+            setIotTsp(iotTsp);
 
             // 插入数据库
-            dustMonitoringDeviceService.insertDustMonitoringDevice(dustMonitoringDevice);
+            iotTsp.setCreatedDate(DateUtils.getNowDate());
+            iotTspService.save(iotTsp);
 
+            Rain rain = new Rain();
+            rain.setRainfall(new BigDecimal(sendMap.get("rainfall").toString()));
+            rain.setDeviceCode("2407052002LXY-02");
+            rainService.insertRain(rain);
 
             // 创建values的List并添加valueMap
             List<Map<String, Object>> valuesList = new ArrayList<>();
@@ -125,8 +138,6 @@ public class TCPController {
             Map<String, Object> rootMap = new HashMap<>();
             rootMap.put("values", valuesList);
             hdyHttpUtils.pushIOT(rootMap,"f69f70f2-9fe6-49e6-bfcf-a062421cb1d2");
-
-
 
             // 关闭流和套接字
             socket.close();
@@ -184,25 +195,22 @@ public class TCPController {
         }
     }
 
-    private void setDustMonitoringDeviceData(DustMonitoringDevice dustMonitoringDevice) {
+    private void setIotTsp(IotTsp iotTsp) {
         String now = DateUtil.now();
         sendMap.put("device_code", "2407052002LXY-02");
-        dustMonitoringDevice.setDeviceCode("2407052002LXY-02");
-        dustMonitoringDevice.setWorkStatus("在线");
-        dustMonitoringDevice.setPm25(new BigDecimal(sendMap.get("pm25").toString()));
-        dustMonitoringDevice.setPm10(new BigDecimal(sendMap.get("pm10").toString()));
-        dustMonitoringDevice.setNoise(new BigDecimal(sendMap.get("noise").toString()));
+        iotTsp.setPmTwoFive(sendMap.get("pm25").toString());
+        iotTsp.setPmTen(sendMap.get("pm10").toString());
+        iotTsp.setNoise(sendMap.get("noise").toString());
         sendMap.put("wind_speed", "0");
-        dustMonitoringDevice.setWindSpeed(new BigDecimal(sendMap.get("wind_speed").toString()));
+        iotTsp.setWindSpeed("0");
         sendMap.put("wind_direction", "");
-        dustMonitoringDevice.setWindDirection(sendMap.get("wind_direction").toString());
-        dustMonitoringDevice.setTemperature(new BigDecimal(sendMap.get("temperature").toString()));
-        dustMonitoringDevice.setHumidity(new BigDecimal(sendMap.get("humidity").toString()));
-        dustMonitoringDevice.setPressure(new BigDecimal(sendMap.get("pressure").toString()));
-        dustMonitoringDevice.setRainfall(new BigDecimal(sendMap.get("rainfall").toString()));
-        DustMonitoringDevice lastMonitor = dustMonitoringDeviceService.getOne(new LambdaQueryWrapper<DustMonitoringDevice>()
-                        .eq(DustMonitoringDevice::getDeviceCode, dustMonitoringDevice.getDeviceCode())
-                        .orderByDesc(DustMonitoringDevice::getCreateTime).last("limit 1")
+        iotTsp.setWindDirection("");
+        iotTsp.setTemperature(sendMap.get("temperature").toString());
+        iotTsp.setHumidity(sendMap.get("humidity").toString());
+        iotTsp.setPressure(sendMap.get("pressure").toString());
+        Rain lastMonitor = rainService.getOne(new LambdaQueryWrapper<Rain>()
+                        .eq(Rain::getDeviceCode, "2407052002LXY-02")
+                        .orderByDesc(Rain::getCreateTime).last("limit 1")
                 , false);
         if(lastMonitor!=null){
             sendMap.put("rainfall", new BigDecimal(sendMap.get("rainfall").toString()).subtract(lastMonitor.getRainfall()).setScale(2, RoundingMode.HALF_UP).toString());
@@ -210,17 +218,10 @@ public class TCPController {
             sendMap.put("rainfall", new BigDecimal(sendMap.get("rainfall").toString()));
         }
         sendMap.put("status", "在线");
-        dustMonitoringDevice.setStatus(sendMap.get("status").toString());
         sendMap.put("date_time", now);
         sendMap.put("push_time", now);
         sendMap.put("portal_id", "1751847977770553345");
-        dustMonitoringDevice.setPushTime(sendMap.get("push_time").toString());
         sendMap.put("other", "");
-        dustMonitoringDevice.setOther(sendMap.get("other").toString());
-        dustMonitoringDevice.setProtalId("1751847977770553345");
-        dustMonitoringDevice.setSubProjectId("1763492186013306882");
-
-
     }
 
     // 处理温度响应的方法

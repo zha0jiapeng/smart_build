@@ -224,7 +224,7 @@ public class CarGateController {
 
         System.out.println(rootMap);
 
-        hdyHttpUtils.pushIOT(rootMap,"bbe55ec4-fc7b-4cd1-a704-1f07964b82d6");
+//        hdyHttpUtils.pushIOT(rootMap,"bbe55ec4-fc7b-4cd1-a704-1f07964b82d6");
 
     }
 

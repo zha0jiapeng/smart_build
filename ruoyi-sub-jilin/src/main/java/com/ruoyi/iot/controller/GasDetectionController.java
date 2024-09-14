@@ -19,6 +19,7 @@ import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.code.DataType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -96,7 +97,7 @@ public class GasDetectionController {
         return JSON.parseObject(body,Map.class);
     }
 
-    @Scheduled(cron = "0 */1 * * * *")
+    @GetMapping("/pushSwzk")
     public void pushSwzk() {
         String now = DateUtil.now();
         List<Device> list = deviceService.list(new LambdaQueryWrapper<Device>().eq(Device::getDeviceType,"GASDETECTOR").eq(Device::getYn,1));

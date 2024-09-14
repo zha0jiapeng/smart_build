@@ -2,7 +2,6 @@ package com.ruoyi.iot.bean;
 
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.hikvision.artemis.sdk.ArtemisHttpUtil;
 import com.hikvision.artemis.sdk.config.ArtemisConfig;
 
@@ -14,9 +13,9 @@ public class DoorFunctionApi {
      * STEP1：设置平台参数，根据实际情况,设置host appkey appsecret 三个参数.
      */
     static {
-        ArtemisConfig.host = "192.168.1.207:443";
-        ArtemisConfig.appKey = "29016549"; // 秘钥appkey
-        ArtemisConfig.appSecret = "2kTiCvwc7xvxHuddO7gT";
+        ArtemisConfig.host = "10.1.3.2:443";
+        ArtemisConfig.appKey = "29632148"; // 秘钥appkey
+        ArtemisConfig.appSecret = "7k0RVVHqdynytJBhPfz8";
     }
     /**
      * STEP2：设置OpenAPI接口的上下文
@@ -49,16 +48,28 @@ public class DoorFunctionApi {
         return result;
     }
 
-    public JSONObject doorList(Map<String,Object> request){
-        String eventsDataApi = ARTEMIS_PATH +"/api/resource/v2/acsDevice/search";
+    //获取门禁事件的图片
+    public  String pictures(PicturesRequest picturesRequest ){
+        String picturesDataApi = ARTEMIS_PATH +"/api/acs/v1/event/pictures";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("https://",eventsDataApi);
+                put("https://",picturesDataApi);
             }
         };
-        String body=JSON.toJSONString(request);
+        String body=JSON.toJSONString(picturesRequest);
         String result =ArtemisHttpUtil.doPostStringArtemis(path,body,null,null,"application/json");
-        JSONObject jsonObject = JSONObject.parseObject(result);
-        return jsonObject;
+        return result;
+    }
+
+    public String states(StatesRequest statesRequest ){
+        String statesDataApi = ARTEMIS_PATH +"/api/acs/v1/door/states";
+        Map<String,String> path = new HashMap<String,String>(2){
+            {
+                put("https://",statesDataApi);
+            }
+        };
+        String body=JSON.toJSONString(statesRequest);
+        String result =ArtemisHttpUtil.doPostStringArtemis(path,body,null,null,"application/json");
+        return result;
     }
 }

@@ -73,7 +73,6 @@ public class TCPController {
     }
 
     @GetMapping("/server4322")
-    @Scheduled(cron = "0 */1 * * * *")
     public void server4322() throws IOException {
         new Thread(this::handleConnection4322).start();
     }
@@ -112,6 +111,7 @@ public class TCPController {
 
             DustMonitoringDevice dustMonitoringDevice = new DustMonitoringDevice();
             setDustMonitoringDeviceData(dustMonitoringDevice);
+            System.out.println("执行插入数据库操作：insertDustMonitoringDevice");
 
             // 插入数据库
             dustMonitoringDeviceService.insertDustMonitoringDevice(dustMonitoringDevice);
@@ -136,7 +136,6 @@ public class TCPController {
     }
 
     @GetMapping("/server4321")
-    @Scheduled(cron = "0 */1 * * * *")
     public void server4321() throws IOException {
         new Thread(this::handleConnection4321).start();
     }
@@ -174,8 +173,8 @@ public class TCPController {
                     sendMap = new HashMap<>();
                 }
                 sendMap.put("rainfall", resultDouble);
+                System.out.println("雨量信息数据："+resultDouble);
             }
-
             // 关闭流和套接字
             inputStream.close();
             outputStream.close();

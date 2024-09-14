@@ -31,17 +31,17 @@ public class PeopleLocationController {
 
     @PostMapping("/outTunnelLocation")
     public Map<String,Object> outPeopleLocation(@RequestBody Map request){
-        Map<String,Object> parse = new HashMap();
-        if(!request.containsKey("map_id")){
-            parse.put("code",500);
-            parse.put("msg","map_id必传");
-            return parse;
-        }
+        //Map<String,Object> parse = new HashMap();
         HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501/push/list")
-                .body(JSON.toJSONString(request), "application/json")
+                .body(JSON.toJSONString(new Object()), "application/json")
                 .execute();
         String body = execute.body();
-        Map map = JSONObject.parseObject(body, Map.class);
+        Map<String,Object> map = JSONObject.parseObject(body, Map.class);
+        if(map!=null) {
+            double[] doubles = XYToCoordinates(Double.parseDouble(map.get("result_x").toString()), Double.parseDouble(map.get("result_y").toString()));
+            map.put("result_wgs84_x", doubles[0]);
+            map.put("result_wgs84_y", doubles[1]);
+        }
         return map;
     }
 
@@ -56,6 +56,9 @@ public class PeopleLocationController {
         Map parse = JSONObject.parseObject(body, Map.class);
         List<Map<String, Object>> datee = (List<Map<String, Object>>) parse.get("data");
         String now = DateUtil.now();
+        if(datee==null){
+            return;
+        }
         for (Map<String, Object> map : datee) {
             // 创建存储设备数据的 Map
             Map<String, Object> deviceData = new HashMap<>();

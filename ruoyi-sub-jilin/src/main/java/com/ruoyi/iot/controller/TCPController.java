@@ -125,11 +125,6 @@ public class TCPController {
             iotTsp.setCreatedDate(DateUtils.getNowDate());
             iotTspService.save(iotTsp);
 
-            Rain rain = new Rain();
-            rain.setRainfall(new BigDecimal(sendMap.get("rainfall").toString()));
-            rain.setDeviceCode("2407052002LXY-02");
-            rainService.insertRain(rain);
-
             // 创建values的List并添加valueMap
             List<Map<String, Object>> valuesList = new ArrayList<>();
             valuesList.add(sendMap);
@@ -184,7 +179,11 @@ public class TCPController {
                     sendMap = new HashMap<>();
                 }
                 sendMap.put("rainfall", resultDouble);
-                System.out.println("雨量信息数据："+resultDouble);
+
+                Rain rain = new Rain();
+                rain.setRainfall(new BigDecimal(sendMap.get("rainfall").toString()));
+                rain.setDeviceCode("2407052002LXY-02");
+                rainService.insertRain(rain);
             }
             // 关闭流和套接字
             inputStream.close();

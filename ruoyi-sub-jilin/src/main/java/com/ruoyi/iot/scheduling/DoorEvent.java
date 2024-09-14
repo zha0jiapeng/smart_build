@@ -48,7 +48,6 @@ public class DoorEvent {
 //    @Scheduled(cron = "0 */10 * * * ?")
     public void execute() {
 
-        ThreadPool.executorService.submit(() -> {
             DateTime date = DateUtil.date();
             String now = DateUtil.formatDateTime(date);
             Date date1 = DateUtils.addMinutes(date, -10);
@@ -105,7 +104,6 @@ public class DoorEvent {
             HttpResponse execute = HttpRequest.put(url).body(JSON.toJSONString(request), "application/json").execute();
             String body1 = execute.body();
             logger.info("...返回值{}",JSON.toJSONString(body1));
-        });
     }
 
     public static String getISO8601TimestampFromDateStr(String timestamp){

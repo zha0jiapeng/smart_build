@@ -35,9 +35,8 @@ public class CarGateController {
 
     @PostMapping("/carAccess")
     public Map<String, Object> carAccess(@RequestBody Map<String, Object> request) {
-        log.info("carAccess:{}", JSON.toJSONString(request));
+//        log.info("carAccess:{}", JSON.toJSONString(request));
         pushCarAccess(request);
-
         return request;
     }
 
@@ -240,9 +239,7 @@ public class CarGateController {
         Map<String, List<Map<String, Object>>> rootMap = new HashMap<>();
         rootMap.put("values", values);
 
-        System.out.println(rootMap);
-
-//        hdyHttpUtils.pushIOT(rootMap,"bbe55ec4-fc7b-4cd1-a704-1f07964b82d6");
+        hdyHttpUtils.pushIOT(rootMap,"bbe55ec4-fc7b-4cd1-a704-1f07964b82d6");
 
     }
 

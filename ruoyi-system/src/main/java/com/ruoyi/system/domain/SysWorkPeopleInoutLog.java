@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.system.domain.basic.BaseDomain;
 import lombok.Data;
@@ -23,10 +24,14 @@ public class SysWorkPeopleInoutLog extends BaseDomain {
     private String inoutId;
     private Integer sysWorkPeopleId;
     private String sn;
+    @TableField(exist = false)
+    private String sns;
     private Integer mode;
     private String logTime;
     private String idCard;
     private String phone;
+    private String photoBase64;
+    private String photoUrl;
     private String name;
 
 }

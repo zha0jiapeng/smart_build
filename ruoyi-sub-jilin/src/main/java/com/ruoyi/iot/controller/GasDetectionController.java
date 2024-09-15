@@ -43,38 +43,35 @@ public class GasDetectionController {
     @Autowired
     IDeviceService deviceService;
     @RequestMapping("/list")
-    public AjaxResult list(){
-        List<Device> list = deviceService.list(new LambdaQueryWrapper<Device>().eq(Device::getDeviceType,"GASDETECTOR").eq(Device::getYn,1));
-        List<Map<String,Object>> response = new ArrayList<>();
-        for (Device device : list) {
-            Map<String,Object> item = new HashMap<>();
-            item.put("sn",device.getSn());
-            ModbusMaster master = new ModbusTcpMaster().getSlave(device.getDeviceIp(), device.getDevicePort());
-            Number temp = Modbus4jReadUtil.readHoldingRegister(master, 1, 0, DataType.TWO_BYTE_INT_UNSIGNED, "温度");
-            Number humi = Modbus4jReadUtil.readHoldingRegister(master, 1, 1, DataType.TWO_BYTE_INT_UNSIGNED, "湿度");
-            Number dust = Modbus4jReadUtil.readHoldingRegister(master, 1, 5, DataType.TWO_BYTE_INT_UNSIGNED, "粉尘");
-            Number o2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 10, DataType.TWO_BYTE_INT_UNSIGNED, "氧气");
-            Number ch4 = Modbus4jReadUtil.readHoldingRegister(master, 1, 11, DataType.TWO_BYTE_INT_UNSIGNED, "甲烷");
-            Number co = Modbus4jReadUtil.readHoldingRegister(master, 1, 12, DataType.TWO_BYTE_INT_UNSIGNED, "一氧化碳");
-            Number h2s = Modbus4jReadUtil.readHoldingRegister(master, 1, 13, DataType.TWO_BYTE_INT_UNSIGNED, "硫化氢");
-            Number co2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 14, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化碳");
-            Number so2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 15, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化硫");
-            Number nh3 = Modbus4jReadUtil.readHoldingRegister(master, 1, 16, DataType.TWO_BYTE_INT_UNSIGNED, "氨气");
-            Number no2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 21, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化氮");
-            item.put("temp",temp.doubleValue());
-            item.put("humi",humi.doubleValue());
-            item.put("dust",dust.doubleValue());
-            item.put("o2",o2.doubleValue());
-            item.put("ch4",ch4.doubleValue());
-            item.put("co",co.doubleValue());
-            item.put("h2s",h2s.doubleValue());
-            item.put("co2",co2.doubleValue());
-            item.put("so2",so2.doubleValue());
-            item.put("nh3",nh3.doubleValue());
-            item.put("no2",no2.doubleValue());
-            response.add(item);
-        }
-        return AjaxResult.success(response);
+    public AjaxResult list(String sn){
+        Device device = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn).eq(Device::getDeviceType, "GASDETECTOR").eq(Device::getYn, 1));
+        Map<String, Object> item = new HashMap<>();
+        item.put("sn", device.getSn());
+        ModbusMaster master = new ModbusTcpMaster().getSlave(device.getDeviceIp(), device.getDevicePort());
+        Number temp = Modbus4jReadUtil.readHoldingRegister(master, 1, 0, DataType.TWO_BYTE_INT_UNSIGNED, "温度");
+        Number humi = Modbus4jReadUtil.readHoldingRegister(master, 1, 1, DataType.TWO_BYTE_INT_UNSIGNED, "湿度");
+        Number dust = Modbus4jReadUtil.readHoldingRegister(master, 1, 5, DataType.TWO_BYTE_INT_UNSIGNED, "粉尘");
+        Number o2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 10, DataType.TWO_BYTE_INT_UNSIGNED, "氧气");
+        Number ch4 = Modbus4jReadUtil.readHoldingRegister(master, 1, 11, DataType.TWO_BYTE_INT_UNSIGNED, "甲烷");
+        Number co = Modbus4jReadUtil.readHoldingRegister(master, 1, 12, DataType.TWO_BYTE_INT_UNSIGNED, "一氧化碳");
+        Number h2s = Modbus4jReadUtil.readHoldingRegister(master, 1, 13, DataType.TWO_BYTE_INT_UNSIGNED, "硫化氢");
+        Number co2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 14, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化碳");
+        Number so2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 15, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化硫");
+        Number nh3 = Modbus4jReadUtil.readHoldingRegister(master, 1, 16, DataType.TWO_BYTE_INT_UNSIGNED, "氨气");
+        Number no2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 21, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化氮");
+        item.put("temp", temp.doubleValue());
+        item.put("humi", humi.doubleValue());
+        item.put("dust", dust.doubleValue());
+        item.put("o2", o2.doubleValue());
+        item.put("ch4", ch4.doubleValue());
+        item.put("co", co.doubleValue());
+        item.put("h2s", h2s.doubleValue());
+        item.put("co2", co2.doubleValue());
+        item.put("so2", so2.doubleValue());
+        item.put("nh3", nh3.doubleValue());
+        item.put("no2", no2.doubleValue());
+
+        return AjaxResult.success(item);
     }
 
 

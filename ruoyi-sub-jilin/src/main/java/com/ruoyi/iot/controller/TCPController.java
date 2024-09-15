@@ -198,6 +198,7 @@ public class TCPController {
         String now = DateUtil.now();
         sendMap.put("device_code", "2407052002LXY-02");
         iotTsp.setPmTwoFive(sendMap.get("pm25").toString());
+        iotTsp.setDevId("54");
         iotTsp.setPmTen(sendMap.get("pm10").toString());
         iotTsp.setNoise(sendMap.get("noise").toString());
         sendMap.put("wind_speed", "0");

@@ -201,6 +201,13 @@
             <version>21.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.2.2</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

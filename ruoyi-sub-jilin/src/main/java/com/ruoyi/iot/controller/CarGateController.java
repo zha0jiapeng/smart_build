@@ -4,6 +4,8 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.config.MinioConfig;
+import com.ruoyi.common.utils.MinioUtils;
 import com.ruoyi.iot.enums.VehicleType;
 import com.ruoyi.iot.utils.HdyHttpUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -22,6 +25,12 @@ public class CarGateController {
 
     @Resource
     HdyHttpUtils hdyHttpUtils;
+
+    @Resource
+    MinioUtils minioUtils;
+
+    @Resource
+    MinioConfig minioConfig;
 
 
     @PostMapping("/carAccess")
@@ -138,6 +147,15 @@ public class CarGateController {
         JSONObject plateResult = result.getJSONObject("PlateResult");
         //抓拍照片
         String imageFile = plateResult.getString("imageFile");
+        String picture = imageFile.replaceAll("\\-", "\\+")
+                .replaceAll("\\_", "\\/").replaceAll("\\.", "\\=");
+        InputStream inputStream = minioUtils.base64ToInputStream(picture);
+        String filename = UUID.randomUUID().toString() + ".png";
+        minioUtils.uploadFile(minioConfig.getCarAccessBucketName(), filename, inputStream);
+        //String presignedObjectUrl = minioUtils.getPresignedObjectUrl("car-access", filename);
+        imageFile = minioConfig.getEndpoint()+"/"+minioConfig.getCarAccessBucketName()+"/"+filename;
+
+
         //设备工作状态
         String isoffline = plateResult.getString("isoffline");
         String onlineStatus = "0".equals(isoffline) ? "在线" : "离线";
@@ -190,7 +208,7 @@ public class CarGateController {
         }
         String allowInType = String.valueOf(ctrltype);
         //设备编号
-        String deviceCode = "";
+        String deviceCode = "10.1.3.210".equals(ipaddr) ? "f106f4e2-49788a49" : "4e32e371-4291fb9a";
         //报警类型
         String alarmType = "";
         //驾驶员

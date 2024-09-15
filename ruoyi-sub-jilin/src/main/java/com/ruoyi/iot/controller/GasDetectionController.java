@@ -59,17 +59,17 @@ public class GasDetectionController {
         Number so2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 15, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化硫");
         Number nh3 = Modbus4jReadUtil.readHoldingRegister(master, 1, 16, DataType.TWO_BYTE_INT_UNSIGNED, "氨气");
         Number no2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 21, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化氮");
-        item.put("temp", temp.doubleValue());
-        item.put("humi", humi.doubleValue());
+        item.put("temp", new BigDecimal(temp.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
+        item.put("humi",  new BigDecimal(humi.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
         item.put("dust", dust.doubleValue());
-        item.put("o2", o2.doubleValue());
-        item.put("ch4", ch4.doubleValue());
-        item.put("co", co.doubleValue());
-        item.put("h2s", h2s.doubleValue());
+        item.put("o2", new BigDecimal(o2.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
+        item.put("ch4", new BigDecimal(ch4.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
+        item.put("co", new BigDecimal(co.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
+        item.put("h2s", new BigDecimal(h2s.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
         item.put("co2", co2.doubleValue());
-        item.put("so2", so2.doubleValue());
-        item.put("nh3", nh3.doubleValue());
-        item.put("no2", no2.doubleValue());
+        item.put("so2", new BigDecimal(so2.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
+        item.put("nh3", new BigDecimal(nh3.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
+        item.put("no2", new BigDecimal(no2.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
 
         return AjaxResult.success(item);
     }

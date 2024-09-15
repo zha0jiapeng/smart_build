@@ -13,7 +13,7 @@ public class MinioConfig {
     /**
      * 访问地址
      */
-    @Value("http://10.1.3.6:9000")
+    @Value("http://10.1.3.202:9000")
     private String endpoint;
 
     /**

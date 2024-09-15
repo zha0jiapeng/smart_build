@@ -88,10 +88,10 @@ public class DoorEvent {
         JSONArray list = (JSONArray) ((JSONObject) jsonObject.get("data")).get("list");
         for (int i = 0; i < list.size(); i++) {
             JSONObject object = (JSONObject) list.get(i);
-            if (object.get("certNo") == null && StringUtils.isEmpty(object.get("certNo").toString())) {
+            if (object.get("certNo") == null || StringUtils.isEmpty(object.get("certNo").toString())) {
                 continue;
             }
-            if (object.get("picUri") == null && StringUtils.isEmpty(object.get("picUri").toString())) {
+            if (object.get("picUri") == null || StringUtils.isEmpty(object.get("picUri").toString())) {
                 continue;
             }
             Map<String, Object> map = new HashMap<>();

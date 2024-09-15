@@ -126,22 +126,38 @@ public class DoorEvent {
         logger.info("...返回值{}", JSON.toJSONString(body1));
     }
 
+    private static final Set<String> ALLOWED_SN = new HashSet<>();
+
+    static {
+        ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG4966329");
+        ALLOWED_SN.add("DS-K1T673M20230818V031000CHAG7090197");
+        ALLOWED_SN.add("DS-K1T67XSBM20220908V030309CHK75967405");
+    }
+
     private void insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime) {
         SysWorkPeopleInoutLog sysWorkPeopleInoutLog = new SysWorkPeopleInoutLog();
-        SysWorkPeople workPeople = workPeopleService.getOne(
-                new LambdaQueryWrapper<SysWorkPeople>()
-                        .eq(SysWorkPeople::getIdCard, jsonObject.get("certNo")));
-        if (workPeople != null) {
-            sysWorkPeopleInoutLog.setSysWorkPeopleId(workPeople.getId());
-        }
         String sn = door.get("devSerialNum").toString();
+        if (!ALLOWED_SN.contains(sn)) {
+            return;
+        }
         sysWorkPeopleInoutLog.setSn(sn);
+
         Device one = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn), false);
         if (one != null) {
             if (com.ruoyi.common.utils.StringUtils.isNotEmpty(one.getModifyBy())) {
                 sysWorkPeopleInoutLog.setSn(one.getModifyBy());
             }
         }
+
+        SysWorkPeople workPeople = workPeopleService.getOne(
+                new LambdaQueryWrapper<SysWorkPeople>()
+                        .eq(SysWorkPeople::getIdCard, jsonObject.get("certNo")));
+        if (workPeople != null) {
+            sysWorkPeopleInoutLog.setSysWorkPeopleId(workPeople.getId());
+        }
+
+
+
         sysWorkPeopleInoutLog.setIdCard(jsonObject.get("certNo").toString());
         sysWorkPeopleInoutLog.setMode(Integer.parseInt(jsonObject.get("inAndOutType").toString().equals("进") ? "1" : "0"));
         sysWorkPeopleInoutLog.setLogTime(DateUtil.formatDateTime(eventTime));

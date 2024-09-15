@@ -18,16 +18,11 @@ import java.util.Map;
 @RequestMapping("/camera")
 public class CameraController {
 
-    @Autowired
-    private IDeviceService deviceService;
-
     @PostMapping("/previewUrl")
-    public AjaxResult previewURLs(Integer deviceId) {
-        Device device = deviceService.getById(deviceId);
-        if(device == null) return AjaxResult.error("找不到设备");
+    public AjaxResult previewURLs(String sn) {
         DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
         Map<String, Object> cameraData = new HashMap<>();
-        cameraData.put("cameraIndexCode", device.getSn());
+        cameraData.put("cameraIndexCode", sn);
         cameraData.put("streamType", 0);
         cameraData.put("protocol", "rtsp");
         cameraData.put("transmode", 1);

@@ -45,7 +45,7 @@ public class PeopleLocationController {
             JSONArray data = jsonObject.getJSONArray("data");
             for (Object datum : data) {
                 JSONObject item = (JSONObject) datum;
-                double[] doubles = XYToCoordinates(Double.parseDouble(item.get("result_x").toString()), Double.parseDouble(map.get("result_y").toString()));
+                double[] doubles = XYToCoordinates(Double.parseDouble(item.get("result_x").toString()), Double.parseDouble(item.get("result_y").toString()));
                 item.put("result_wgs84_x", doubles[0]);
                 item.put("result_wgs84_y", doubles[1]);
             }

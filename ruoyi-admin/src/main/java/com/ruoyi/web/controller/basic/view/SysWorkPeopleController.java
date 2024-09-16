@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.basic.view;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
@@ -19,10 +20,12 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.utils.qrcode.QRCodeUtils;
 import com.ruoyi.system.domain.FlowPathConfig;
 import com.ruoyi.system.domain.SysWorkPeople;
+import com.ruoyi.system.domain.SysWorkPeopleInoutLog;
 import com.ruoyi.system.domain.SysWorkPeopleIntegralDetails;
 import com.ruoyi.system.domain.basic.IotStaffAttendance;
 import com.ruoyi.system.domain.vo.SysWorkPeopleVO;
 import com.ruoyi.system.mapper.IotStaffAttendanceMapper;
+import com.ruoyi.system.mapper.SysWorkPeopleInoutLogMapper;
 import com.ruoyi.system.mapper.SysWorkPeopleMapper;
 import com.ruoyi.system.service.FlowPathConfigService;
 import com.ruoyi.system.service.SysWorkPeopleIntegralDetailsService;
@@ -62,6 +65,8 @@ public class SysWorkPeopleController extends BaseController {
      */
     @Resource
     private SysWorkPeopleService sysWorkPeopleService;
+    @Resource
+    private SysWorkPeopleInoutLogMapper sysWorkPeopleInoutLogMapper;
     @Resource
     private SysWorkPeopleMapper sysWorkPeopleMapper;
     @Resource

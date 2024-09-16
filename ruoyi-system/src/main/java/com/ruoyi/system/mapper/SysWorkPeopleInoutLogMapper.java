@@ -13,18 +13,21 @@ import java.util.Map;
  * @date 2024/6/23
  */
 public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleInoutLog> {
-    @Select("SELECT COUNT(DISTINCT a.sys_work_people_id) inHoleNum " +
+    //    统计当天进入过指定区域（a.sn like 'T99%'）但未离开的独立人员数量（去重）。
+    @Select("SELECT COUNT(DISTINCT a.idCard) inHoleNum " +
             "FROM sys_work_people_inout_log a " +
             "LEFT JOIN sys_work_people_inout_log b " +
-            "ON a.sys_work_people_id = b.sys_work_people_id " +
+            "ON a.idCard = b.idCard " +
             "AND b.mode = 0 " +
+            "AND b.sn = 'DS-K1T673M20230818V031000CHAG7090197' " +
             "AND DATE(b.log_time) = CURDATE() " +
             "WHERE a.mode = 1 " +
-            "AND a.sn like 'T99%' "+
+            "AND a.sn = 'DS-K1T673TMW20230818V031000CHAG4966329' " +
             "AND DATE(a.log_time) = CURDATE() " +
-            "AND b.sys_work_people_id IS NULL")
+            "AND b.idCard IS NULL")
     int countOnlyEnteredPeopleToday();
 
+    //    统计特定月份内每天的独立人员出勤数量（仅统计进入的记录），按日期分组。
     @Select("SELECT DATE(log_time) as date, COUNT(DISTINCT sys_work_people_id) AS attendance_count " +
             "FROM sys_work_people_inout_log " +
             "WHERE mode = 1 " +  // 只统计进入的记录
@@ -32,6 +35,7 @@ public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleIno
             "GROUP BY DATE(log_time)")
     List<Map<String, Object>> getPeopleAttendanceStatistics(String yearMonth);
 
+    //    统计指定年份内每个月不同人员配置类型的出勤情况。
     @Select("SELECT swp.personnel_config_type, " +
             "DATE_FORMAT(swil.log_time, '%Y-%m') AS month, " +
             "COUNT(DISTINCT swil.sys_work_people_id) AS attendance_count " +
@@ -42,7 +46,7 @@ public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleIno
             "ORDER BY month")
     List<Map<String, Object>> getMonthlyAttendanceCountByPersonnelConfigType(@Param("year") String year);
 
-
+    //    统计指定日期内按工作类型分组的独立人员出勤数量。
     @Select("SELECT sys_work_people.work_type, COUNT(DISTINCT sys_work_people_id) AS count " +
             "FROM sys_work_people_inout_log " +
             "JOIN sys_work_people ON sys_work_people.id = sys_work_people_inout_log.sys_work_people_id " +
@@ -50,6 +54,7 @@ public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleIno
             "GROUP BY sys_work_people.work_type")
     List<Map<String, Object>> getPeopleAttendanceStatisticsByWorkType(String today);
 
+    //    统计指定日期内按公司分组的独立人员出勤数量。
     @Select("SELECT sys_work_people.company, COUNT(DISTINCT sys_work_people_id) AS count " +
             "FROM sys_work_people_inout_log " +
             "JOIN sys_work_people ON sys_work_people.id = sys_work_people_inout_log.sys_work_people_id " +
@@ -57,6 +62,7 @@ public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleIno
             "GROUP BY sys_work_people.company")
     List<Map<String, Object>> getPeopleAttendanceStatisticsByCompany(String today);
 
+    //    统计过去 7 天每天的独立人员出勤数量。
     @Select("SELECT DATE(log_time) AS date, COUNT(DISTINCT sys_work_people_id) AS count " +
             "FROM sys_work_people_inout_log " +
             "WHERE DATE(log_time) BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE() " +
@@ -64,6 +70,7 @@ public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleIno
             "ORDER BY DATE(log_time)")
     List<Map<String, Object>> countDailyAttendanceForLast7Days();
 
+    //    统计关键人员中不同人员配置类型的出勤率，出勤率以百分比表示。
     @Select("SELECT " +
             "  p.personnel_config_type, " +
             "  COUNT(DISTINCT l.sys_work_people_id) AS attended_people_count, " +
@@ -83,6 +90,7 @@ public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleIno
             "  p.personnel_config_type")
     List<Map<String, Object>> getAttendanceRateByPersonnelConfigType();
 
+    //    统计在场人员的逗留时间（单位：小时），按逗留时间降序排列，包括最早进入时间。
     @Select("SELECT " +
             "p.name, " +
             "TIMESTAMPDIFF(HOUR, l.enter_time, NOW()) AS hours_stayed, " +

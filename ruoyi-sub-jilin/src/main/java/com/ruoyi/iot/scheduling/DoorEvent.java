@@ -114,7 +114,8 @@ public class DoorEvent {
             String devIndexCode = object.getString("devIndexCode");
             JSONObject door = getDoor(devIndexCode);
             DateTime eventTime = DateUtil.parse(getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
-            insertInOutLog(door, map, eventTime);
+            String personName = object.get("personName").toString();
+            insertInOutLog(door, map, eventTime, personName);
             listt.add(map);
         }
         request.put("values", listt);
@@ -134,7 +135,7 @@ public class DoorEvent {
         ALLOWED_SN.add("DS-K1T67XSBM20220908V030309CHK75967405");
     }
 
-    private void insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime) {
+    private void insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName) {
         SysWorkPeopleInoutLog sysWorkPeopleInoutLog = new SysWorkPeopleInoutLog();
         String sn = door.get("devSerialNum").toString();
         if (!ALLOWED_SN.contains(sn)) {
@@ -151,17 +152,16 @@ public class DoorEvent {
 
         SysWorkPeople workPeople = workPeopleService.getOne(
                 new LambdaQueryWrapper<SysWorkPeople>()
-                        .eq(SysWorkPeople::getIdCard, jsonObject.get("certNo")));
+                        .eq(SysWorkPeople::getIdCard, jsonObject.get("id_card").toString()));
         if (workPeople != null) {
             sysWorkPeopleInoutLog.setSysWorkPeopleId(workPeople.getId());
         }
 
 
-
-        sysWorkPeopleInoutLog.setIdCard(jsonObject.get("certNo").toString());
-        sysWorkPeopleInoutLog.setMode(Integer.parseInt(jsonObject.get("inAndOutType").toString().equals("进") ? "1" : "0"));
+        sysWorkPeopleInoutLog.setIdCard(jsonObject.get("id_card").toString());
+        sysWorkPeopleInoutLog.setMode(Integer.parseInt(jsonObject.get("in_out_direction").toString().equals("进") ? "1" : "0"));
         sysWorkPeopleInoutLog.setLogTime(DateUtil.formatDateTime(eventTime));
-        sysWorkPeopleInoutLog.setName(jsonObject.get("personName").toString());
+        sysWorkPeopleInoutLog.setName(personName);
         //sysWorkPeopleInoutLog.setPhone(jsonObject.get("telephone").toString());
         sysWorkPeopleInoutLog.setPhotoUrl(jsonObject.get("record_Image_file").toString());
         sysWorkPeopleInoutLog.setCreatedDate(new Date());

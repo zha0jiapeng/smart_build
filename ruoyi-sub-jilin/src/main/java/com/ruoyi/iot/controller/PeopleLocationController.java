@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.utils.HdyHttpUtils;
@@ -32,20 +33,25 @@ public class PeopleLocationController {
 
 
     @PostMapping("/outTunnelLocation")
-    public Map<String,Object> outPeopleLocation(@RequestBody Map request){
+    public JSONObject outPeopleLocation(@RequestBody Map request){
         //Map<String,Object> parse = new HashMap();
         HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501/push/list")
                 .body(JSON.toJSONString(new Object()), "application/json")
                 .execute();
         String body = execute.body();
         log.info("body :{}",body);
-        Map<String,Object> map = JSONObject.parseObject(body, Map.class);
-        if(map!=null) {
-            double[] doubles = XYToCoordinates(Double.parseDouble(map.get("result_x").toString()), Double.parseDouble(map.get("result_y").toString()));
-            map.put("result_wgs84_x", doubles[0]);
-            map.put("result_wgs84_y", doubles[1]);
+        JSONObject jsonObject = JSONObject.parseObject(body);
+        if(jsonObject!=null) {
+            JSONArray data = jsonObject.getJSONArray("data");
+            for (Object datum : data) {
+                JSONObject item = (JSONObject) datum;
+                double[] doubles = XYToCoordinates(Double.parseDouble(item.get("result_x").toString()), Double.parseDouble(map.get("result_y").toString()));
+                item.put("result_wgs84_x", doubles[0]);
+                item.put("result_wgs84_y", doubles[1]);
+            }
+
         }
-        return map;
+        return jsonObject;
     }
 
 

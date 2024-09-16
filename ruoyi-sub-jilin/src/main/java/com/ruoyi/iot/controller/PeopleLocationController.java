@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.utils.HdyHttpUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Slf4j
 @RequestMapping("/peopleLocation")
 public class PeopleLocationController {
 
@@ -36,6 +38,7 @@ public class PeopleLocationController {
                 .body(JSON.toJSONString(new Object()), "application/json")
                 .execute();
         String body = execute.body();
+        log.info("body :{}",body);
         Map<String,Object> map = JSONObject.parseObject(body, Map.class);
         if(map!=null) {
             double[] doubles = XYToCoordinates(Double.parseDouble(map.get("result_x").toString()), Double.parseDouble(map.get("result_y").toString()));

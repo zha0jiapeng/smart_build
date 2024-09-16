@@ -133,6 +133,7 @@ public class DoorEvent {
         ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG4966329");
         ALLOWED_SN.add("DS-K1T673M20230818V031000CHAG7090197");
         ALLOWED_SN.add("DS-K1T67XSBM20220908V030309CHK75967405");
+        ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG7636046");
     }
 
     private void insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName) {
@@ -166,6 +167,7 @@ public class DoorEvent {
         sysWorkPeopleInoutLog.setPhotoUrl(jsonObject.get("record_Image_file").toString());
         sysWorkPeopleInoutLog.setCreatedDate(new Date());
         sysWorkPeopleInoutLog.setModifyDate(new Date());
+        logger.info("进行插入数据库操作：{}",sysWorkPeopleInoutLog);
         sysWorkPeopleInoutLogMapper.insert(sysWorkPeopleInoutLog);
     }
 

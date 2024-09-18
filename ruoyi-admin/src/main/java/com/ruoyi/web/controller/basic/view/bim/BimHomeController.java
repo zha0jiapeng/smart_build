@@ -426,7 +426,7 @@ public class BimHomeController {
 
         //质量问题负责人
         if (flag) {
-            QualityBimDomain.Head head = new Head();
+            Head head = new Head();
             List<String> name = new ArrayList<>();
             List<String> value = new ArrayList<>();
 
@@ -498,8 +498,8 @@ public class BimHomeController {
             } else {
                 qualityDistribution.setHunningtu("0");
             }
-            if (collect.containsKey("其它")) {
-                qualityDistribution.setQiti(String.valueOf(collect.get("其它").size()));
+            if (collect.containsKey("其他")) {
+                qualityDistribution.setQiti(String.valueOf(collect.get("其他").size()));
             } else {
                 qualityDistribution.setQiti("0");
             }
@@ -597,5 +597,4 @@ public class BimHomeController {
 
         return Result.OK(equipmentBimDomain);
     }
-
 }

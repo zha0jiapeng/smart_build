@@ -46,6 +46,7 @@ public class PeopleController {
 
     /**
      * 人员总览
+     *
      * 获取今天进入场地但未离开的人数统计，以及按人员配置类型（personnel_config_type）统计的人数
      * @return
      */
@@ -78,7 +79,14 @@ public class PeopleController {
         return AjaxResult.success(map);
     }
 
-//    功能: 获取指定年月（格式：yyyy-MM）的考勤统计数据
+
+    /**
+     * 施工人力统计
+     *
+     * 获取指定年月（格式：yyyy-MM）的考勤统计数据
+     * @param yearMonth
+     * @return
+     */
     @GetMapping("/getAttendanceStatistics")
     public Map<String,Object> getPeopleAttendanceStatistics(String yearMonth){
         List<Map<String, Object>> list = sysWorkPeopleInoutLogMapper.getPeopleAttendanceStatistics(yearMonth);
@@ -86,6 +94,8 @@ public class PeopleController {
     }
 
     /**
+     * 作业人员趋势
+     *
      * 获取指定年份，每月按人员配置类型统计的考勤数据
      * @param year
      * @return
@@ -129,6 +139,8 @@ public class PeopleController {
     }
 
     /**
+     * 工班分析
+     *
      * 获取指定日期（格式：yyyy-MM-dd）按工种统计的考勤数据
      * @param today
      * @return
@@ -140,6 +152,8 @@ public class PeopleController {
     }
 
     /**
+     * 分包单位分析
+     *
      * 获取指定日期（格式：yyyy-MM-dd）按公司统计的考勤数据
      * @param today
      * @return
@@ -151,6 +165,8 @@ public class PeopleController {
     }
 
     /**
+     * 近七天作业人员分析
+     *
      * 获取过去7天的每日考勤记录数据
      * @return
      */

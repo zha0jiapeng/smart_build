@@ -14,17 +14,17 @@ import java.util.Map;
  */
 public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleInoutLog> {
     //    统计当天进入过指定区域（a.sn like 'T99%'）但未离开的独立人员数量（去重）。
-    @Select("SELECT COUNT(DISTINCT a.idCard) inHoleNum " +
+    @Select("SELECT COUNT(DISTINCT a.id_card) inHoleNum " +
             "FROM sys_work_people_inout_log a " +
             "LEFT JOIN sys_work_people_inout_log b " +
-            "ON a.idCard = b.idCard " +
+            "ON a.id_card = b.id_card " +
             "AND b.mode = 0 " +
             "AND b.sn = 'DS-K1T673M20230818V031000CHAG7090197' " +
             "AND DATE(b.log_time) = CURDATE() " +
             "WHERE a.mode = 1 " +
             "AND a.sn = 'DS-K1T673TMW20230818V031000CHAG4966329' " +
             "AND DATE(a.log_time) = CURDATE() " +
-            "AND b.idCard IS NULL")
+            "AND b.id_card IS NULL")
     int countOnlyEnteredPeopleToday();
 
     //    统计特定月份内每天的独立人员出勤数量（仅统计进入的记录），按日期分组。

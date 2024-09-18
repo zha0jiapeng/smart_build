@@ -47,11 +47,11 @@ public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleIno
     List<Map<String, Object>> getMonthlyAttendanceCountByPersonnelConfigType(@Param("year") String year);
 
     //    统计指定日期内按工作类型分组的独立人员出勤数量。
-    @Select("SELECT sys_work_people.work_type, COUNT(DISTINCT sys_work_people_id) AS count " +
+    @Select("SELECT sys_work_people.groups_name, COUNT(DISTINCT sys_work_people_id) AS count " +
             "FROM sys_work_people_inout_log " +
             "JOIN sys_work_people ON sys_work_people.id = sys_work_people_inout_log.sys_work_people_id " +
             "WHERE DATE(log_time) BETWEEN #{today} AND DATE_ADD(#{today}, INTERVAL 1 DAY) " +
-            "GROUP BY sys_work_people.work_type")
+            "GROUP BY sys_work_people.groups_name")
     List<Map<String, Object>> getPeopleAttendanceStatisticsByWorkType(String today);
 
     //    统计指定日期内按公司分组的独立人员出勤数量。

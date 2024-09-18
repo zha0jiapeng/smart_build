@@ -50,8 +50,8 @@ public class TCPController {
         commandHandlers.put("66 03 00 03 00 01 7C 1D", TCPController::handleNoiseResponse);
         commandHandlers.put("8A 03 00 01 00 01 CB 71", TCPController::handlePM2_5Response);
         commandHandlers.put("8A 03 00 02 00 01 3B 71", TCPController::handlePM10Response);
-//        commandHandlers.put("01 03 00 00 00 01 84 0A", TCPController::handleWindDirectionResponse);
-//        commandHandlers.put("02 03 00 01 00 01 D5 F9", TCPController::handleWinSpeedResponse);
+        commandHandlers.put("02 03 00 01 00 01 D5 F9", TCPController::handleWindDirectionResponse);
+        commandHandlers.put("01 03 00 00 00 01 84 0A", TCPController::handleWinSpeedResponse);
     }
 
     private static Map<String, Object> sendMap = new HashMap<>();
@@ -88,6 +88,7 @@ public class TCPController {
 
     private void handleConnection4322() {
         try {
+            System.out.println("扬尘开始链接");
             Socket socket = serverSocket4322.accept();
             handleClient(socket);
         } catch (IOException e) {
@@ -98,6 +99,7 @@ public class TCPController {
     private void handleClient(Socket socket) {
         try {
             // 处理客户端连接
+            System.out.println("开始处理扬尘客户端链接");
             for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
                 String command = entry.getKey();
                 BiConsumer<byte[], Integer> handler = entry.getValue();
@@ -123,6 +125,7 @@ public class TCPController {
 
             // 插入数据库
             iotTsp.setCreatedDate(DateUtils.getNowDate());
+            System.out.println("扬尘数据开始插入数据库");
             iotTspService.save(iotTsp);
 
             // 创建values的List并添加valueMap
@@ -201,10 +204,8 @@ public class TCPController {
         iotTsp.setDevId("54");
         iotTsp.setPmTen(sendMap.get("pm10").toString());
         iotTsp.setNoise(sendMap.get("noise").toString());
-        sendMap.put("wind_speed", "0");
-        iotTsp.setWindSpeed("0");
-        sendMap.put("wind_direction", "");
-        iotTsp.setWindDirection("");
+        iotTsp.setWindSpeed(sendMap.get("wind_speed").toString());
+        iotTsp.setWindDirection(sendMap.get("wind_direction").toString());
         iotTsp.setTemperature(sendMap.get("temperature").toString());
         iotTsp.setHumidity(sendMap.get("humidity").toString());
         iotTsp.setPressure(sendMap.get("pressure").toString());
@@ -285,6 +286,26 @@ public class TCPController {
             int lowByte = receivedBytes[4] & 0xFF;
             int PM10 = (highByte << 8) | lowByte;
             sendMap.put("pm10", PM10 );
+        }
+    }
+
+    // 处理风向响应的方法
+    private static void handleWindDirectionResponse(byte[] receivedBytes, int read) {
+        if (read >= 5) {
+            int highByte = receivedBytes[3] & 0xFF;
+            int lowByte = receivedBytes[4] & 0xFF;
+            int WindWirection = (highByte << 8) | lowByte;
+            sendMap.put("wind_direction", WindWirection );
+        }
+    }
+
+    // 处理风速响应的方法
+    private static void handleWinSpeedResponse(byte[] receivedBytes, int read) {
+        if (read >= 5) {
+            int highByte = receivedBytes[3] & 0xFF;
+            int lowByte = receivedBytes[4] & 0xFF;
+            int WindSpeed = (highByte << 8) | lowByte;
+            sendMap.put("wind_speed", WindSpeed );
         }
     }
 

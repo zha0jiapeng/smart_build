@@ -116,7 +116,6 @@ public class PeopleController {
                 initialMap.put(1, 0);  // 默认值0
                 initialMap.put(2, 0);
                 initialMap.put(3, 0);
-                initialMap.put(4, 0);
                 return initialMap;
             });
 

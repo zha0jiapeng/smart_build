@@ -58,7 +58,7 @@ public class PeopleController {
                 .groupBy("personnel_config_type");
         List<Map<String, Object>> list = workPeopleService.listMaps(queryWrapper);
         Map<Integer, Map<String, Object>> defaultMap = new HashMap<>();
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i <= 3; i++) {
             Map<String, Object> typeMap = new HashMap<>();
             typeMap.put("personnel_config_type", i);
             typeMap.put("count", 0);

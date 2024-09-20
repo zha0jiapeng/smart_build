@@ -336,7 +336,7 @@ public class CarGateController {
             List<Map<String, Object>> values = new ArrayList<>();
             values.add(valueMap);
             Map<String, List<Map<String, Object>>> param = new HashMap<>();
-            rootMap.put("values", values);
+            param.put("values", values);
 
             hdyHttpUtils.pushIOT(param, "bbe55ec4-fc7b-4cd1-a704-1f07964b82d6");
 
@@ -356,14 +356,6 @@ public class CarGateController {
 
         // 格式化到目标格式并返回
         return zonedDateTime.format(targetFormatter);
-    }
-
-    public static void main(String[] args) {
-        String iso8601String = "2018-07-26T15:00:00+08:00";
-        String formattedString = convertIso8601ToCustomFormat(iso8601String);
-
-        System.out.println("Original ISO 8601 String: " + iso8601String);
-        System.out.println("Formatted String: " + formattedString);
     }
 
 }

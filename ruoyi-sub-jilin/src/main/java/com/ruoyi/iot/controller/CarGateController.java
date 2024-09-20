@@ -305,7 +305,7 @@ public class CarGateController {
             String allowInType = VehicleType.getRemarkByCode("hik" + releaseWay);
 
             //设备编号
-//            String deviceCode = "10.1.3.210".equals(ipaddr) ? "f106f4e2-49788a49" : "4e32e371-4291fb9a";
+            String deviceCode = jsonObject.getString("entranceSyscode");
             //报警类型
             String alarmType = "";
             //驾驶员
@@ -318,7 +318,7 @@ public class CarGateController {
             Map<String, Object> valueMap = new HashMap<>();
             valueMap.put("portal_id", portalId);
             valueMap.put("sub_project_id", subProjectId);
-//            valueMap.put("device_code", deviceCode);
+            valueMap.put("device_code", deviceCode);
 //            valueMap.put("device_name", deviceName);
             valueMap.put("work_status", onlineStatus);
             valueMap.put("video_streaming", imageFile);

@@ -86,4 +86,22 @@ public class DoorFunctionApi {
         JSONObject jsonObject = JSONObject.parseObject(result);
         return jsonObject;
     }
+
+    /**
+     * 海康道闸
+     * @param request
+     * @return
+     */
+    public JSONObject crossRecordsPage(Map<String,Object> request){
+        String eventsDataApi = ARTEMIS_PATH +"/api/pms/v1/crossRecords/page";
+        Map<String,String> path = new HashMap<String,String>(2){
+            {
+                put("https://",eventsDataApi);
+            }
+        };
+        String body=JSON.toJSONString(request);
+        String result =ArtemisHttpUtil.doPostStringArtemis(path,body,null,null,"application/json");
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        return jsonObject;
+    }
 }

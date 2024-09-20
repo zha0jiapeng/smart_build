@@ -8,7 +8,15 @@ public enum VehicleType {
     MINIBUS("4", "小型客车"),
     COACH("5", "大型客车"),
     SMALL_TRUCK("6", "小型货车"),
-    LARGE_TRUCK("7", "大型货车");
+    LARGE_TRUCK("7", "大型货车"),
+    OTHER("hik0", "其他车"),
+    SMALL_CAR("hik1", "小型车"),
+    LARGE_CAR("hik2", "大型车"),
+    MOTORCYCLE("hik3", "摩托车"),
+    NOT_OPEN("hik10", "未开闸"),
+    AUTO_OPEN("hik11", "自动开闸"),
+    MANUAL_OPEN("hik12", "人工/人工开闸"),
+    REMOTE_OPEN("hik13", "遥控器开闸");
 
     private final String code;
     private final String remark;

@@ -67,6 +67,8 @@ public class TCPController {
 
     private static ServerSocket serverSocket4322;
     private static ServerSocket serverSocket4321;
+    private static ServerSocket serverSocket4323;
+    private static ServerSocket serverSocket4324;
 
     @PostConstruct
     public void init() {
@@ -76,6 +78,12 @@ public class TCPController {
 
             serverSocket4321 = new ServerSocket(4321);
             serverSocket4321.setReuseAddress(true);
+
+            serverSocket4323 = new ServerSocket(4323);
+            serverSocket4323.setReuseAddress(true);
+
+            serverSocket4324 = new ServerSocket(4324);
+            serverSocket4324.setReuseAddress(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -88,7 +96,6 @@ public class TCPController {
 
     private void handleConnection4322() {
         try {
-            System.out.println("扬尘开始链接");
             Socket socket = serverSocket4322.accept();
             handleClient(socket);
         } catch (IOException e) {
@@ -99,7 +106,6 @@ public class TCPController {
     private void handleClient(Socket socket) {
         try {
             // 处理客户端连接
-            System.out.println("开始处理扬尘客户端链接");
             for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
                 String command = entry.getKey();
                 BiConsumer<byte[], Integer> handler = entry.getValue();
@@ -125,7 +131,6 @@ public class TCPController {
 
             // 插入数据库
             iotTsp.setCreatedDate(DateUtils.getNowDate());
-            System.out.println("扬尘数据开始插入数据库");
             iotTspService.save(iotTsp);
 
             // 创建values的List并添加valueMap

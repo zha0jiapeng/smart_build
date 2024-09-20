@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 @RestController
 @RequestMapping("/TCP")
 public class TCPController {
@@ -44,17 +46,17 @@ public class TCPController {
     static {
         // 初始化指令和对应的处理方法
         commandHandlers.put("66 03 00 00 00 01 8C 1D", TCPController::handleTemperatureResponse);
-//        commandHandlers.put("8A 03 00 00 00 01 9A B1", TCPController::handleCO2Response);
         commandHandlers.put("66 03 00 01 00 01 DD DD", TCPController::handleHumidityResponse);
         commandHandlers.put("66 03 00 02 00 01 2D DD", TCPController::handlePressureResponse);
         commandHandlers.put("66 03 00 03 00 01 7C 1D", TCPController::handleNoiseResponse);
         commandHandlers.put("8A 03 00 01 00 01 CB 71", TCPController::handlePM2_5Response);
         commandHandlers.put("8A 03 00 02 00 01 3B 71", TCPController::handlePM10Response);
         commandHandlers.put("02 03 00 01 00 01 D5 F9", TCPController::handleWindDirectionResponse);
-        commandHandlers.put("01 03 00 00 00 01 84 0A", TCPController::handleWinSpeedResponse);
+        commandHandlers.put("01 03 00 00 00 01 84 0A", TCPController::handleWindSpeedResponse);
     }
 
-    private static Map<String, Object> sendMap = new HashMap<>();
+    private static Map<String, Object> sendMap4322_4321 = new HashMap<>();
+    private static Map<String, Object> sendMap4323_4324 = new HashMap<>();
 
     @Resource
     HdyHttpUtils hdyHttpUtils;
@@ -65,6 +67,7 @@ public class TCPController {
     @Autowired
     private IRainService rainService;
 
+    private static final Map<Integer, Consumer<Socket>> portHandlers = new HashMap<>();
     private static ServerSocket serverSocket4322;
     private static ServerSocket serverSocket4321;
     private static ServerSocket serverSocket4323;
@@ -74,16 +77,19 @@ public class TCPController {
     public void init() {
         try {
             serverSocket4322 = new ServerSocket(4322);
-            serverSocket4322.setReuseAddress(true);
-
             serverSocket4321 = new ServerSocket(4321);
-            serverSocket4321.setReuseAddress(true);
-
             serverSocket4323 = new ServerSocket(4323);
-            serverSocket4323.setReuseAddress(true);
-
             serverSocket4324 = new ServerSocket(4324);
-            serverSocket4324.setReuseAddress(true);
+
+            portHandlers.put(4322, socket -> handleClient(socket, sendMap4322_4321));
+            portHandlers.put(4321, socket -> handleClient4321(socket, sendMap4322_4321));
+            portHandlers.put(4323, socket -> handleClient(socket, sendMap4323_4324));
+            portHandlers.put(4324, socket -> handleClient4321(socket, sendMap4323_4324));
+
+            new Thread(() -> handleConnection(serverSocket4322, portHandlers.get(4322))).start();
+            new Thread(() -> handleConnection(serverSocket4321, portHandlers.get(4321))).start();
+            new Thread(() -> handleConnection(serverSocket4323, portHandlers.get(4323))).start();
+            new Thread(() -> handleConnection(serverSocket4324, portHandlers.get(4324))).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -91,101 +97,89 @@ public class TCPController {
 
     @GetMapping("/server4322")
     public void server4322() throws IOException {
-        new Thread(this::handleConnection4322).start();
+        new Thread(() -> handleConnection(serverSocket4322, portHandlers.get(4322))).start();
     }
 
-    private void handleConnection4322() {
+    @GetMapping("/server4321")
+    public void server4321() throws IOException {
+        new Thread(() -> handleConnection(serverSocket4321, portHandlers.get(4321))).start();
+    }
+
+    @GetMapping("/server4323")
+    public void server4323() throws IOException {
+        new Thread(() -> handleConnection(serverSocket4323, portHandlers.get(4323))).start();
+    }
+
+    @GetMapping("/server4324")
+    public void server4324() throws IOException {
+        new Thread(() -> handleConnection(serverSocket4324, portHandlers.get(4324))).start();
+    }
+
+    private void handleConnection(ServerSocket serverSocket, Consumer<Socket> handler) {
         try {
-            Socket socket = serverSocket4322.accept();
-            handleClient(socket);
+            while (true) {
+                Socket socket = serverSocket.accept();
+                handler.accept(socket);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void handleClient(Socket socket) {
+    private void handleClient(Socket socket, Map<String, Object> sendMap) {
         try {
-            // 处理客户端连接
             for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
                 String command = entry.getKey();
                 BiConsumer<byte[], Integer> handler = entry.getValue();
 
-                // 发送数据到客户端
                 OutputStream outputStream = socket.getOutputStream();
                 byte[] initialData = hexStringToByteArray(command);
                 outputStream.write(initialData);
                 outputStream.flush();
 
-                // 接收客户端反馈的数据
                 InputStream inputStream = socket.getInputStream();
                 byte[] receivedBytes = new byte[1024];
                 int read = inputStream.read(receivedBytes);
-                String receivedMessage = bytesToHex(receivedBytes, read);
 
-                // 调用对应的处理方法
                 handler.accept(receivedBytes, read);
             }
 
             IotTsp iotTsp = new IotTsp();
-            setIotTsp(iotTsp);
+            setIotTsp(iotTsp, sendMap);
 
-            // 插入数据库
             iotTsp.setCreatedDate(DateUtils.getNowDate());
             iotTspService.save(iotTsp);
 
-            // 创建values的List并添加valueMap
             List<Map<String, Object>> valuesList = new ArrayList<>();
             valuesList.add(sendMap);
 
-            // 创建根Map
             Map<String, Object> rootMap = new HashMap<>();
             rootMap.put("values", valuesList);
-            hdyHttpUtils.pushIOT(rootMap,"f69f70f2-9fe6-49e6-bfcf-a062421cb1d2");
+            hdyHttpUtils.pushIOT(rootMap, "f69f70f2-9fe6-49e6-bfcf-a062421cb1d2");
 
-            // 关闭流和套接字
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @GetMapping("/server4321")
-    public void server4321() throws IOException {
-        new Thread(this::handleConnection4321).start();
-    }
-
-    private void handleConnection4321() {
+    private void handleClient4321(Socket socket, Map<String, Object> sendMap) {
         try {
-            Socket socket = serverSocket4321.accept();
-            handleClient4321(socket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void handleClient4321(Socket socket) {
-        try {
-            // 发送数据到客户端
             OutputStream outputStream = socket.getOutputStream();
             byte[] initialData = hexStringToByteArray("25 03 00 00 00 02 C2 EF");
             outputStream.write(initialData);
             outputStream.flush();
 
-            // 接收客户端反馈的数据
             InputStream inputStream = socket.getInputStream();
             byte[] receivedBytes = new byte[1024];
             int read = inputStream.read(receivedBytes);
-            String receivedMessage = bytesToHex(receivedBytes, read);
 
-            // 提取并计算特定字节的数据
             if (read >= 8) {
                 int value1 = receivedBytes[4] & 0xFF;
                 int value2 = receivedBytes[6] & 0xFF;
                 int result = (value1 * 256) + value2;
                 double resultDouble = result / 10.0;
-                if (sendMap == null) {
-                    sendMap = new HashMap<>();
-                }
+
                 sendMap.put("rainfall", resultDouble);
 
                 Rain rain = new Rain();
@@ -193,7 +187,6 @@ public class TCPController {
                 rain.setDeviceCode("2407052002LXY-02");
                 rainService.insertRain(rain);
             }
-            // 关闭流和套接字
             inputStream.close();
             outputStream.close();
             socket.close();
@@ -202,7 +195,7 @@ public class TCPController {
         }
     }
 
-    private void setIotTsp(IotTsp iotTsp) {
+    private void setIotTsp(IotTsp iotTsp, Map<String, Object> sendMap) {
         String now = DateUtil.now();
         sendMap.put("device_code", "2407052002LXY-02");
         iotTsp.setPmTwoFive(sendMap.get("pm25").toString());
@@ -215,12 +208,11 @@ public class TCPController {
         iotTsp.setHumidity(sendMap.get("humidity").toString());
         iotTsp.setPressure(sendMap.get("pressure").toString());
         Rain lastMonitor = rainService.getOne(new LambdaQueryWrapper<Rain>()
-                        .eq(Rain::getDeviceCode, "2407052002LXY-02")
-                        .orderByDesc(Rain::getCreateTime).last("limit 1")
-                , false);
-        if(lastMonitor!=null){
+                .eq(Rain::getDeviceCode, "2407052002LXY-02")
+                .orderByDesc(Rain::getCreateTime).last("limit 1"), false);
+        if (lastMonitor != null) {
             sendMap.put("rainfall", new BigDecimal(sendMap.get("rainfall").toString()).subtract(lastMonitor.getRainfall()).setScale(2, RoundingMode.HALF_UP).toString());
-        }else {
+        } else {
             sendMap.put("rainfall", new BigDecimal(sendMap.get("rainfall").toString()));
         }
         sendMap.put("status", "在线");
@@ -230,91 +222,90 @@ public class TCPController {
         sendMap.put("other", "");
     }
 
-    // 处理温度响应的方法
     private static void handleTemperatureResponse(byte[] receivedBytes, int read) {
         if (read >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int temperature = (highByte << 8) | lowByte;
             double actualTemperature = temperature / 100.0;
-            sendMap.put("temperature", actualTemperature);
+            sendMap4322_4321.put("temperature", actualTemperature);
+            sendMap4323_4324.put("temperature", actualTemperature);
         }
     }
 
-    // 处理湿度响应的方法
     private static void handleHumidityResponse(byte[] receivedBytes, int read) {
         if (read >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int humidity = (highByte << 8) | lowByte;
             double actualHumidity = humidity / 100.0;
-            sendMap.put("humidity", actualHumidity);
+            sendMap4322_4321.put("humidity", actualHumidity);
+            sendMap4323_4324.put("humidity", actualHumidity);
         }
     }
 
-    // 处理气压响应的方法
     private static void handlePressureResponse(byte[] receivedBytes, int read) {
         if (read >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int pressure = (highByte << 8) | lowByte;
             double actualPressure = pressure / 100.0;
-            sendMap.put("pressure", actualPressure );
+            sendMap4322_4321.put("pressure", actualPressure);
+            sendMap4323_4324.put("pressure", actualPressure);
         }
     }
 
-    // 处理噪声响应的方法
     private static void handleNoiseResponse(byte[] receivedBytes, int read) {
         if (read >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int noise = (highByte << 8) | lowByte;
             double actualNoise = noise / 10.0;
-            sendMap.put("noise", actualNoise );
+            sendMap4322_4321.put("noise", actualNoise);
+            sendMap4323_4324.put("noise", actualNoise);
         }
     }
 
-    // 处理PM2.5响应的方法
     private static void handlePM2_5Response(byte[] receivedBytes, int read) {
         if (read >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int PM2_5 = (highByte << 8) | lowByte;
-            sendMap.put("pm25", PM2_5);
+            sendMap4322_4321.put("pm25", PM2_5);
+            sendMap4323_4324.put("pm25", PM2_5);
         }
     }
 
-    // 处理PM10响应的方法
     private static void handlePM10Response(byte[] receivedBytes, int read) {
         if (read >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int PM10 = (highByte << 8) | lowByte;
-            sendMap.put("pm10", PM10 );
+            sendMap4322_4321.put("pm10", PM10);
+            sendMap4323_4324.put("pm10", PM10);
         }
     }
 
-    // 处理风向响应的方法
     private static void handleWindDirectionResponse(byte[] receivedBytes, int read) {
         if (read >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int WindWirection = (highByte << 8) | lowByte;
-            sendMap.put("wind_direction", WindWirection );
+            sendMap4322_4321.put("wind_direction", WindWirection);
+            sendMap4323_4324.put("wind_direction", WindWirection);
         }
     }
 
-    // 处理风速响应的方法
-    private static void handleWinSpeedResponse(byte[] receivedBytes, int read) {
+    private static void handleWindSpeedResponse(byte[] receivedBytes, int read) {
         if (read >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int WindSpeed = (highByte << 8) | lowByte;
-            sendMap.put("wind_speed", WindSpeed );
+            sendMap4322_4321.put("wind_speed", WindSpeed);
+            sendMap4323_4324.put("wind_speed", WindSpeed);
         }
     }
 
-    // 将字节数组转换为十六进制字符串
     public static String bytesToHex(byte[] bytes, int len) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; i++) {
@@ -323,14 +314,12 @@ public class TCPController {
         return sb.toString().trim();
     }
 
-    // 将十六进制字符串转换为字节数组
     public static byte[] hexStringToByteArray(String s) {
         s = s.replace(" ", "");
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i + 1), 16));
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
     }

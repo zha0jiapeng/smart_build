@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.domain.DustMonitoringDevice;
+import com.ruoyi.iot.enums.Direction;
 import com.ruoyi.iot.service.IDustMonitoringDeviceService;
 import com.ruoyi.iot.utils.HdyHttpUtils;
 import com.ruoyi.system.domain.basic.IotTsp;
@@ -80,6 +81,9 @@ public class TCPController {
             serverSocket4321 = new ServerSocket(4321);
             serverSocket4323 = new ServerSocket(4323);
             serverSocket4324 = new ServerSocket(4324);
+
+            sendMap4322_4321.put("deviceArea","14#支洞");
+            sendMap4323_4324.put("deviceArea","15#支洞");
 
             portHandlers.put(4322, socket -> handleClient(socket, sendMap4322_4321));
             portHandlers.put(4321, socket -> handleClient4321(socket, sendMap4322_4321));
@@ -197,7 +201,6 @@ public class TCPController {
 
     private void setIotTsp(IotTsp iotTsp, Map<String, Object> sendMap) {
         String now = DateUtil.now();
-        sendMap.put("device_code", "2407052002LXY-02");
         iotTsp.setPmTwoFive(sendMap.get("pm25").toString());
         iotTsp.setDevId("54");
         iotTsp.setPmTen(sendMap.get("pm10").toString());
@@ -207,8 +210,17 @@ public class TCPController {
         iotTsp.setTemperature(sendMap.get("temperature").toString());
         iotTsp.setHumidity(sendMap.get("humidity").toString());
         iotTsp.setPressure(sendMap.get("pressure").toString());
+        iotTsp.setDeviceArea(sendMap.get("deviceArea").toString());
+        String rainDeviceCode = "";
+        if (iotTsp.getDeviceArea().equals("14#支洞")){
+            rainDeviceCode = "2407052002LXY-02";
+            sendMap.put("device_code", "2407052002LXY-02");
+        } else {
+            rainDeviceCode = "2407052002LXY-02";
+            sendMap.put("device_code", "2407052002LXY-02");
+        }
         Rain lastMonitor = rainService.getOne(new LambdaQueryWrapper<Rain>()
-                .eq(Rain::getDeviceCode, "2407052002LXY-02")
+                .eq(Rain::getDeviceCode, rainDeviceCode)
                 .orderByDesc(Rain::getCreateTime).last("limit 1"), false);
         if (lastMonitor != null) {
             sendMap.put("rainfall", new BigDecimal(sendMap.get("rainfall").toString()).subtract(lastMonitor.getRainfall()).setScale(2, RoundingMode.HALF_UP).toString());
@@ -291,8 +303,9 @@ public class TCPController {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int WindWirection = (highByte << 8) | lowByte;
-            sendMap4322_4321.put("wind_direction", WindWirection);
-            sendMap4323_4324.put("wind_direction", WindWirection);
+            String direction = Direction.fromAngle(String.valueOf(WindWirection));
+            sendMap4322_4321.put("wind_direction", direction);
+            sendMap4323_4324.put("wind_direction", direction);
         }
     }
 

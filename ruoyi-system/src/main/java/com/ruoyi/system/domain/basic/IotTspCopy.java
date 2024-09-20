@@ -39,6 +39,8 @@ public class IotTspCopy extends BaseDomain implements Serializable {
 
     private String voc;
 
+    private String deviceArea;
+
     @TableField(exist = false)
     private List<IotTspCopyDetails> iotTspCopyDetails;
 

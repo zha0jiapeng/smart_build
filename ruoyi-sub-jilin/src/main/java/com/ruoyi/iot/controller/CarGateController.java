@@ -256,7 +256,7 @@ public class CarGateController {
         rootMap.put("pageNo", 1);
         rootMap.put("pageSize", 100);
         ZonedDateTime endTime = ZonedDateTime.now();
-        ZonedDateTime startTime = endTime.minusMinutes(1000);
+        ZonedDateTime startTime = endTime.minusMinutes(5000);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
         String formattedEndTime = endTime.format(formatter);
         String formattedStartTime = startTime.format(formatter);
@@ -338,8 +338,7 @@ public class CarGateController {
             Map<String, List<Map<String, Object>>> param = new HashMap<>();
             param.put("values", values);
 
-            log.info("14洞口道闸：{}", param.toString());
-//            hdyHttpUtils.pushIOT(param, "bbe55ec4-fc7b-4cd1-a704-1f07964b82d6");
+            hdyHttpUtils.pushIOT(param, "bbe55ec4-fc7b-4cd1-a704-1f07964b82d6");
 
         }
     }

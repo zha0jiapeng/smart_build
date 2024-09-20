@@ -33,17 +33,40 @@ public class TspController extends BaseController {
     @Resource
     private MerchantService merchantService;
 
-    @GetMapping("tsp/list")
-    public TableDataInfo queryByPage(IotTsp iotTsp) {
+    @GetMapping("tsp/list/14")
+    public TableDataInfo queryByPage14(IotTsp iotTsp) {
         startPage();
+        iotTsp.setDeviceArea("14#支洞");
         List<IotTsp> iotTspList = iotTspService.queryByPage(iotTsp);
         return getDataTable(iotTspList);
     }
 
-    @RequestMapping("bim/tsp/list")
-    public TableDataInfo queryByPageBim() {
+    @GetMapping("tsp/list/15")
+    public TableDataInfo queryByPage15(IotTsp iotTsp) {
+        startPage();
+        iotTsp.setDeviceArea("15#支洞");
+        List<IotTsp> iotTspList = iotTspService.queryByPage(iotTsp);
+        return getDataTable(iotTspList);
+    }
+
+    @RequestMapping("bim/tsp/list/14")
+    public TableDataInfo queryByPageBim14() {
         List<IotTsp> iotTspLists = new ArrayList<>();
         QueryWrapper<IotTsp> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("device_area", "14#支洞");
+        queryWrapper.orderByDesc("id");
+        queryWrapper.last("limit 1");
+        List<IotTsp> iotTspList = iotTspService.list(queryWrapper);
+        Optional<IotTsp> max = iotTspList.stream().max(Comparator.comparingDouble(IotTsp::getId));
+        max.ifPresent(iotTspLists::add);
+        return getDataTable(iotTspLists);
+    }
+
+    @RequestMapping("bim/tsp/list/15")
+    public TableDataInfo queryByPageBim15() {
+        List<IotTsp> iotTspLists = new ArrayList<>();
+        QueryWrapper<IotTsp> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("device_area", "15#支洞");
         queryWrapper.orderByDesc("id");
         queryWrapper.last("limit 1");
         List<IotTsp> iotTspList = iotTspService.list(queryWrapper);

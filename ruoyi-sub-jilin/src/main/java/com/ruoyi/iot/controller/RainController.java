@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -106,9 +107,19 @@ public class RainController extends BaseController {
     }
 
 
-    @GetMapping("/getLatestRain")
-    public AjaxResult getLatestRain(){
+    @GetMapping("/getLatestRain/14")
+    public AjaxResult getLatestRain14() {
         QueryWrapper<Rain> rainQueryWrapper = new QueryWrapper<>();
+        rainQueryWrapper.eq("device_code", "2407052002LXY-02");
+        rainQueryWrapper.orderByDesc("id").last("limit 1");
+        Rain latestRain = rainMapper.selectOne(rainQueryWrapper);
+        return success(latestRain);
+    }
+
+    @GetMapping("/getLatestRain/15")
+    public AjaxResult getLatestRain15() {
+        QueryWrapper<Rain> rainQueryWrapper = new QueryWrapper<>();
+        rainQueryWrapper.eq("device_code", "2407052002LXY-02");
         rainQueryWrapper.orderByDesc("id").last("limit 1");
         Rain latestRain = rainMapper.selectOne(rainQueryWrapper);
         return success(latestRain);

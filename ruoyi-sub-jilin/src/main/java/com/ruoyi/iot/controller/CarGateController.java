@@ -244,6 +244,8 @@ public class CarGateController {
         value.put("allow_in_type", allowInType);
         value.put("other", other);
 
+        saveSQL(value);
+
         List<Map<String, Object>> values = new ArrayList<>();
         values.add(value);
         Map<String, List<Map<String, Object>>> rootMap = new HashMap<>();
@@ -340,7 +342,7 @@ public class CarGateController {
             valueMap.put("phone_number", phoneNumber);
             valueMap.put("allow_in_type", allowInType);
             valueMap.put("other", other);
-
+            saveSQL(valueMap);
             List<Map<String, Object>> values = new ArrayList<>();
             values.add(valueMap);
             Map<String, List<Map<String, Object>>> param = new HashMap<>();

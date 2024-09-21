@@ -9,12 +9,17 @@ import com.ruoyi.common.utils.MinioUtils;
 import com.ruoyi.iot.bean.DoorFunctionApi;
 import com.ruoyi.iot.enums.VehicleType;
 import com.ruoyi.iot.utils.HdyHttpUtils;
+import com.ruoyi.system.domain.basic.CarAccess;
+import com.ruoyi.system.service.CarAccessService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,6 +38,9 @@ public class CarGateController {
 
     @Resource
     MinioConfig minioConfig;
+
+    @Autowired
+    private CarAccessService carAccessService;
 
 
     @PostMapping("/carAccess")
@@ -254,9 +262,9 @@ public class CarGateController {
     public void carAccessHik() {
         Map<String, Object> rootMap = new HashMap<>();
         rootMap.put("pageNo", 1);
-        rootMap.put("pageSize", 100);
+        rootMap.put("pageSize", 1000);
         ZonedDateTime endTime = ZonedDateTime.now();
-        ZonedDateTime startTime = endTime.minusMinutes(5000);
+        ZonedDateTime startTime = endTime.minusMinutes(10);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
         String formattedEndTime = endTime.format(formatter);
         String formattedStartTime = startTime.format(formatter);
@@ -341,6 +349,40 @@ public class CarGateController {
             hdyHttpUtils.pushIOT(param, "bbe55ec4-fc7b-4cd1-a704-1f07964b82d6");
 
         }
+    }
+
+    public void saveSQL(Map<String, Object> valueMap) {
+        CarAccess carAccess = new CarAccess();
+        //车辆编码
+        String carCode = valueMap.get("license_number").toString();
+        carAccess.setCarCode(carCode);
+
+        String in_out_type = valueMap.get("in_out_type").toString();
+        String create_time = valueMap.get("create_time").toString();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            date = dateFormat.parse(create_time);
+        } catch (ParseException e) {
+            System.err.println("转换失败: " + e.getMessage());
+        }
+        if (in_out_type.equals("进")) {
+            //入场时间
+            carAccess.setCarInDate(date);
+        } else {
+            //出场时间
+            carAccess.setCarOutDate(date);
+        }
+        carAccess.setPhotoBase64("");
+
+        String photoUrl = valueMap.get("video_streaming").toString();
+        carAccess.setPhotoUrl(photoUrl);
+
+        String sn = valueMap.get("device_code").toString();
+        carAccess.setSn(sn);
+
+        carAccessService.insert(carAccess);
     }
 
 

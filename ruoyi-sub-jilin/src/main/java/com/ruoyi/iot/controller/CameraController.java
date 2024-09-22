@@ -25,7 +25,7 @@ public class CameraController {
         Map<String, Object> cameraData = new HashMap<>();
         cameraData.put("cameraIndexCode", sn);
         cameraData.put("streamType", 0);
-        cameraData.put("protocol", "ws");
+        cameraData.put("protocol", "hls");
         cameraData.put("transmode", 1);
         cameraData.put("expand", "transcode=0");
         cameraData.put("streamform", "rtp");

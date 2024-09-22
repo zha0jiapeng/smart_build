@@ -56,10 +56,11 @@ public class Controller {
     public void hikPush(@RequestBody Map<String,String> requestt ) throws Exception {
         String end = requestt.get("end");
         String start = requestt.get("start");
+        String name = requestt.get("name");
         log.info("...start{}...end:{}",start,end);
         log.info("=========门禁通行事件===========");
 
-        fetchEventsRecursively(start, end, 1);  // 从第一页开始递归
+        fetchEventsRecursively(start, end, name,1);  // 从第一页开始递归
 
 
     }
@@ -73,7 +74,20 @@ public class Controller {
                 continue;
             }
             if(object.get("picUri")==null){
-                continue;
+                Map<String, Object> map = new HashMap<>();
+                map.put("pageNo",1);
+                map.put("pageSize",1);
+                map.put("certificateNo", object.get("certNo").toString());
+                DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
+                String s = doorFunctionApi.personList(map);
+                JSONObject jsonObject1 = JSONObject.parseObject(s);
+                JSONObject data = jsonObject1.getJSONObject("data");
+                if (data != null) {
+                    JSONArray list1 = data.getJSONArray("list");
+                    if(list1!=null && list1.size()>0) {
+                        object.put("picUri",list1.getJSONObject(0).getJSONObject("personPhoto").getString("picUri") );
+                    }
+                }
             }
             Map<String, Object> map = new HashMap<>();
             map.put("portal_id", "1751847977770553345");
@@ -103,8 +117,8 @@ public class Controller {
         log.info("...返回值{}",JSON.toJSONString(body1));
     }
 
-    private void fetchEventsRecursively(String start, String end, int page) {
-        JSONObject data = getObjects(end, start, page);
+    private void fetchEventsRecursively(String start, String end,String name, int page) {
+        JSONObject data = getObjects(end, start, name, page);
 
         if (data != null) {
             Integer total = data.getInteger("total");
@@ -120,20 +134,21 @@ public class Controller {
             if (total != null && total > page * 1000) {
 
                 // 递归调用下一页
-                fetchEventsRecursively(start, end, page + 1);
+                fetchEventsRecursively(start, end, name,page + 1);
             }
         } else {
             log.warn("未获取到有效的事件数据");
         }
     }
 
-    private static JSONObject getObjects(String end, String start,Integer page) {
+    private static JSONObject getObjects(String end, String start,String name,Integer page) {
         DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
         EventsRequest eventsRequest = new EventsRequest(); //查询门禁事件
         eventsRequest.setPageNo(page); // 显示最后一个人
         eventsRequest.setPageSize(1000);
         eventsRequest.setStartTime(getISO8601TimestampFromDateStr(start));
         eventsRequest.setEndTime(getISO8601TimestampFromDateStr(end));
+        eventsRequest.setPersonName(name);
         log.info("...门禁事件入参{}",JSON.toJSONString(eventsRequest));
         String doorcount = doorFunctionApi.events(eventsRequest);//查询门禁事件V2
         JSONObject jsonObject = JSONObject.parseObject(doorcount);

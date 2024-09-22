@@ -503,8 +503,8 @@ public class BimHomeController {
             } else {
                 qualityDistribution.setHunningtu("0");
             }
-            if (collect.containsKey("其他")) {
-                qualityDistribution.setQiti(String.valueOf(collect.get("其他").size()));
+            if (collect.containsKey("其他工程")) {
+                qualityDistribution.setQiti(String.valueOf(collect.get("其他工程").size()));
             } else {
                 qualityDistribution.setQiti("0");
             }

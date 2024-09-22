@@ -483,18 +483,23 @@ public class BimHomeController {
             Map<String, List<com.ruoyi.system.entity.QualityProblem>> collect = qualityProblems.stream()
                     .collect(Collectors.groupingBy(com.ruoyi.system.entity.QualityProblem::getPatternBase));
             QualityDistribution qualityDistribution = new QualityDistribution();
-            if (collect.containsKey("模板")) {
-                qualityDistribution.setMoban(String.valueOf(collect.get("模板").size()));
+            if (collect.containsKey("开挖工程")) {
+                qualityDistribution.setKaiwa(String.valueOf(collect.get("开挖工程").size()));
+            } else {
+                qualityDistribution.setKaiwa("0");
+            }
+            if (collect.containsKey("模板工程")) {
+                qualityDistribution.setMoban(String.valueOf(collect.get("模板工程").size()));
             } else {
                 qualityDistribution.setMoban("0");
             }
-            if (collect.containsKey("钢筋")) {
-                qualityDistribution.setGangjin(String.valueOf(collect.get("钢筋").size()));
+            if (collect.containsKey("钢筋工程")) {
+                qualityDistribution.setGangjin(String.valueOf(collect.get("钢筋工程").size()));
             } else {
                 qualityDistribution.setGangjin("0");
             }
-            if (collect.containsKey("混凝土")) {
-                qualityDistribution.setHunningtu(String.valueOf(collect.get("混凝土").size()));
+            if (collect.containsKey("混凝土工程")) {
+                qualityDistribution.setHunningtu(String.valueOf(collect.get("混凝土工程").size()));
             } else {
                 qualityDistribution.setHunningtu("0");
             }

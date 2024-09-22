@@ -52,6 +52,7 @@ public class QualityBimDomain {
 
     @Data
     public static class QualityDistribution {
+        private String kaiwa;
         private String moban;
         private String gangjin;
         private String hunningtu;

@@ -383,7 +383,8 @@ public class CarGateController {
 
         String sn = valueMap.get("device_code").toString();
         carAccess.setSn(sn);
-
+        carAccess.setCreatedDate(new Date());
+        carAccess.setModifyDate(date);
         carAccessService.insert(carAccess);
     }
 

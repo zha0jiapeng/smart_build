@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class BroadcastAlarmUtil {
 
-    private final String serviceUrl = "http://192.168.1.201:8090";
+    private final String serviceUrl = "http://10.1.3.201:8090";
 
 
     @Autowired

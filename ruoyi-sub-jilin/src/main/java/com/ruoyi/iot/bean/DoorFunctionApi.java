@@ -27,7 +27,7 @@ public class DoorFunctionApi {
         String doControlDataApi = ARTEMIS_PATH +"/api/resource/v2/person/advance/personList";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("http://",doControlDataApi);
+                put("https://",doControlDataApi);
             }
         };
         String body= JSON.toJSONString(request);
@@ -36,10 +36,10 @@ public class DoorFunctionApi {
     }
 
     public  String previewURLs(Map<String,Object> request ){
-        String doControlDataApi = ARTEMIS_PATH +"";
+        String doControlDataApi = ARTEMIS_PATH +"/api/video/v2/cameras/previewURLs";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("http://",doControlDataApi);
+                put("https://",doControlDataApi);
             }
         };
         String body= JSON.toJSONString(request);
@@ -53,7 +53,7 @@ public class DoorFunctionApi {
         String eventsDataApi = ARTEMIS_PATH +"/api/acs/v2/door/events";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("http://",eventsDataApi);
+                put("https://",eventsDataApi);
             }
         };
         String body=JSON.toJSONString(eventsRequest);
@@ -66,7 +66,7 @@ public class DoorFunctionApi {
         String picturesDataApi = ARTEMIS_PATH +"/api/acs/v1/event/pictures";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("http://",picturesDataApi);
+                put("https://",picturesDataApi);
             }
         };
         String body=JSON.toJSONString(picturesRequest);
@@ -78,7 +78,7 @@ public class DoorFunctionApi {
         String statesDataApi = ARTEMIS_PATH +"/api/acs/v1/door/states";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("http://",statesDataApi);
+                put("https://",statesDataApi);
             }
         };
         String body=JSON.toJSONString(statesRequest);
@@ -108,7 +108,7 @@ public class DoorFunctionApi {
         String eventsDataApi = ARTEMIS_PATH +"/api/pms/v1/crossRecords/page";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("http://",eventsDataApi);
+                put("https://",eventsDataApi);
             }
         };
         String body=JSON.toJSONString(request);

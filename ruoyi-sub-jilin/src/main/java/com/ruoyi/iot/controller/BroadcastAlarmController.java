@@ -93,7 +93,7 @@ public class BroadcastAlarmController {
                 uploadData.put("audio_no", log.get("audio_no"));
                 uploadData.put("content", log.get("content"));
 
-                //hdyHttpUtils.pushIOT(uploadData,"a9ab60bf-1430-486f-984b-8b7630b63b0d");
+                hdyHttpUtils.pushIOT(uploadData,"a9ab60bf-1430-486f-984b-8b7630b63b0d");
 
             }
         } else {

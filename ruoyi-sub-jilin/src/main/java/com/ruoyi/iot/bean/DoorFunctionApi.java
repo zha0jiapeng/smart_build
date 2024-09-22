@@ -27,7 +27,7 @@ public class DoorFunctionApi {
         String doControlDataApi = ARTEMIS_PATH +"/api/resource/v2/person/advance/personList";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("https://",doControlDataApi);
+                put("http://",doControlDataApi);
             }
         };
         String body= JSON.toJSONString(request);
@@ -39,7 +39,7 @@ public class DoorFunctionApi {
         String doControlDataApi = ARTEMIS_PATH +"";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("https://",doControlDataApi);
+                put("http://",doControlDataApi);
             }
         };
         String body= JSON.toJSONString(request);
@@ -53,7 +53,7 @@ public class DoorFunctionApi {
         String eventsDataApi = ARTEMIS_PATH +"/api/acs/v2/door/events";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("https://",eventsDataApi);
+                put("http://",eventsDataApi);
             }
         };
         String body=JSON.toJSONString(eventsRequest);
@@ -66,7 +66,7 @@ public class DoorFunctionApi {
         String picturesDataApi = ARTEMIS_PATH +"/api/acs/v1/event/pictures";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("https://",picturesDataApi);
+                put("http://",picturesDataApi);
             }
         };
         String body=JSON.toJSONString(picturesRequest);
@@ -78,7 +78,7 @@ public class DoorFunctionApi {
         String statesDataApi = ARTEMIS_PATH +"/api/acs/v1/door/states";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("https://",statesDataApi);
+                put("http://",statesDataApi);
             }
         };
         String body=JSON.toJSONString(statesRequest);
@@ -108,7 +108,7 @@ public class DoorFunctionApi {
         String eventsDataApi = ARTEMIS_PATH +"/api/pms/v1/crossRecords/page";
         Map<String,String> path = new HashMap<String,String>(2){
             {
-                put("https://",eventsDataApi);
+                put("http://",eventsDataApi);
             }
         };
         String body=JSON.toJSONString(request);

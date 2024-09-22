@@ -92,7 +92,19 @@ public class DoorEvent {
                 continue;
             }
             if (object.get("picUri") == null || StringUtils.isEmpty(object.get("picUri").toString())) {
-                continue;
+                Map<String, Object> map = new HashMap<>();
+                map.put("pageNo",1);
+                map.put("pageSize",1);
+                map.put("certificateNo", object.get("certNo").toString());
+                String s = doorFunctionApi.personList(map);
+                JSONObject jsonObject1 = JSONObject.parseObject(s);
+                JSONObject data = jsonObject1.getJSONObject("data");
+                if (data != null) {
+                    JSONArray list1 = data.getJSONArray("list");
+                    if(list1!=null && list1.size()>0) {
+                        object.put("picUri",list1.getJSONObject(0).getJSONObject("personPhoto").getString("picUri") );
+                    }
+                }
             }
             Map<String, Object> map = new HashMap<>();
             map.put("portal_id", "1751847977770553345");

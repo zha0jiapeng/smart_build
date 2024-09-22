@@ -22,9 +22,21 @@ public class DoorFunctionApi {
      * STEP2：设置OpenAPI接口的上下文
      */
     private static final String ARTEMIS_PATH = "/artemis";
-    // 查询监控点列表v2
+
+    public  String personList(Map<String,Object> request ){
+        String doControlDataApi = ARTEMIS_PATH +"/api/resource/v2/person/advance/personList";
+        Map<String,String> path = new HashMap<String,String>(2){
+            {
+                put("https://",doControlDataApi);
+            }
+        };
+        String body= JSON.toJSONString(request);
+        String result = ArtemisHttpUtil.doPostStringArtemis(path,body,null,null,"application/json");
+        return result;
+    }
+
     public  String previewURLs(Map<String,Object> request ){
-        String doControlDataApi = ARTEMIS_PATH +"/api/video/v2/cameras/previewURLs";
+        String doControlDataApi = ARTEMIS_PATH +"";
         Map<String,String> path = new HashMap<String,String>(2){
             {
                 put("https://",doControlDataApi);

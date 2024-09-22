@@ -14,7 +14,7 @@ public class SyncTask {
 
 
     /**
-     * 调用扬尘监测仪（每分钟一次）
+     * 调用扬尘监测仪（每2分钟一次）
      */
     public void callMonitoring() {
         //CO2/PM通信协议

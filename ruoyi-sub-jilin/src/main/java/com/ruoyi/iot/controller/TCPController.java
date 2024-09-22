@@ -82,8 +82,8 @@ public class TCPController {
             serverSocket4323 = new ServerSocket(4323);
             serverSocket4324 = new ServerSocket(4324);
 
-            sendMap4322_4321.put("deviceArea","14#支洞");
-            sendMap4323_4324.put("deviceArea","15#支洞");
+            sendMap4322_4321.put("deviceArea", "14#支洞");
+            sendMap4323_4324.put("deviceArea", "15#支洞");
 
             portHandlers.put(4322, socket -> handleClient(socket, sendMap4322_4321));
             portHandlers.put(4321, socket -> handleClient4321(socket, sendMap4322_4321));
@@ -121,10 +121,8 @@ public class TCPController {
 
     private void handleConnection(ServerSocket serverSocket, Consumer<Socket> handler) {
         try {
-            while (true) {
-                Socket socket = serverSocket.accept();
-                handler.accept(socket);
-            }
+            Socket socket = serverSocket.accept();
+            handler.accept(socket);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -212,7 +210,7 @@ public class TCPController {
         iotTsp.setPressure(sendMap.get("pressure").toString());
         iotTsp.setDeviceArea(sendMap.get("deviceArea").toString());
         String rainDeviceCode = "";
-        if (iotTsp.getDeviceArea().equals("14#支洞")){
+        if (iotTsp.getDeviceArea().equals("14#支洞")) {
             rainDeviceCode = "2407052002LXY-02";
             sendMap.put("device_code", "2407052002LXY-02");
         } else {

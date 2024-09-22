@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.iot.mapper.GenericDelTableMapper">
+    
+    <resultMap type="GenericDelTable" id="GenericDelTableResult">
+        <result property="id"    column="id"    />
+        <result property="tableName"    column="table_name"    />
+        <result property="fieldName"    column="field_name"    />
+        <result property="intervalMonths"    column="interval_months"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectGenericDelTableVo">
+        select id, table_name, field_name, interval_months, create_by, create_time, update_by, update_time from generic_del_table
+    </sql>
+
+    <select id="selectGenericDelTableList" parameterType="GenericDelTable" resultMap="GenericDelTableResult">
+        <include refid="selectGenericDelTableVo"/>
+        <where>  
+            <if test="tableName != null  and tableName != ''"> and table_name = #{tableName}</if>
+            <if test="fieldName != null  and fieldName != ''"> and field_name = #{fieldName}</if>
+            <if test="intervalMonths != null  and intervalMonths != ''"> and interval_months = #{intervalMonths}</if>
+        </where>
+    </select>
+    
+    <select id="selectGenericDelTableById" parameterType="Long" resultMap="GenericDelTableResult">
+        <include refid="selectGenericDelTableVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertGenericDelTable" parameterType="GenericDelTable" useGeneratedKeys="true" keyProperty="id">
+        insert into generic_del_table
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tableName != null">table_name,</if>
+            <if test="fieldName != null">field_name,</if>
+            <if test="intervalMonths != null">interval_months,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tableName != null">#{table_name},</if>
+            <if test="fieldName != null">#{field_name},</if>
+            <if test="intervalMonths != null">#{interval_months},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGenericDelTable" parameterType="GenericDelTable">
+        update generic_del_table
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tableName != null">table = #{table_name},</if>
+            <if test="fieldName != null">field = #{field_name},</if>
+            <if test="intervalMonths != null">#{interval_months},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGenericDelTableById" parameterType="Long">
+        delete from generic_del_table where id = #{id}
+    </delete>
+
+    <delete id="deleteGenericDelTableByIds" parameterType="String">
+        delete from generic_del_table where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

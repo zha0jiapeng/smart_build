@@ -30,7 +30,7 @@ public class TuhuguancheUtil {
         }
         Map<String, String> paramMap = getCommonParam();
         // 私有参数_获取token
-        paramMap.put("userId", "13521470746");
+        paramMap.put("userId", "18747574274");
         paramMap.put("expiresIn", "7200");
 
         String sign = "";

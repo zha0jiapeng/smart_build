@@ -105,25 +105,21 @@ public class TCPController {
 
     @GetMapping("/server4322")
     public void server4322() throws IOException {
-        System.out.println("当前执行：14扬尘");
         new Thread(() -> handleConnection(serverSocket4322, portHandlers.get(4322))).start();
     }
 
     @GetMapping("/server4321")
     public void server4321() throws IOException {
-        System.out.println("当前执行：14雨量");
         new Thread(() -> handleConnection(serverSocket4321, portHandlers.get(4321))).start();
     }
 
     @GetMapping("/server4323")
     public void server4323() throws IOException {
-        System.out.println("当前执行：15扬尘");
         new Thread(() -> handleConnection(serverSocket4323, portHandlers.get(4323))).start();
     }
 
     @GetMapping("/server4324")
     public void server4324() throws IOException {
-        System.out.println("当前执行：15雨量");
         new Thread(() -> handleConnection(serverSocket4324, portHandlers.get(4324))).start();
     }
 
@@ -137,6 +133,7 @@ public class TCPController {
     }
 
     private void handleClient(Socket socket, Map<String, Object> sendMap) {
+        System.out.println("扬尘设备：" + sendMap);
         try {
             for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
                 String command = entry.getKey();
@@ -153,7 +150,6 @@ public class TCPController {
 
                 handler.accept(receivedBytes, read);
             }
-            System.out.println("当前落下的是谁："+sendMap.get("deviceArea"));
             IotTsp iotTsp = new IotTsp();
             setIotTsp(iotTsp, sendMap);
 

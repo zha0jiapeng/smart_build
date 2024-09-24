@@ -7,6 +7,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.iot.utils.TuhuguancheUtil;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +24,7 @@ public class CarLocationController {
     @Resource
     private RedisTemplate redisTemplate;
 
-//    @Resource
+    @Resource
 //    SwzkHttpUtils swzkHttpUtils;
 
     @RequestMapping("/location")
@@ -36,7 +37,7 @@ public class CarLocationController {
         }
     }
 
-  //  @Scheduled(cron = "0 */5 * * * *")
+//    @Scheduled(cron = "0 */5 * * * *")
     private void pushSwzk() {
         Map deviceLocation = TuhuguancheUtil.getDeviceLocation();
         redisTemplate.opsForValue().set("carLocation", JSON.toJSONString(deviceLocation));
@@ -102,7 +103,7 @@ public class CarLocationController {
         jsonData.put("deviceName", "车辆网关");
 
         jsonData.put("values", valuesList);
-       // swzkHttpUtils.pushIOT(jsonData);
+//        swzkHttpUtils.pushIOT(jsonData);
 
 
     }

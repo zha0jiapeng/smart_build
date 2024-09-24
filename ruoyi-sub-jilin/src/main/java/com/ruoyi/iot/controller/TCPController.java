@@ -85,9 +85,13 @@ public class TCPController {
             sendMap4322_4321.put("deviceArea", "14#支洞");
             sendMap4323_4324.put("deviceArea", "15#支洞");
 
+            //14#扬尘
             portHandlers.put(4322, socket -> handleClient(socket, sendMap4322_4321));
+            //14#雨量
             portHandlers.put(4321, socket -> handleClient4321(socket, sendMap4322_4321));
+            //15#支洞扬尘
             portHandlers.put(4323, socket -> handleClient(socket, sendMap4323_4324));
+            //15#支洞雨量
             portHandlers.put(4324, socket -> handleClient4321(socket, sendMap4323_4324));
 
             new Thread(() -> handleConnection(serverSocket4322, portHandlers.get(4322))).start();
@@ -186,7 +190,12 @@ public class TCPController {
 
                 Rain rain = new Rain();
                 rain.setRainfall(new BigDecimal(sendMap.get("rainfall").toString()));
-                rain.setDeviceCode("2407052002LXY-02");
+                if (sendMap.get("deviceArea").toString().contains("14#支洞")) {
+                    rain.setDeviceCode("2407052002LXY-02");
+                } else {
+                    rain.setDeviceCode("2407052002LXY-01");
+                }
+
                 rainService.insertRain(rain);
             }
             inputStream.close();
@@ -214,8 +223,8 @@ public class TCPController {
             rainDeviceCode = "2407052002LXY-02";
             sendMap.put("device_code", "2407052002LXY-02");
         } else {
-            rainDeviceCode = "2407052002LXY-02";
-            sendMap.put("device_code", "2407052002LXY-02");
+            rainDeviceCode = "2407052002LXY-01";
+            sendMap.put("device_code", "2407052002LXY-01");
         }
         Rain lastMonitor = rainService.getOne(new LambdaQueryWrapper<Rain>()
                 .eq(Rain::getDeviceCode, rainDeviceCode)

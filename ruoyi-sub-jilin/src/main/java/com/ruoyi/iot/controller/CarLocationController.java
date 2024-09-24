@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.ruoyi.iot.utils.HdyHttpUtils;
 import com.ruoyi.iot.utils.TuhuguancheUtil;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +26,7 @@ public class CarLocationController {
     private RedisTemplate redisTemplate;
 
     @Resource
-//    SwzkHttpUtils swzkHttpUtils;
+    HdyHttpUtils hdyHttpUtils;
 
     @RequestMapping("/location")
     public Map carLocation() {

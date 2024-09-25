@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 public class TuhuguancheUtil {
 
     private static final String openapi_url = "http://open.tuhugc.com";
-    private static final String app_key = "5508166a129cf8e1bfe2943b14e6d1dc";
-    private static final String app_secret = "b05cec7978367a830ab693c0a504e103";
+    private static final String app_key = "421377c6faf0b354b8944ad58d120514";
+    private static final String app_secret = "83341a9d8d3cfeec4c5c54f74b9b1289";
 
 
     private synchronized static String getToken() {
@@ -30,7 +30,7 @@ public class TuhuguancheUtil {
         }
         Map<String, String> paramMap = getCommonParam();
         // 私有参数_获取token
-        paramMap.put("userId", "13521470746");
+        paramMap.put("userId", "18747574274");
         paramMap.put("expiresIn", "7200");
 
         String sign = "";
@@ -48,7 +48,7 @@ public class TuhuguancheUtil {
         JSONObject jsonObject = JSON.parseObject(body);
         JSONObject result = jsonObject.getJSONObject("result");
         Object accessToken = result.get("accessToken");
-        redisTemplate.opsForValue().set("carToken",accessToken,2, TimeUnit.HOURS);
+        redisTemplate.opsForValue().set("carToken",accessToken,1, TimeUnit.HOURS);
         System.out.println("redis token :"+carToken);
         return accessToken.toString();
     }
@@ -95,6 +95,19 @@ public class TuhuguancheUtil {
                     }
                 }
             }
+        }
+        return jsonObject.toJavaObject(Map.class);
+    }
+
+    public static Map getDeviceHistoryLocation(){
+        String token = getToken();
+        Map<String, String> paramMap2 = getCommonParam();
+        Map<String, String> paramMap = getCommonParam();
+        paramMap.put("mapType","WGS84");
+        paramMap.put("userId", "13521470746");
+        JSONObject jsonObject = getParam(token, paramMap, "/v1/device/track/list");
+        if(0==(Integer)jsonObject.get("code")){
+
         }
         return jsonObject.toJavaObject(Map.class);
     }

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.iot.mapper.ElectricityMonitoringMapper">
+    
+    <resultMap type="ElectricityMonitoring" id="ElectricityMonitoringResult">
+        <result property="id"    column="id"    />
+        <result property="rawData"    column="raw_data"    />
+        <result property="totalPRE"    column="total_p_r_e"    />
+        <result property="totalPRRE"    column="total_p_r_r_e"    />
+        <result property="totalPAE"    column="total_p_a_e"    />
+        <result property="totalPRAE"    column="total_p_r_a_e"    />
+        <result property="aBCVoltage"    column="a_b_c_voltage"    />
+        <result property="aBCCurrent"    column="a_b_c_current"    />
+        <result property="aElectricity"    column="a_electricity"    />
+        <result property="bBlectricity"    column="b_blectricity"    />
+        <result property="cElectricity"    column="c_electricity"    />
+        <result property="aVoltage"    column="a_voltage"    />
+        <result property="bVoltage"    column="b_voltage"    />
+        <result property="cVoltage"    column="c_voltage"    />
+        <result property="boxPower"    column="box_power"    />
+        <result property="lineATemperature"    column="line_a_temperature"    />
+        <result property="lineBTemperature"    column="line_b_temperature"    />
+        <result property="lineCTemperature"    column="line_c_temperature"    />
+        <result property="lineNTemperature"    column="line_n_temperature"    />
+        <result property="pushTime"    column="push_time"    />
+        <result property="totalWattage"    column="total_wattage"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectElectricityMonitoringVo">
+        select id, raw_data, total_p_r_e, total_p_r_r_e, total_p_a_e, total_p_r_a_e, a_b_c_voltage, a_b_c_current, a_electricity, b_blectricity, c_electricity, a_voltage, b_voltage, c_voltage, box_power, line_a_temperature, line_b_temperature, line_c_temperature, line_n_temperature, push_time, total_wattage, del_flag, create_by, create_time, update_by, update_time, remark from electricity_monitoring
+    </sql>
+
+    <select id="selectElectricityMonitoringList" parameterType="ElectricityMonitoring" resultMap="ElectricityMonitoringResult">
+        <include refid="selectElectricityMonitoringVo"/>
+        <where>  
+            <if test="rawData != null  and rawData != ''"> and raw_data = #{rawData}</if>
+            <if test="totalPRE != null  and totalPRE != ''"> and total_p_r_e = #{totalPRE}</if>
+            <if test="totalPRRE != null  and totalPRRE != ''"> and total_p_r_r_e = #{totalPRRE}</if>
+            <if test="totalPAE != null  and totalPAE != ''"> and total_p_a_e = #{totalPAE}</if>
+            <if test="totalPRAE != null  and totalPRAE != ''"> and total_p_r_a_e = #{totalPRAE}</if>
+            <if test="aBCVoltage != null  and aBCVoltage != ''"> and a_b_c_voltage = #{aBCVoltage}</if>
+            <if test="aBCCurrent != null  and aBCCurrent != ''"> and a_b_c_current = #{aBCCurrent}</if>
+            <if test="aElectricity != null  and aElectricity != ''"> and a_electricity = #{aElectricity}</if>
+            <if test="bBlectricity != null  and bBlectricity != ''"> and b_blectricity = #{bBlectricity}</if>
+            <if test="cElectricity != null  and cElectricity != ''"> and c_electricity = #{cElectricity}</if>
+            <if test="aVoltage != null  and aVoltage != ''"> and a_voltage = #{aVoltage}</if>
+            <if test="bVoltage != null  and bVoltage != ''"> and b_voltage = #{bVoltage}</if>
+            <if test="cVoltage != null  and cVoltage != ''"> and c_voltage = #{cVoltage}</if>
+            <if test="boxPower != null  and boxPower != ''"> and box_power = #{boxPower}</if>
+            <if test="lineATemperature != null  and lineATemperature != ''"> and line_a_temperature = #{lineATemperature}</if>
+            <if test="lineBTemperature != null  and lineBTemperature != ''"> and line_b_temperature = #{lineBTemperature}</if>
+            <if test="lineCTemperature != null  and lineCTemperature != ''"> and line_c_temperature = #{lineCTemperature}</if>
+            <if test="lineNTemperature != null  and lineNTemperature != ''"> and line_n_temperature = #{lineNTemperature}</if>
+            <if test="pushTime != null  and pushTime != ''"> and push_time = #{pushTime}</if>
+            <if test="totalWattage != null  and totalWattage != ''"> and total_wattage = #{totalWattage}</if>
+        </where>
+    </select>
+    
+    <select id="selectElectricityMonitoringById" parameterType="Long" resultMap="ElectricityMonitoringResult">
+        <include refid="selectElectricityMonitoringVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertElectricityMonitoring" parameterType="ElectricityMonitoring">
+        insert into electricity_monitoring
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="rawData != null">raw_data,</if>
+            <if test="totalPRE != null">total_p_r_e,</if>
+            <if test="totalPRRE != null">total_p_r_r_e,</if>
+            <if test="totalPAE != null">total_p_a_e,</if>
+            <if test="totalPRAE != null">total_p_r_a_e,</if>
+            <if test="aBCVoltage != null">a_b_c_voltage,</if>
+            <if test="aBCCurrent != null">a_b_c_current,</if>
+            <if test="aElectricity != null">a_electricity,</if>
+            <if test="bBlectricity != null">b_blectricity,</if>
+            <if test="cElectricity != null">c_electricity,</if>
+            <if test="aVoltage != null">a_voltage,</if>
+            <if test="bVoltage != null">b_voltage,</if>
+            <if test="cVoltage != null">c_voltage,</if>
+            <if test="boxPower != null">box_power,</if>
+            <if test="lineATemperature != null">line_a_temperature,</if>
+            <if test="lineBTemperature != null">line_b_temperature,</if>
+            <if test="lineCTemperature != null">line_c_temperature,</if>
+            <if test="lineNTemperature != null">line_n_temperature,</if>
+            <if test="pushTime != null">push_time,</if>
+            <if test="totalWattage != null">total_wattage,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="rawData != null">#{rawData},</if>
+            <if test="totalPRE != null">#{totalPRE},</if>
+            <if test="totalPRRE != null">#{totalPRRE},</if>
+            <if test="totalPAE != null">#{totalPAE},</if>
+            <if test="totalPRAE != null">#{totalPRAE},</if>
+            <if test="aBCVoltage != null">#{aBCVoltage},</if>
+            <if test="aBCCurrent != null">#{aBCCurrent},</if>
+            <if test="aElectricity != null">#{aElectricity},</if>
+            <if test="bBlectricity != null">#{bBlectricity},</if>
+            <if test="cElectricity != null">#{cElectricity},</if>
+            <if test="aVoltage != null">#{aVoltage},</if>
+            <if test="bVoltage != null">#{bVoltage},</if>
+            <if test="cVoltage != null">#{cVoltage},</if>
+            <if test="boxPower != null">#{boxPower},</if>
+            <if test="lineATemperature != null">#{lineATemperature},</if>
+            <if test="lineBTemperature != null">#{lineBTemperature},</if>
+            <if test="lineCTemperature != null">#{lineCTemperature},</if>
+            <if test="lineNTemperature != null">#{lineNTemperature},</if>
+            <if test="pushTime != null">#{pushTime},</if>
+            <if test="totalWattage != null">#{totalWattage},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateElectricityMonitoring" parameterType="ElectricityMonitoring">
+        update electricity_monitoring
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="rawData != null">raw_data = #{rawData},</if>
+            <if test="totalPRE != null">total_p_r_e = #{totalPRE},</if>
+            <if test="totalPRRE != null">total_p_r_r_e = #{totalPRRE},</if>
+            <if test="totalPAE != null">total_p_a_e = #{totalPAE},</if>
+            <if test="totalPRAE != null">total_p_r_a_e = #{totalPRAE},</if>
+            <if test="aBCVoltage != null">a_b_c_voltage = #{aBCVoltage},</if>
+            <if test="aBCCurrent != null">a_b_c_current = #{aBCCurrent},</if>
+            <if test="aElectricity != null">a_electricity = #{aElectricity},</if>
+            <if test="bBlectricity != null">b_blectricity = #{bBlectricity},</if>
+            <if test="cElectricity != null">c_electricity = #{cElectricity},</if>
+            <if test="aVoltage != null">a_voltage = #{aVoltage},</if>
+            <if test="bVoltage != null">b_voltage = #{bVoltage},</if>
+            <if test="cVoltage != null">c_voltage = #{cVoltage},</if>
+            <if test="boxPower != null">box_power = #{boxPower},</if>
+            <if test="lineATemperature != null">line_a_temperature = #{lineATemperature},</if>
+            <if test="lineBTemperature != null">line_b_temperature = #{lineBTemperature},</if>
+            <if test="lineCTemperature != null">line_c_temperature = #{lineCTemperature},</if>
+            <if test="lineNTemperature != null">line_n_temperature = #{lineNTemperature},</if>
+            <if test="pushTime != null">push_time = #{pushTime},</if>
+            <if test="totalWattage != null">total_wattage = #{totalWattage},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteElectricityMonitoringById" parameterType="Long">
+        delete from electricity_monitoring where id = #{id}
+    </delete>
+
+    <delete id="deleteElectricityMonitoringByIds" parameterType="String">
+        delete from electricity_monitoring where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

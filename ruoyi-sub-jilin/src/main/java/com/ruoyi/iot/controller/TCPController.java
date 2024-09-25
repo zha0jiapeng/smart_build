@@ -85,9 +85,13 @@ public class TCPController {
             sendMap4322_4321.put("deviceArea", "14#支洞");
             sendMap4323_4324.put("deviceArea", "15#支洞");
 
+            //14#扬尘
             portHandlers.put(4322, socket -> handleClient(socket, sendMap4322_4321));
+            //14#雨量
             portHandlers.put(4321, socket -> handleClient4321(socket, sendMap4322_4321));
+            //15#支洞扬尘
             portHandlers.put(4323, socket -> handleClient(socket, sendMap4323_4324));
+            //15#支洞雨量
             portHandlers.put(4324, socket -> handleClient4321(socket, sendMap4323_4324));
 
             new Thread(() -> handleConnection(serverSocket4322, portHandlers.get(4322))).start();
@@ -131,7 +135,15 @@ public class TCPController {
     private void handleClient(Socket socket, Map<String, Object> sendMap) {
         try {
             for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
+
                 String command = entry.getKey();
+                // 处理"15#支洞"特定的命令
+                if (sendMap.get("deviceArea").toString().equals("15#支洞") &&
+                        (command.equals("02 03 00 01 00 01 D5 F9") || command.equals("01 03 00 00 00 01 84 0A"))) {
+                    sendMap.put("wind_direction", "");
+                    sendMap.put("wind_speed", "");
+                    continue;
+                }
                 BiConsumer<byte[], Integer> handler = entry.getValue();
 
                 OutputStream outputStream = socket.getOutputStream();
@@ -145,7 +157,6 @@ public class TCPController {
 
                 handler.accept(receivedBytes, read);
             }
-
             IotTsp iotTsp = new IotTsp();
             setIotTsp(iotTsp, sendMap);
 
@@ -158,7 +169,6 @@ public class TCPController {
             Map<String, Object> rootMap = new HashMap<>();
             rootMap.put("values", valuesList);
             hdyHttpUtils.pushIOT(rootMap, "f69f70f2-9fe6-49e6-bfcf-a062421cb1d2");
-
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -186,7 +196,12 @@ public class TCPController {
 
                 Rain rain = new Rain();
                 rain.setRainfall(new BigDecimal(sendMap.get("rainfall").toString()));
-                rain.setDeviceCode("2407052002LXY-02");
+                if (sendMap.get("deviceArea").toString().contains("14#支洞")) {
+                    rain.setDeviceCode("2407052002LXY-02");
+                } else {
+                    rain.setDeviceCode("2407052002LXY-01");
+                }
+
                 rainService.insertRain(rain);
             }
             inputStream.close();
@@ -214,8 +229,8 @@ public class TCPController {
             rainDeviceCode = "2407052002LXY-02";
             sendMap.put("device_code", "2407052002LXY-02");
         } else {
-            rainDeviceCode = "2407052002LXY-02";
-            sendMap.put("device_code", "2407052002LXY-02");
+            rainDeviceCode = "2407052002LXY-01";
+            sendMap.put("device_code", "2407052002LXY-01");
         }
         Rain lastMonitor = rainService.getOne(new LambdaQueryWrapper<Rain>()
                 .eq(Rain::getDeviceCode, rainDeviceCode)

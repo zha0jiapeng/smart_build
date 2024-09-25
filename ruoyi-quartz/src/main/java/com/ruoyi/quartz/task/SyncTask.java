@@ -21,6 +21,11 @@ public class SyncTask {
         String result1 = HttpUtil.get("http://127.0.0.1:8097/TCP/server4322");
         //雨量传感器通信协议
         String result2 = HttpUtil.get("http://127.0.0.1:8097/TCP/server4321");
+
+        //15#支洞扬尘
+        String result3 = HttpUtil.get("http://127.0.0.1:8097/TCP/server4323");
+        //15#支洞雨量
+        String result4 = HttpUtil.get("http://127.0.0.1:8097/TCP/server4324");
     }
 
     /**

@@ -286,10 +286,10 @@ public class BimHomeController {
 
         //四色图 写死不变
         RiskGradeCountModel riskGradeCountModel = new RiskGradeCountModel();
-        riskGradeCountModel.setTeda("24");
-        riskGradeCountModel.setZhongda("3");
-        riskGradeCountModel.setJiaoda("2");
-        riskGradeCountModel.setYiban("4");
+        riskGradeCountModel.setTeda("11");
+        riskGradeCountModel.setZhongda("1");
+        riskGradeCountModel.setJiaoda("23");
+        riskGradeCountModel.setYiban("12");
         securityBimDomain.setFengxiandengjitongji(riskGradeCountModel);
 
         //暂无数据

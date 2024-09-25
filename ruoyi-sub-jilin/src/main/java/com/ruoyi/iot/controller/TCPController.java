@@ -133,10 +133,17 @@ public class TCPController {
     }
 
     private void handleClient(Socket socket, Map<String, Object> sendMap) {
-        System.out.println("扬尘设备：" + sendMap);
         try {
             for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
+
                 String command = entry.getKey();
+                // 处理"15#支洞"特定的命令
+                if (sendMap.get("deviceArea").toString().equals("15#支洞") &&
+                        (command.equals("02 03 00 01 00 01 D5 F9") || command.equals("01 03 00 00 00 01 84 0A"))) {
+                    sendMap.put("wind_direction", "");
+                    sendMap.put("wind_speed", "");
+                    continue;
+                }
                 BiConsumer<byte[], Integer> handler = entry.getValue();
 
                 OutputStream outputStream = socket.getOutputStream();
@@ -162,7 +169,6 @@ public class TCPController {
             Map<String, Object> rootMap = new HashMap<>();
             rootMap.put("values", valuesList);
             hdyHttpUtils.pushIOT(rootMap, "f69f70f2-9fe6-49e6-bfcf-a062421cb1d2");
-
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();

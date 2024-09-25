@@ -119,7 +119,7 @@ public class RainController extends BaseController {
     @GetMapping("/getLatestRain/15")
     public AjaxResult getLatestRain15() {
         QueryWrapper<Rain> rainQueryWrapper = new QueryWrapper<>();
-        rainQueryWrapper.eq("device_code", "2407052002LXY-02");
+        rainQueryWrapper.eq("device_code", "2407052002LXY-01");
         rainQueryWrapper.orderByDesc("id").last("limit 1");
         Rain latestRain = rainMapper.selectOne(rainQueryWrapper);
         return success(latestRain);

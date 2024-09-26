@@ -102,7 +102,7 @@ public class DoorEvent {
                 if (data != null) {
                     JSONArray list1 = data.getJSONArray("list");
                     if(list1!=null && list1.size()>0) {
-                        object.put("picUri",list1.getJSONObject(0).getJSONObject("personPhoto").getString("picUri") );
+                        object.put("picUri",list1.getJSONObject(0).getJSONArray("personPhoto").getJSONObject(0).getString("picUri") );
                     }
                 }
             }

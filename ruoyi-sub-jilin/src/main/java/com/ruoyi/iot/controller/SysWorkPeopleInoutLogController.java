@@ -125,6 +125,4 @@ public class SysWorkPeopleInoutLogController extends BaseController {
         query.orderByDesc("log_time");
         return getDataTable(sysWorkPeopleInoutLogMapper.selectList(query));
     }
-
-
 }

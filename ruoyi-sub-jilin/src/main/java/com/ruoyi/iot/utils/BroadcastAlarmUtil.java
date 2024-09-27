@@ -44,9 +44,9 @@ public class BroadcastAlarmUtil {
         return token;
     }
 
-    public JSONObject getDeviceList(){
+    public JSONObject getDeviceList(Map map){
         HttpResponse response = HttpUtil.createGet(serviceUrl + "/v1/device")
-                .header("access_token", getToken()).execute();
+                .header("access_token", getToken()).form(map).execute();
         return JSONUtil.parseObj(response.body());
     }
 

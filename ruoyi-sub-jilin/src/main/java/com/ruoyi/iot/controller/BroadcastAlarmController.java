@@ -46,12 +46,21 @@ public class BroadcastAlarmController {
      * 获取广播报警设备
      */
     @GetMapping("device")
-    public JSONObject deviceList(){
-        JSONObject deviceList = broadcastAlarmUtil.getDeviceList();
+    public JSONObject deviceList(@RequestParam(required = false) Integer id,
+                                 @RequestParam(required = false) Integer page,
+                                 @RequestParam(required = false) Integer limit,
+                                 @RequestParam(required = false) String keyword){
+        Map<String,Object> map = new HashMap<>();
+        Optional.ofNullable(id).ifPresent(i -> map.put("id",i));
+        Optional.ofNullable(page).ifPresent(p -> map.put("page",p));
+        Optional.ofNullable(limit).ifPresent(l -> map.put("limit", l));
+        Optional.ofNullable(keyword).ifPresent(k -> map.put("keyword", k));
+        JSONObject deviceList = broadcastAlarmUtil.getDeviceList(map);
         return deviceList;
     }
 
-    private static final String API_URL = "https://your-api-domain.com/v1/task_log";
+
+    private static final String API_URL = "http://10.1.3.201:8090/v1/task_log";
 
     // 每10分钟查询一次定时任务的日志
     @Scheduled(cron = "0 */10 * * * ?") // 每10分钟执行一次

@@ -1,85 +1,85 @@
 package com.ruoyi.iot.scheduling;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.iot.utils.HdyHttpUtils;
+import org.eclipse.paho.client.mqttv3.*;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * @author y
+ */
+@Service
 public class MqttSubscriber {
 
-    private static final String MQTT_SERVER = "tcp://101.200.216.234:6879";  // MQTT 服务器地址
-    private static final String MQTT_TOPIC = "24090502540001";  // 要订阅的 Topic
-    private static final String MQTT_USERNAME = "username";  // 用户名
-    private static final String MQTT_PASSWORD = "password";  // 密码
+    @Resource
+    HdyHttpUtils hdyHttpUtils;
 
-    public static void main(String[] args) {
-        System.out.println(new Date());
+
+    public void subscribe() {
+        // MQTT 代理地址
+        String broker = "tcp://10.1.3.234:1883";
+        // 客户端 ID
+        String clientId = "JavaClient";
+        // 订阅的主题
+        String topic = "24090502540001";
+        // 用户名
+        String username = "root";
+        // 密码
+        String password = "sj4xMw65BE9y";
+
         try {
             // 创建 MQTT 客户端
-            MqttClient client = new MqttClient(MQTT_SERVER, MqttClient.generateClientId());
+            MqttClient client = new MqttClient(broker, clientId);
 
-            // 设置回调函数
-            client.setCallback(new MqttCallback() {
-                @Override
-                public void connectionLost(Throwable cause) {
-                    System.out.println("Connection lost: " + cause.getMessage());
-                }
+            // 创建连接选项
+            MqttConnectOptions options = new MqttConnectOptions();
+            options.setAutomaticReconnect(true);
+            options.setCleanSession(true);
+            options.setConnectionTimeout(10);
+            // 设置用户名
+            options.setUserName(username);
+            // 设置密码
+            options.setPassword(password.toCharArray());
 
+            // 连接到 MQTT 代理
+            client.connect(options);
+            // 订阅主题
+            client.subscribe(topic, new IMqttMessageListener() {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    String payload = new String(message.getPayload());
-                    System.out.println("Message arrived:\nTopic: " + topic + "\nMessage: " + payload);
-
-                    // 解析 JSON 数据
-                    parseMessage(payload);
-                }
-
-                @Override
-                public void deliveryComplete(IMqttDeliveryToken token) {
-                    // Not used here
+                    // 接收到的消息处理
+                    String json = new String(message.getPayload());
+                    parseMessage(json);
                 }
             });
-
-            // 设置 MQTT 连接选项
-            MqttConnectOptions options = new MqttConnectOptions();
-            options.setUserName(MQTT_USERNAME);
-            options.setPassword(MQTT_PASSWORD.toCharArray());
-            options.setCleanSession(true);
-            options.setKeepAliveInterval(60);  // 设置 keep-alive 时间
-
-            // 连接到 MQTT 服务器
-            client.connect(options);
-            System.out.println("Connected to MQTT server.");
-
-            // 订阅 Topic
-            client.subscribe(MQTT_TOPIC, 1);  // 设置 QoS 为 1
-            System.out.println("Subscribed to topic: " + MQTT_TOPIC);
 
         } catch (MqttException e) {
             e.printStackTrace();
         }
     }
 
-    private static void parseMessage(String json) {
+    // 添加一个静态变量用于计数
+    private static int callCount = 0;
+
+    private void parseMessage(String json) {
         Map<Integer, String> idValueMap = new HashMap<>();
         boolean isConfirm = false;
         try {
             System.out.println("初始数据：" + json);
-            JSONObject jsonObject = JSON.parseObject(json);
+            com.alibaba.fastjson.JSONObject jsonObject = JSON.parseObject(json);
 
             if (jsonObject.containsKey("data")) {
-                JSONArray dataArray = jsonObject.getJSONArray("data");
+                com.alibaba.fastjson.JSONArray dataArray = jsonObject.getJSONArray("data");
 
                 for (int i = 0; i < dataArray.size(); i++) {
-                    JSONObject obj = dataArray.getJSONObject(i);
+                    com.alibaba.fastjson.JSONObject obj = dataArray.getJSONObject(i);
                     String timestamp = obj.getString("tp");
                     idValueMap.put(-1, timestamp);
                     JSONArray pointsArray = obj.getJSONArray("point");
@@ -87,7 +87,7 @@ public class MqttSubscriber {
                         JSONObject pointObj = pointsArray.getJSONObject(j);
                         int id = pointObj.getIntValue("id");
                         String value = pointObj.getString("val");
-                        if (id == 36){
+                        if (id == 36) {
                             isConfirm = true;
                         }
                         idValueMap.put(id, value);
@@ -97,17 +97,22 @@ public class MqttSubscriber {
         } catch (Exception e) {
             System.out.println("Failed to parse message: " + e.getMessage());
         }
-        if (isConfirm){
-//            pushIOT(idValueMap);
+
+        callCount++;
+
+        // 当第二次调用并且满足条件时才调用 pushIOT
+        if (callCount == 2 && isConfirm) {
+            pushIOT(idValueMap);
+            callCount = 0; // 重置计数器
         }
     }
 
-    public static void pushIOT(Map<Integer, String> idValueMap) {
+    public void pushIOT(Map<Integer, String> idValueMap) {
         Map<String, Object> valueMap = new HashMap<>();
         //门户ID  String
-        valueMap.put("portal_id", "");
+        valueMap.put("portal_id", "1751847977770553345");
         //标段ID  String
-        valueMap.put("sub_project_id", "");
+        valueMap.put("sub_project_id", "1801194524869922817");
         //设备编号  String 0
         valueMap.put("device_code", idValueMap.get(0));
         //设备工作状态  String
@@ -129,7 +134,12 @@ public class MqttSubscriber {
         valueMap.put("a_b_c_voltage", a_b_c_voltage);
         //ABC三项电流  Decimal (7+8+9)/3
         String a_b_c_currentString = calculateAndFormatSum(idValueMap, 1, 2, 3);
-//        valueMap.put("a_b_c_current", a_b_c_current);
+        Double a_b_c_currentDouble = Double.parseDouble(a_b_c_currentString)/3;
+        Double result = a_b_c_currentDouble / 3;
+        // 格式化结果保留一位小数
+        DecimalFormat decimalFormat = new DecimalFormat("#.#");
+        result = Double.valueOf(decimalFormat.format(result));
+        valueMap.put("a_b_c_current", String.valueOf(result));
         //A相电流  Decimal 7
         valueMap.put("a_electricity", idValueMap.get(7));
         //B相电流  Decimal 8
@@ -189,7 +199,7 @@ public class MqttSubscriber {
         Map<String, List<Map<String, Object>>> param = new HashMap<>();
         param.put("values", values);
 
-//        hdyHttpUtils.pushIOT(param, "bbe55ec4-fc7b-4cd1-a704-1f07964b82d6");
+        hdyHttpUtils.pushIOT(param, "2e2529ef-f03a-4159-8ebb-a050e0e0fc89");
     }
 
 

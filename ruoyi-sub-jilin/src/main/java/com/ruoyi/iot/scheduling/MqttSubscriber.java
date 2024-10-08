@@ -51,7 +51,9 @@ public class MqttSubscriber {
             MqttConnectOptions options = new MqttConnectOptions();
             options.setAutomaticReconnect(true);
             options.setCleanSession(true);
-            options.setConnectionTimeout(10);
+            options.setConnectionTimeout(30);
+            // 以秒为单位的心跳间隔
+            options.setKeepAliveInterval(60);
             // 设置用户名
             options.setUserName(username);
             // 设置密码
@@ -74,15 +76,14 @@ public class MqttSubscriber {
         }
     }
 
-    // 添加一个静态变量用于计数
     private static int callCount = 0;
     private static Map<Integer, String> idValueMap = new HashMap<>();
     private static String rawData = "";
 
     private void parseMessage(String json) {
         boolean isConfirm = false;
+
         try {
-            rawData += json;
             System.out.println("初始数据：" + json);
 
             com.alibaba.fastjson.JSONObject jsonObject = JSON.parseObject(json);
@@ -94,34 +95,44 @@ public class MqttSubscriber {
                     com.alibaba.fastjson.JSONObject obj = dataArray.getJSONObject(i);
                     String timestamp = obj.getString("tp");
                     idValueMap.put(-1, timestamp);
+
                     JSONArray pointsArray = obj.getJSONArray("point");
                     for (int j = 0; j < pointsArray.size(); j++) {
                         JSONObject pointObj = pointsArray.getJSONObject(j);
                         int id = pointObj.getIntValue("id");
                         String value = pointObj.getString("val");
+
                         if (id == 36) {
                             isConfirm = true;
+                        } else if (id == 1 && callCount != 0) {
+                            resetData();
                         }
+
                         idValueMap.put(id, value);
                     }
                 }
             }
+
+            rawData += json;
+            callCount++;
+            System.out.println("当前状态：callCount" + callCount + "isConfirm：" + isConfirm);
+            if (callCount == 2 && isConfirm) {
+                System.out.println("开始执行用电监测数据解析");
+                ElectricityMonitoring electricityMonitoring = new ElectricityMonitoring();
+                electricityMonitoring.setRawData(rawData);
+                pushIOT(idValueMap, electricityMonitoring);
+                resetData();
+            }
+
         } catch (Exception e) {
             System.out.println("Failed to parse message: " + e.getMessage());
         }
+    }
 
-        callCount++;
-
-        // 当第二次调用并且满足条件时才调用 pushIOT
-        if (callCount == 2 && isConfirm) {
-            ElectricityMonitoring electricityMonitoring = new ElectricityMonitoring();
-            electricityMonitoring.setRawData(rawData);
-            pushIOT(idValueMap, electricityMonitoring);
-            idValueMap = new HashMap<>();
-            rawData = "";
-            // 重置计数器
-            callCount = 0;
-        }
+    private void resetData() {
+        idValueMap.clear();
+        rawData = "";
+        callCount = 0;
     }
 
     public void pushIOT(Map<Integer, String> idValueMap, ElectricityMonitoring electricityMonitoring) {

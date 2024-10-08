@@ -245,7 +245,7 @@ public class MqttSubscriber {
         param.put("values", values);
         //开始插入数据库
         electricityMonitoringService.insertElectricityMonitoring(electricityMonitoring);
-        hdyHttpUtils.pushIOT(param, "query/2e2529ef-f03a-4159-8ebb-a050e0e0fc89");
+        hdyHttpUtils.pushIOT(param, "2e2529ef-f03a-4159-8ebb-a050e0e0fc89");
     }
 
 

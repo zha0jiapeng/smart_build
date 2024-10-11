@@ -1,9 +1,6 @@
 package com.ruoyi.iot.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.*;
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.enums.DataSourceType;
 import io.swagger.annotations.ApiModel;
@@ -27,7 +24,6 @@ import java.util.Date;
 @Accessors(chain = true)
 @TableName("q_receive")
 @ApiModel(value = "QReceive", description = "收料对象 q_receive")
-@DataSource(value = DataSourceType.SLAVE)
 public class QReceive implements Serializable {
 
 private static final long serialVersionUID=1L;
@@ -342,10 +338,12 @@ private static final long serialVersionUID=1L;
 
     /** 主表发货时间 */
     @ApiModelProperty(value = "主表发货时间")
+    @TableField("col_varchar_50_no_01")
     private String colVarchar50No01;
 
     /** 运单编号 */
     @ApiModelProperty(value = "运单编号")
+    @TableField("col_varchar_500_no_01")
     private String colVarchar500No01;
 
     /** 补录原因(冲红原因) */

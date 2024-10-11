@@ -1,10 +1,14 @@
 package com.ruoyi.iot.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.annotation.DataSource;
+import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.iot.domain.QReceive;
 
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -62,4 +66,12 @@ public interface IQReceiveService extends IService<QReceive>
      * @return 结果
      */
     public int deleteQReceiveByOrgId(String orgId);
+
+    Map<String,List<QReceive>> selectQReceiveList();
+
+    @DataSource(value = DataSourceType.SLAVE)
+    List<QReceive> selectQReceiveListSLAVE(QueryWrapper<QReceive> queryWrapper);
+
+    @DataSource(value = DataSourceType.SLAVEDATA)
+    List<QReceive> selectQReceiveListSLAVEDATA(QueryWrapper<QReceive> queryWrapper);
 }

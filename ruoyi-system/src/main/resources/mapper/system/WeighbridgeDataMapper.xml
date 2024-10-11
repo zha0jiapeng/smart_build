@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.iot.mapper.WeighbridgeDataMapper">
+    
+    <resultMap type="WeighbridgeData" id="WeighbridgeDataResult">
+        <result property="id"    column="id"    />
+        <result property="deviceCode"    column="device_code"    />
+        <result property="workStatus"    column="work_status"    />
+        <result property="licenseNumber"    column="license_number"    />
+        <result property="carPicture"    column="car_picture"    />
+        <result property="boxPicture"    column="box_picture"    />
+        <result property="oneWeightTime"    column="one_weight_time"    />
+        <result property="twoWeightTime"    column="two_weight_time"    />
+        <result property="actualWeight"    column="actual_weight"    />
+        <result property="deductWeight"    column="deduct_weight"    />
+        <result property="suttleWeight"    column="suttle_weight"    />
+        <result property="roughWeight"    column="rough_weight"    />
+        <result property="tare"    column="tare"    />
+        <result property="inWeightTime"    column="in_weight_time"    />
+        <result property="outWeightTime"    column="out_weight_time"    />
+        <result property="orderCode"    column="order_code"    />
+        <result property="orderNumber"    column="order_number"    />
+        <result property="deviationNumber"    column="deviation_number"    />
+        <result property="deviationNumberUp"    column="deviation_number_up"    />
+        <result property="deviationNumberDown"    column="deviation_number_down"    />
+        <result property="other"    column="other"    />
+        <result property="weightTime"    column="weight_time"    />
+        <result property="weightPicture"    column="weight_picture"    />
+        <result property="waringType"    column="waring_type"    />
+        <result property="dateType"    column="date_type"    />
+        <result property="driverName"    column="driver_name"    />
+        <result property="driverPhone"    column="driver_phone"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="modifyDate"    column="modify_date"    />
+        <result property="yn"    column="yn"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="region"    column="region"    />
+    </resultMap>
+
+    <sql id="selectWeighbridgeDataVo">
+        select id, device_code, work_status, license_number, car_picture, box_picture, one_weight_time, two_weight_time, actual_weight, deduct_weight, suttle_weight, rough_weight, tare, in_weight_time, out_weight_time, order_code, order_number, deviation_number, deviation_number_up, deviation_number_down, other, weight_time, weight_picture, waring_type, date_type, driver_name, driver_phone, created_by, created_date, modify_by, modify_date, yn, order_id, region from weighbridge_data
+    </sql>
+
+    <select id="selectWeighbridgeDataList" parameterType="WeighbridgeData" resultMap="WeighbridgeDataResult">
+        <include refid="selectWeighbridgeDataVo"/>
+        <where>  
+            <if test="deviceCode != null  and deviceCode != ''"> and device_code = #{deviceCode}</if>
+            <if test="workStatus != null  and workStatus != ''"> and work_status = #{workStatus}</if>
+            <if test="licenseNumber != null  and licenseNumber != ''"> and license_number = #{licenseNumber}</if>
+            <if test="carPicture != null  and carPicture != ''"> and car_picture = #{carPicture}</if>
+            <if test="boxPicture != null  and boxPicture != ''"> and box_picture = #{boxPicture}</if>
+            <if test="oneWeightTime != null  and oneWeightTime != ''"> and one_weight_time = #{oneWeightTime}</if>
+            <if test="twoWeightTime != null  and twoWeightTime != ''"> and two_weight_time = #{twoWeightTime}</if>
+            <if test="actualWeight != null  and actualWeight != ''"> and actual_weight = #{actualWeight}</if>
+            <if test="deductWeight != null  and deductWeight != ''"> and deduct_weight = #{deductWeight}</if>
+            <if test="suttleWeight != null  and suttleWeight != ''"> and suttle_weight = #{suttleWeight}</if>
+            <if test="roughWeight != null  and roughWeight != ''"> and rough_weight = #{roughWeight}</if>
+            <if test="tare != null  and tare != ''"> and tare = #{tare}</if>
+            <if test="inWeightTime != null  and inWeightTime != ''"> and in_weight_time = #{inWeightTime}</if>
+            <if test="outWeightTime != null  and outWeightTime != ''"> and out_weight_time = #{outWeightTime}</if>
+            <if test="orderCode != null  and orderCode != ''"> and order_code = #{orderCode}</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and order_number = #{orderNumber}</if>
+            <if test="deviationNumber != null  and deviationNumber != ''"> and deviation_number = #{deviationNumber}</if>
+            <if test="deviationNumberUp != null  and deviationNumberUp != ''"> and deviation_number_up = #{deviationNumberUp}</if>
+            <if test="deviationNumberDown != null  and deviationNumberDown != ''"> and deviation_number_down = #{deviationNumberDown}</if>
+            <if test="other != null  and other != ''"> and other = #{other}</if>
+            <if test="weightTime != null  and weightTime != ''"> and weight_time = #{weightTime}</if>
+            <if test="weightPicture != null  and weightPicture != ''"> and weight_picture = #{weightPicture}</if>
+            <if test="waringType != null  and waringType != ''"> and waring_type = #{waringType}</if>
+            <if test="dateType != null  and dateType != ''"> and date_type = #{dateType}</if>
+            <if test="driverName != null  and driverName != ''"> and driver_name like concat('%', #{driverName}, '%')</if>
+            <if test="driverPhone != null  and driverPhone != ''"> and driver_phone = #{driverPhone}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="modifyBy != null  and modifyBy != ''"> and modify_by = #{modifyBy}</if>
+            <if test="modifyDate != null "> and modify_date = #{modifyDate}</if>
+            <if test="yn != null "> and yn = #{yn}</if>
+            <if test="orderId != null  and orderId != ''"> and order_id = #{orderId}</if>
+            <if test="region != null  and region != ''"> and region = #{region}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeighbridgeDataById" parameterType="Long" resultMap="WeighbridgeDataResult">
+        <include refid="selectWeighbridgeDataVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertWeighbridgeData" parameterType="WeighbridgeData" useGeneratedKeys="true" keyProperty="id">
+        insert into weighbridge_data
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null">device_code,</if>
+            <if test="workStatus != null">work_status,</if>
+            <if test="licenseNumber != null">license_number,</if>
+            <if test="carPicture != null">car_picture,</if>
+            <if test="boxPicture != null">box_picture,</if>
+            <if test="oneWeightTime != null">one_weight_time,</if>
+            <if test="twoWeightTime != null">two_weight_time,</if>
+            <if test="actualWeight != null">actual_weight,</if>
+            <if test="deductWeight != null">deduct_weight,</if>
+            <if test="suttleWeight != null">suttle_weight,</if>
+            <if test="roughWeight != null">rough_weight,</if>
+            <if test="tare != null">tare,</if>
+            <if test="inWeightTime != null">in_weight_time,</if>
+            <if test="outWeightTime != null">out_weight_time,</if>
+            <if test="orderCode != null">order_code,</if>
+            <if test="orderNumber != null">order_number,</if>
+            <if test="deviationNumber != null">deviation_number,</if>
+            <if test="deviationNumberUp != null">deviation_number_up,</if>
+            <if test="deviationNumberDown != null">deviation_number_down,</if>
+            <if test="other != null">other,</if>
+            <if test="weightTime != null">weight_time,</if>
+            <if test="weightPicture != null">weight_picture,</if>
+            <if test="waringType != null">waring_type,</if>
+            <if test="dateType != null">date_type,</if>
+            <if test="driverName != null">driver_name,</if>
+            <if test="driverPhone != null">driver_phone,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="modifyBy != null">modify_by,</if>
+            <if test="modifyDate != null">modify_date,</if>
+            <if test="yn != null">yn,</if>
+            <if test="orderId != null and orderId != ''">order_id,</if>
+            <if test="region != null and region != ''">region,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null">#{deviceCode},</if>
+            <if test="workStatus != null">#{workStatus},</if>
+            <if test="licenseNumber != null">#{licenseNumber},</if>
+            <if test="carPicture != null">#{carPicture},</if>
+            <if test="boxPicture != null">#{boxPicture},</if>
+            <if test="oneWeightTime != null">#{oneWeightTime},</if>
+            <if test="twoWeightTime != null">#{twoWeightTime},</if>
+            <if test="actualWeight != null">#{actualWeight},</if>
+            <if test="deductWeight != null">#{deductWeight},</if>
+            <if test="suttleWeight != null">#{suttleWeight},</if>
+            <if test="roughWeight != null">#{roughWeight},</if>
+            <if test="tare != null">#{tare},</if>
+            <if test="inWeightTime != null">#{inWeightTime},</if>
+            <if test="outWeightTime != null">#{outWeightTime},</if>
+            <if test="orderCode != null">#{orderCode},</if>
+            <if test="orderNumber != null">#{orderNumber},</if>
+            <if test="deviationNumber != null">#{deviationNumber},</if>
+            <if test="deviationNumberUp != null">#{deviationNumberUp},</if>
+            <if test="deviationNumberDown != null">#{deviationNumberDown},</if>
+            <if test="other != null">#{other},</if>
+            <if test="weightTime != null">#{weightTime},</if>
+            <if test="weightPicture != null">#{weightPicture},</if>
+            <if test="waringType != null">#{waringType},</if>
+            <if test="dateType != null">#{dateType},</if>
+            <if test="driverName != null">#{driverName},</if>
+            <if test="driverPhone != null">#{driverPhone},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="modifyBy != null">#{modifyBy},</if>
+            <if test="modifyDate != null">#{modifyDate},</if>
+            <if test="yn != null">#{yn},</if>
+            <if test="orderId != null and orderId != ''">#{orderId},</if>
+            <if test="region != null and region != ''">#{region},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeighbridgeData" parameterType="WeighbridgeData">
+        update weighbridge_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceCode != null">device_code = #{deviceCode},</if>
+            <if test="workStatus != null">work_status = #{workStatus},</if>
+            <if test="licenseNumber != null">license_number = #{licenseNumber},</if>
+            <if test="carPicture != null">car_picture = #{carPicture},</if>
+            <if test="boxPicture != null">box_picture = #{boxPicture},</if>
+            <if test="oneWeightTime != null">one_weight_time = #{oneWeightTime},</if>
+            <if test="twoWeightTime != null">two_weight_time = #{twoWeightTime},</if>
+            <if test="actualWeight != null">actual_weight = #{actualWeight},</if>
+            <if test="deductWeight != null">deduct_weight = #{deductWeight},</if>
+            <if test="suttleWeight != null">suttle_weight = #{suttleWeight},</if>
+            <if test="roughWeight != null">rough_weight = #{roughWeight},</if>
+            <if test="tare != null">tare = #{tare},</if>
+            <if test="inWeightTime != null">in_weight_time = #{inWeightTime},</if>
+            <if test="outWeightTime != null">out_weight_time = #{outWeightTime},</if>
+            <if test="orderCode != null">order_code = #{orderCode},</if>
+            <if test="orderNumber != null">order_number = #{orderNumber},</if>
+            <if test="deviationNumber != null">deviation_number = #{deviationNumber},</if>
+            <if test="deviationNumberUp != null">deviation_number_up = #{deviationNumberUp},</if>
+            <if test="deviationNumberDown != null">deviation_number_down = #{deviationNumberDown},</if>
+            <if test="other != null">other = #{other},</if>
+            <if test="weightTime != null">weight_time = #{weightTime},</if>
+            <if test="weightPicture != null">weight_picture = #{weightPicture},</if>
+            <if test="waringType != null">waring_type = #{waringType},</if>
+            <if test="dateType != null">date_type = #{dateType},</if>
+            <if test="driverName != null">driver_name = #{driverName},</if>
+            <if test="driverPhone != null">driver_phone = #{driverPhone},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+            <if test="modifyDate != null">modify_date = #{modifyDate},</if>
+            <if test="yn != null">yn = #{yn},</if>
+            <if test="orderId != null and orderId != ''">order_id = #{orderId},</if>
+            <if test="region != null and region != ''">region = #{region},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeighbridgeDataById" parameterType="Long">
+        delete from weighbridge_data where id = #{id}
+    </delete>
+
+    <delete id="deleteWeighbridgeDataByIds" parameterType="String">
+        delete from weighbridge_data where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

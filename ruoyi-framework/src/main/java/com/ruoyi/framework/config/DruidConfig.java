@@ -49,6 +49,15 @@ public class DruidConfig
         return druidProperties.dataSource(dataSource);
     }
 
+    @Bean
+    @ConfigurationProperties("spring.datasource.druid.slave-data") //这里就是从库2
+    @ConditionalOnProperty(prefix = "spring.datasource.druid.slave-data", name = "enabled", havingValue = "true")
+    public DataSource slaveData(DruidProperties druidProperties)
+    {
+        DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
+        return druidProperties.dataSource(dataSource);
+    }
+
     @Bean(name = "dynamicDataSource")
     @Primary
     public DynamicDataSource dataSource(DataSource masterDataSource)
@@ -56,6 +65,7 @@ public class DruidConfig
         Map<Object, Object> targetDataSources = new HashMap<>();
         targetDataSources.put(DataSourceType.MASTER.name(), masterDataSource);
         setDataSource(targetDataSources, DataSourceType.SLAVE.name(), "slaveDataSource");
+        setDataSource(targetDataSources, DataSourceType.SLAVEDATA.name(), "slaveData");
         return new DynamicDataSource(masterDataSource, targetDataSources);
     }
     

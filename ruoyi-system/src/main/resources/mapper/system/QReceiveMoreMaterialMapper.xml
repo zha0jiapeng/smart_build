@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.iot.mapper.QReceiveMoreMaterialMapper">
+    
+    <resultMap type="QReceiveMoreMaterial" id="QReceiveMoreMaterialResult">
+        <result property="orgId"    column="org_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="id"    column="id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="materialCode"    column="material_code"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="materialModel"    column="material_model"    />
+        <result property="materialUnit"    column="material_unit"    />
+        <result property="classId"    column="class_id"    />
+        <result property="classFullId"    column="class_full_id"    />
+        <result property="netQuantity"    column="net_quantity"    />
+        <result property="conversionRate"    column="conversion_rate"    />
+        <result property="oriNetQuantity"    column="ori_net_quantity"    />
+        <result property="mainNetQuantity"    column="main_net_quantity"    />
+        <result property="itemAuxiliaryNetQuantity"    column="item_auxiliary_net_quantity"    />
+        <result property="remark"    column="remark"    />
+        <result property="oriMaterialId"    column="ori_material_id"    />
+        <result property="oriClassId"    column="ori_class_id"    />
+        <result property="itemBarCode"    column="item_bar_code"    />
+        <result property="oriOrgId"    column="ori_org_id"    />
+        <result property="oriItemRedId"    column="ori_item_red_id"    />
+        <result property="isRed"    column="is_red"    />
+        <result property="creatorId"    column="creator_id"    />
+        <result property="creatorName"    column="creator_name"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="modifierId"    column="modifier_id"    />
+        <result property="modifierName"    column="modifier_name"    />
+        <result property="updatedAt"    column="updated_at"    />
+        <result property="isRemoved"    column="is_removed"    />
+        <result property="version"    column="version"    />
+        <result property="stockbinId"    column="stockbin_id"    />
+        <result property="stockbinName"    column="stockbin_name"    />
+        <result property="stockbinFullName"    column="stockbin_full_name"    />
+        <result property="oriStockbinId"    column="ori_stockbin_id"    />
+        <result property="deductQuantity"    column="deduct_quantity"    />
+        <result property="labDeductQuantity"    column="lab_deduct_quantity"    />
+        <result property="labDeductRate"    column="lab_deduct_rate"    />
+        <result property="manufacturer"    column="manufacturer"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="testReportNo"    column="test_report_no"    />
+        <result property="qualityCertificate"    column="quality_certificate"    />
+        <result property="acceptanceRecord"    column="acceptance_record"    />
+        <result property="purchaseMethod"    column="purchase_method"    />
+        <result property="purchaseMethodFullName"    column="purchase_method_full_name"    />
+        <result property="colVarchar50No01"    column="col_varchar_50_no_01"    />
+        <result property="colDecimal8No01"    column="col_decimal_8_no_01"    />
+        <result property="colVarchar50No02"    column="col_varchar_50_no_02"    />
+        <result property="colVarchar50No03"    column="col_varchar_50_no_03"    />
+    </resultMap>
+
+    <sql id="selectQReceiveMoreMaterialVo">
+        select org_id, order_id, id, material_id, material_code, material_name, material_model, material_unit, class_id, class_full_id, net_quantity, conversion_rate, ori_net_quantity, main_net_quantity, item_auxiliary_net_quantity, remark, ori_material_id, ori_class_id, item_bar_code, ori_org_id, ori_item_red_id, is_red, creator_id, creator_name, created_at, modifier_id, modifier_name, updated_at, is_removed, version, stockbin_id, stockbin_name, stockbin_full_name, ori_stockbin_id, deduct_quantity, lab_deduct_quantity, lab_deduct_rate, manufacturer, batch_no, test_report_no, quality_certificate, acceptance_record, purchase_method, purchase_method_full_name, col_varchar_50_no_01, col_decimal_8_no_01, col_varchar_50_no_02, col_varchar_50_no_03 from q_receive_more_material
+    </sql>
+
+    <select id="selectQReceiveMoreMaterialList" parameterType="QReceiveMoreMaterial" resultMap="QReceiveMoreMaterialResult">
+        <include refid="selectQReceiveMoreMaterialVo"/>
+        <where>  
+            <if test="materialId != null  and materialId != ''"> and material_id = #{materialId}</if>
+            <if test="materialCode != null  and materialCode != ''"> and material_code = #{materialCode}</if>
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+            <if test="materialModel != null  and materialModel != ''"> and material_model = #{materialModel}</if>
+            <if test="materialUnit != null  and materialUnit != ''"> and material_unit = #{materialUnit}</if>
+            <if test="classId != null  and classId != ''"> and class_id = #{classId}</if>
+            <if test="classFullId != null  and classFullId != ''"> and class_full_id = #{classFullId}</if>
+            <if test="netQuantity != null "> and net_quantity = #{netQuantity}</if>
+            <if test="conversionRate != null "> and conversion_rate = #{conversionRate}</if>
+            <if test="oriNetQuantity != null "> and ori_net_quantity = #{oriNetQuantity}</if>
+            <if test="mainNetQuantity != null "> and main_net_quantity = #{mainNetQuantity}</if>
+            <if test="itemAuxiliaryNetQuantity != null "> and item_auxiliary_net_quantity = #{itemAuxiliaryNetQuantity}</if>
+            <if test="oriMaterialId != null  and oriMaterialId != ''"> and ori_material_id = #{oriMaterialId}</if>
+            <if test="oriClassId != null  and oriClassId != ''"> and ori_class_id = #{oriClassId}</if>
+            <if test="itemBarCode != null  and itemBarCode != ''"> and item_bar_code = #{itemBarCode}</if>
+            <if test="oriOrgId != null  and oriOrgId != ''"> and ori_org_id = #{oriOrgId}</if>
+            <if test="oriItemRedId != null  and oriItemRedId != ''"> and ori_item_red_id = #{oriItemRedId}</if>
+            <if test="isRed != null "> and is_red = #{isRed}</if>
+            <if test="creatorId != null  and creatorId != ''"> and creator_id = #{creatorId}</if>
+            <if test="creatorName != null  and creatorName != ''"> and creator_name like concat('%', #{creatorName}, '%')</if>
+            <if test="createdAt != null "> and created_at = #{createdAt}</if>
+            <if test="modifierId != null  and modifierId != ''"> and modifier_id = #{modifierId}</if>
+            <if test="modifierName != null  and modifierName != ''"> and modifier_name like concat('%', #{modifierName}, '%')</if>
+            <if test="updatedAt != null "> and updated_at = #{updatedAt}</if>
+            <if test="isRemoved != null "> and is_removed = #{isRemoved}</if>
+            <if test="version != null "> and version = #{version}</if>
+            <if test="stockbinId != null  and stockbinId != ''"> and stockbin_id = #{stockbinId}</if>
+            <if test="stockbinName != null  and stockbinName != ''"> and stockbin_name like concat('%', #{stockbinName}, '%')</if>
+            <if test="stockbinFullName != null  and stockbinFullName != ''"> and stockbin_full_name like concat('%', #{stockbinFullName}, '%')</if>
+            <if test="oriStockbinId != null  and oriStockbinId != ''"> and ori_stockbin_id = #{oriStockbinId}</if>
+            <if test="deductQuantity != null "> and deduct_quantity = #{deductQuantity}</if>
+            <if test="labDeductQuantity != null "> and lab_deduct_quantity = #{labDeductQuantity}</if>
+            <if test="labDeductRate != null "> and lab_deduct_rate = #{labDeductRate}</if>
+            <if test="manufacturer != null  and manufacturer != ''"> and manufacturer = #{manufacturer}</if>
+            <if test="batchNo != null  and batchNo != ''"> and batch_no = #{batchNo}</if>
+            <if test="testReportNo != null  and testReportNo != ''"> and test_report_no = #{testReportNo}</if>
+            <if test="qualityCertificate != null  and qualityCertificate != ''"> and quality_certificate = #{qualityCertificate}</if>
+            <if test="acceptanceRecord != null  and acceptanceRecord != ''"> and acceptance_record = #{acceptanceRecord}</if>
+            <if test="purchaseMethod != null  and purchaseMethod != ''"> and purchase_method = #{purchaseMethod}</if>
+            <if test="purchaseMethodFullName != null  and purchaseMethodFullName != ''"> and purchase_method_full_name like concat('%', #{purchaseMethodFullName}, '%')</if>
+            <if test="colVarchar50No01 != null  and colVarchar50No01 != ''"> and col_varchar_50_no_01 = #{colVarchar50No01}</if>
+            <if test="colDecimal8No01 != null "> and col_decimal_8_no_01 = #{colDecimal8No01}</if>
+            <if test="colVarchar50No02 != null  and colVarchar50No02 != ''"> and col_varchar_50_no_02 = #{colVarchar50No02}</if>
+            <if test="colVarchar50No03 != null  and colVarchar50No03 != ''"> and col_varchar_50_no_03 = #{colVarchar50No03}</if>
+        </where>
+    </select>
+    
+    <select id="selectQReceiveMoreMaterialByOrgId" parameterType="String" resultMap="QReceiveMoreMaterialResult">
+        <include refid="selectQReceiveMoreMaterialVo"/>
+        where org_id = #{orgId}
+    </select>
+
+    <insert id="insertQReceiveMoreMaterial" parameterType="QReceiveMoreMaterial">
+        insert into q_receive_more_material
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">org_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="id != null">id,</if>
+            <if test="materialId != null">material_id,</if>
+            <if test="materialCode != null">material_code,</if>
+            <if test="materialName != null">material_name,</if>
+            <if test="materialModel != null">material_model,</if>
+            <if test="materialUnit != null">material_unit,</if>
+            <if test="classId != null">class_id,</if>
+            <if test="classFullId != null">class_full_id,</if>
+            <if test="netQuantity != null">net_quantity,</if>
+            <if test="conversionRate != null">conversion_rate,</if>
+            <if test="oriNetQuantity != null">ori_net_quantity,</if>
+            <if test="mainNetQuantity != null">main_net_quantity,</if>
+            <if test="itemAuxiliaryNetQuantity != null">item_auxiliary_net_quantity,</if>
+            <if test="remark != null">remark,</if>
+            <if test="oriMaterialId != null">ori_material_id,</if>
+            <if test="oriClassId != null">ori_class_id,</if>
+            <if test="itemBarCode != null">item_bar_code,</if>
+            <if test="oriOrgId != null">ori_org_id,</if>
+            <if test="oriItemRedId != null">ori_item_red_id,</if>
+            <if test="isRed != null">is_red,</if>
+            <if test="creatorId != null">creator_id,</if>
+            <if test="creatorName != null">creator_name,</if>
+            <if test="createdAt != null">created_at,</if>
+            <if test="modifierId != null">modifier_id,</if>
+            <if test="modifierName != null">modifier_name,</if>
+            <if test="updatedAt != null">updated_at,</if>
+            <if test="isRemoved != null">is_removed,</if>
+            <if test="version != null">version,</if>
+            <if test="stockbinId != null">stockbin_id,</if>
+            <if test="stockbinName != null">stockbin_name,</if>
+            <if test="stockbinFullName != null">stockbin_full_name,</if>
+            <if test="oriStockbinId != null">ori_stockbin_id,</if>
+            <if test="deductQuantity != null">deduct_quantity,</if>
+            <if test="labDeductQuantity != null">lab_deduct_quantity,</if>
+            <if test="labDeductRate != null">lab_deduct_rate,</if>
+            <if test="manufacturer != null">manufacturer,</if>
+            <if test="batchNo != null">batch_no,</if>
+            <if test="testReportNo != null">test_report_no,</if>
+            <if test="qualityCertificate != null">quality_certificate,</if>
+            <if test="acceptanceRecord != null">acceptance_record,</if>
+            <if test="purchaseMethod != null">purchase_method,</if>
+            <if test="purchaseMethodFullName != null">purchase_method_full_name,</if>
+            <if test="colVarchar50No01 != null">col_varchar_50_no_01,</if>
+            <if test="colDecimal8No01 != null">col_decimal_8_no_01,</if>
+            <if test="colVarchar50No02 != null">col_varchar_50_no_02,</if>
+            <if test="colVarchar50No03 != null">col_varchar_50_no_03,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">#{orgId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="id != null">#{id},</if>
+            <if test="materialId != null">#{materialId},</if>
+            <if test="materialCode != null">#{materialCode},</if>
+            <if test="materialName != null">#{materialName},</if>
+            <if test="materialModel != null">#{materialModel},</if>
+            <if test="materialUnit != null">#{materialUnit},</if>
+            <if test="classId != null">#{classId},</if>
+            <if test="classFullId != null">#{classFullId},</if>
+            <if test="netQuantity != null">#{netQuantity},</if>
+            <if test="conversionRate != null">#{conversionRate},</if>
+            <if test="oriNetQuantity != null">#{oriNetQuantity},</if>
+            <if test="mainNetQuantity != null">#{mainNetQuantity},</if>
+            <if test="itemAuxiliaryNetQuantity != null">#{itemAuxiliaryNetQuantity},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="oriMaterialId != null">#{oriMaterialId},</if>
+            <if test="oriClassId != null">#{oriClassId},</if>
+            <if test="itemBarCode != null">#{itemBarCode},</if>
+            <if test="oriOrgId != null">#{oriOrgId},</if>
+            <if test="oriItemRedId != null">#{oriItemRedId},</if>
+            <if test="isRed != null">#{isRed},</if>
+            <if test="creatorId != null">#{creatorId},</if>
+            <if test="creatorName != null">#{creatorName},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="modifierId != null">#{modifierId},</if>
+            <if test="modifierName != null">#{modifierName},</if>
+            <if test="updatedAt != null">#{updatedAt},</if>
+            <if test="isRemoved != null">#{isRemoved},</if>
+            <if test="version != null">#{version},</if>
+            <if test="stockbinId != null">#{stockbinId},</if>
+            <if test="stockbinName != null">#{stockbinName},</if>
+            <if test="stockbinFullName != null">#{stockbinFullName},</if>
+            <if test="oriStockbinId != null">#{oriStockbinId},</if>
+            <if test="deductQuantity != null">#{deductQuantity},</if>
+            <if test="labDeductQuantity != null">#{labDeductQuantity},</if>
+            <if test="labDeductRate != null">#{labDeductRate},</if>
+            <if test="manufacturer != null">#{manufacturer},</if>
+            <if test="batchNo != null">#{batchNo},</if>
+            <if test="testReportNo != null">#{testReportNo},</if>
+            <if test="qualityCertificate != null">#{qualityCertificate},</if>
+            <if test="acceptanceRecord != null">#{acceptanceRecord},</if>
+            <if test="purchaseMethod != null">#{purchaseMethod},</if>
+            <if test="purchaseMethodFullName != null">#{purchaseMethodFullName},</if>
+            <if test="colVarchar50No01 != null">#{colVarchar50No01},</if>
+            <if test="colDecimal8No01 != null">#{colDecimal8No01},</if>
+            <if test="colVarchar50No02 != null">#{colVarchar50No02},</if>
+            <if test="colVarchar50No03 != null">#{colVarchar50No03},</if>
+         </trim>
+    </insert>
+
+    <update id="updateQReceiveMoreMaterial" parameterType="QReceiveMoreMaterial">
+        update q_receive_more_material
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="id != null">id = #{id},</if>
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="materialCode != null">material_code = #{materialCode},</if>
+            <if test="materialName != null">material_name = #{materialName},</if>
+            <if test="materialModel != null">material_model = #{materialModel},</if>
+            <if test="materialUnit != null">material_unit = #{materialUnit},</if>
+            <if test="classId != null">class_id = #{classId},</if>
+            <if test="classFullId != null">class_full_id = #{classFullId},</if>
+            <if test="netQuantity != null">net_quantity = #{netQuantity},</if>
+            <if test="conversionRate != null">conversion_rate = #{conversionRate},</if>
+            <if test="oriNetQuantity != null">ori_net_quantity = #{oriNetQuantity},</if>
+            <if test="mainNetQuantity != null">main_net_quantity = #{mainNetQuantity},</if>
+            <if test="itemAuxiliaryNetQuantity != null">item_auxiliary_net_quantity = #{itemAuxiliaryNetQuantity},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="oriMaterialId != null">ori_material_id = #{oriMaterialId},</if>
+            <if test="oriClassId != null">ori_class_id = #{oriClassId},</if>
+            <if test="itemBarCode != null">item_bar_code = #{itemBarCode},</if>
+            <if test="oriOrgId != null">ori_org_id = #{oriOrgId},</if>
+            <if test="oriItemRedId != null">ori_item_red_id = #{oriItemRedId},</if>
+            <if test="isRed != null">is_red = #{isRed},</if>
+            <if test="creatorId != null">creator_id = #{creatorId},</if>
+            <if test="creatorName != null">creator_name = #{creatorName},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="modifierId != null">modifier_id = #{modifierId},</if>
+            <if test="modifierName != null">modifier_name = #{modifierName},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+            <if test="isRemoved != null">is_removed = #{isRemoved},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="stockbinId != null">stockbin_id = #{stockbinId},</if>
+            <if test="stockbinName != null">stockbin_name = #{stockbinName},</if>
+            <if test="stockbinFullName != null">stockbin_full_name = #{stockbinFullName},</if>
+            <if test="oriStockbinId != null">ori_stockbin_id = #{oriStockbinId},</if>
+            <if test="deductQuantity != null">deduct_quantity = #{deductQuantity},</if>
+            <if test="labDeductQuantity != null">lab_deduct_quantity = #{labDeductQuantity},</if>
+            <if test="labDeductRate != null">lab_deduct_rate = #{labDeductRate},</if>
+            <if test="manufacturer != null">manufacturer = #{manufacturer},</if>
+            <if test="batchNo != null">batch_no = #{batchNo},</if>
+            <if test="testReportNo != null">test_report_no = #{testReportNo},</if>
+            <if test="qualityCertificate != null">quality_certificate = #{qualityCertificate},</if>
+            <if test="acceptanceRecord != null">acceptance_record = #{acceptanceRecord},</if>
+            <if test="purchaseMethod != null">purchase_method = #{purchaseMethod},</if>
+            <if test="purchaseMethodFullName != null">purchase_method_full_name = #{purchaseMethodFullName},</if>
+            <if test="colVarchar50No01 != null">col_varchar_50_no_01 = #{colVarchar50No01},</if>
+            <if test="colDecimal8No01 != null">col_decimal_8_no_01 = #{colDecimal8No01},</if>
+            <if test="colVarchar50No02 != null">col_varchar_50_no_02 = #{colVarchar50No02},</if>
+            <if test="colVarchar50No03 != null">col_varchar_50_no_03 = #{colVarchar50No03},</if>
+        </trim>
+        where org_id = #{orgId}
+    </update>
+
+    <delete id="deleteQReceiveMoreMaterialByOrgId" parameterType="String">
+        delete from q_receive_more_material where org_id = #{orgId}
+    </delete>
+
+    <delete id="deleteQReceiveMoreMaterialByOrgIds" parameterType="String">
+        delete from q_receive_more_material where org_id in 
+        <foreach item="orgId" collection="array" open="(" separator="," close=")">
+            #{orgId}
+        </foreach>
+    </delete>
+</mapper>

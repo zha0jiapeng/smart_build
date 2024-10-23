@@ -4,12 +4,14 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.config.MinioConfig;
 import com.ruoyi.common.utils.MinioUtils;
 import com.ruoyi.iot.bean.DoorFunctionApi;
 import com.ruoyi.iot.enums.VehicleType;
 import com.ruoyi.iot.utils.HdyHttpUtils;
 import com.ruoyi.system.domain.basic.CarAccess;
+import com.ruoyi.system.mapper.CarAccessMapper;
 import com.ruoyi.system.service.CarAccessService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,9 @@ public class CarGateController {
 
     @Autowired
     private CarAccessService carAccessService;
+
+    @Resource
+    private CarAccessMapper carAccessMapper;
 
 
     @PostMapping("/carAccess")
@@ -260,13 +265,14 @@ public class CarGateController {
      *
      * @return
      */
-    @GetMapping("/crossRecords/page")
+    @GetMapping("/crossRecords/push")
     public void carAccessHik() {
         Map<String, Object> rootMap = new HashMap<>();
         rootMap.put("pageNo", 1);
         rootMap.put("pageSize", 1000);
+        rootMap.put("entranceSyscode", "de35c3216f0f47d7b89f77678ab4ef6f");
         ZonedDateTime endTime = ZonedDateTime.now();
-        ZonedDateTime startTime = endTime.minusMinutes(10);
+        ZonedDateTime startTime = endTime.minusMinutes(15);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
         String formattedEndTime = endTime.format(formatter);
         String formattedStartTime = startTime.format(formatter);
@@ -277,8 +283,6 @@ public class CarGateController {
         JSONArray objects = (JSONArray) ((JSONObject) JSONObject.get("data")).get("list");
         for (Object value : objects) {
             JSONObject jsonObject = (JSONObject) value;
-            //设备名称（无）
-
             //抓拍照片
             String imageFile = "http://10.1.3.2" + jsonObject.getString("vehiclePicUri");
 
@@ -315,7 +319,7 @@ public class CarGateController {
             String allowInType = VehicleType.getRemarkByCode("hik" + releaseWay);
 
             //设备编号
-            String deviceCode = jsonObject.getString("entranceSyscode");
+            String deviceCode = "0".equals(vehicleOut) ? "77091ae04d404a58925f59631975cf34" : "64b8b4e9988143bba67de8d96672be9f";
             //报警类型
             String alarmType = "";
             //驾驶员
@@ -329,7 +333,7 @@ public class CarGateController {
             valueMap.put("portal_id", portalId);
             valueMap.put("sub_project_id", subProjectId);
             valueMap.put("device_code", deviceCode);
-//            valueMap.put("device_name", deviceName);
+            valueMap.put("device_name", "14支洞支洞口车辆道闸设备");
             valueMap.put("work_status", onlineStatus);
             valueMap.put("video_streaming", imageFile);
             valueMap.put("license_number", plateNumber);
@@ -342,7 +346,11 @@ public class CarGateController {
             valueMap.put("phone_number", phoneNumber);
             valueMap.put("allow_in_type", allowInType);
             valueMap.put("other", other);
-            saveSQL(valueMap);
+            boolean isSaveSQL = saveSQL(valueMap);
+            //加一个判断条件，查看是否有重复的
+            if (isSaveSQL) {
+                continue;
+            }
             List<Map<String, Object>> values = new ArrayList<>();
             values.add(valueMap);
             Map<String, List<Map<String, Object>>> param = new HashMap<>();
@@ -353,7 +361,8 @@ public class CarGateController {
         }
     }
 
-    public void saveSQL(Map<String, Object> valueMap) {
+    public boolean saveSQL(Map<String, Object> valueMap) {
+        QueryWrapper<CarAccess> carAccessQueryWrapper = new QueryWrapper<>();
         CarAccess carAccess = new CarAccess();
         //车辆编码
         String carCode = valueMap.get("license_number").toString();
@@ -372,9 +381,11 @@ public class CarGateController {
         if (in_out_type.equals("进")) {
             //入场时间
             carAccess.setCarInDate(date);
+            carAccessQueryWrapper.eq("car_in_date", date);
         } else {
             //出场时间
             carAccess.setCarOutDate(date);
+            carAccessQueryWrapper.eq("car_out_date", date);
         }
         carAccess.setPhotoBase64("");
 
@@ -385,7 +396,16 @@ public class CarGateController {
         carAccess.setSn(sn);
         carAccess.setCreatedDate(new Date());
         carAccess.setModifyDate(date);
+
+        carAccessQueryWrapper.eq("sn", sn);
+        carAccessQueryWrapper.eq("car_code", carCode);
+        int count = carAccessService.count(carAccessQueryWrapper);
+        if (count > 0) {
+            return false;
+        }
+
         carAccessService.insert(carAccess);
+        return true;
     }
 
 

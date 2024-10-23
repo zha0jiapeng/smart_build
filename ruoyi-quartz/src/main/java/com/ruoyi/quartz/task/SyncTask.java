@@ -40,6 +40,7 @@ public class SyncTask {
      */
     public void sendDoor(){
         event.execute();
+        String result1 = HttpUtil.get("http://127.0.0.1:8097/carAccess/crossRecords/push");
     }
 
     /**

@@ -42,5 +42,19 @@ public class SyncTask {
         event.execute();
     }
 
+    /**
+     * 地磅信息获取和推送（每五分钟一次）
+     */
+    public void sendWeighbridgeData(){
+        String result = HttpUtil.get("http://127.0.0.1:8097/system/data/upload");
+    }
+
+    /**
+     * IP电话信息获取和推送
+     */
+    public void sendIPPhone(){
+
+    }
+
 
 }

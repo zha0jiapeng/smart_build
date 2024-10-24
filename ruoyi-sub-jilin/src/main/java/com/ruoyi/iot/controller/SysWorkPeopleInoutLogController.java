@@ -6,6 +6,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.YnEnum;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.iot.utils.StringUtil;
 import com.ruoyi.system.domain.SysWorkPeople;
 import com.ruoyi.system.domain.SysWorkPeopleInoutLog;
 import com.ruoyi.system.domain.WorkDateStorage;
@@ -20,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.hutool.core.date.DateUtil;
@@ -123,8 +121,8 @@ public class SysWorkPeopleInoutLogController extends BaseController {
     public TableDataInfo list(SysWorkPeopleInoutLog log) {
         startPage();
         final QueryWrapper<SysWorkPeopleInoutLog> query = new QueryWrapper<>(log);
+        query.in(StringUtil.areNotEmpty(log.getSns()),"sn", new ArrayList<>(Arrays.asList(log.getSns().split("\\,"))));
+        query.orderByDesc("log_time");
         return getDataTable(sysWorkPeopleInoutLogMapper.selectList(query));
     }
-
-
 }

@@ -234,11 +234,20 @@ public class TCPController {
         }
         Rain lastMonitor = rainService.getOne(new LambdaQueryWrapper<Rain>()
                 .eq(Rain::getDeviceCode, rainDeviceCode)
-                .orderByDesc(Rain::getCreateTime).last("limit 1"), false);
+                .orderByDesc(Rain::getCreateTime).last("limit 1"));
         if (lastMonitor != null) {
-            sendMap.put("rainfall", new BigDecimal(sendMap.get("rainfall").toString()).subtract(lastMonitor.getRainfall()).setScale(2, RoundingMode.HALF_UP).toString());
+            BigDecimal currentRainfall = new BigDecimal(sendMap.get("rainfall").toString());
+            BigDecimal lastRainfall = lastMonitor.getRainfall();
+
+            // 进行减法运算
+            BigDecimal result = currentRainfall.subtract(lastRainfall).setScale(2, RoundingMode.HALF_UP);
+
+            // 取绝对值以确保结果为正数
+            result = result.abs();
+            sendMap.put("rainfall", result);
         } else {
-            sendMap.put("rainfall", new BigDecimal(sendMap.get("rainfall").toString()));
+            BigDecimal bigDecimal = new BigDecimal(sendMap.get("rainfall").toString());
+            sendMap.put("rainfall", bigDecimal.abs());
         }
         sendMap.put("status", "在线");
         sendMap.put("date_time", now);

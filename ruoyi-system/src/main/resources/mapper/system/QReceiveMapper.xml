@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.iot.mapper.QReceiveMapper">
+
+    <resultMap type="QReceive" id="QReceiveResult">
+        <result property="orgId"    column="org_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="rdsId"    column="rds_id"    />
+        <result property="orgName"    column="org_name"    />
+        <result property="recordedDate"    column="recorded_date"    />
+        <result property="orderDate"    column="order_date"    />
+        <result property="orderCode"    column="order_code"    />
+        <result property="serviceType"    column="service_type"    />
+        <result property="orderType"    column="order_type"    />
+        <result property="weightType"    column="weight_type"    />
+        <result property="materialCollection"    column="material_collection"    />
+        <result property="maker"    column="maker"    />
+        <result property="exitMaker"    column="exit_maker"    />
+        <result property="makerDate"    column="maker_date"    />
+        <result property="remark"    column="remark"    />
+        <result property="printTimes"    column="print_times"    />
+        <result property="plateNumber"    column="plate_number"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="supplierName"    column="supplier_name"    />
+        <result property="labourId"    column="labour_id"    />
+        <result property="labourName"    column="labour_name"    />
+        <result property="ghId"    column="gh_id"    />
+        <result property="ghFullId"    column="gh_full_id"    />
+        <result property="ghFullName"    column="gh_full_name"    />
+        <result property="ghName"    column="gh_name"    />
+        <result property="enterTime"    column="enter_time"    />
+        <result property="exitTime"    column="exit_time"    />
+        <result property="isRed"    column="is_red"    />
+        <result property="isAudit"    column="is_audit"    />
+        <result property="auditor"    column="auditor"    />
+        <result property="auditDate"    column="audit_date"    />
+        <result property="oriOrgId"    column="ori_org_id"    />
+        <result property="oriSupplierId"    column="ori_supplier_id"    />
+        <result property="oriGhId"    column="ori_gh_id"    />
+        <result property="oriLabourId"    column="ori_labour_id"    />
+        <result property="oriRedId"    column="ori_red_id"    />
+        <result property="isUpload"    column="is_upload"    />
+        <result property="discernPlateNumber"    column="discern_plate_number"    />
+        <result property="stockbinFullName"    column="stockbin_full_name"    />
+        <result property="stockbinName"    column="stockbin_name"    />
+        <result property="stockbinId"    column="stockbin_id"    />
+        <result property="oriStockbinId"    column="ori_stockbin_id"    />
+        <result property="isExit"    column="is_exit"    />
+        <result property="isSplit"    column="is_split"    />
+        <result property="isTare"    column="is_tare"    />
+        <result property="roughQuantity"    column="rough_quantity"    />
+        <result property="tareQuantity"    column="tare_quantity"    />
+        <result property="deductRate"    column="deduct_rate"    />
+        <result property="deductQuantity"    column="deduct_quantity"    />
+        <result property="auxiliaryNetQuantity"    column="auxiliary_net_quantity"    />
+        <result property="oriNetQuantity"    column="ori_net_quantity"    />
+        <result property="isNotAccounting"    column="is_not_accounting"    />
+        <result property="isUseOriNetQuantity"    column="is_use_ori_net_quantity"    />
+        <result property="sortOrderCode"    column="sort_order_code"    />
+        <result property="isReturn"    column="is_return"    />
+        <result property="creatorId"    column="creator_id"    />
+        <result property="creatorName"    column="creator_name"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="modifierId"    column="modifier_id"    />
+        <result property="modifierName"    column="modifier_name"    />
+        <result property="updatedAt"    column="updated_at"    />
+        <result property="isRemoved"    column="is_removed"    />
+        <result property="version"    column="version"    />
+        <result property="clientVersion"    column="client_version"    />
+        <result property="discernMode"    column="discern_mode"    />
+        <result property="settlementName"    column="settlement_name"    />
+        <result property="settlementId"    column="settlement_id"    />
+        <result property="purchaseMethod"    column="purchase_method"    />
+        <result property="purchaseMethodFullName"    column="purchase_method_full_name"    />
+        <result property="isQrcode"    column="is_qrcode"    />
+        <result property="qrCodeType"    column="QR_code_type"    />
+        <result property="logistId"    column="logist_id"    />
+        <result property="qrOrgId"    column="qr_org_id"    />
+        <result property="oriTeamId"    column="ori_team_id"    />
+        <result property="teamName"    column="team_name"    />
+        <result property="teamLeader"    column="team_leader"    />
+        <result property="colVarchar50No01"    column="col_varchar_50_no_01"    />
+        <result property="colVarchar500No01"    column="col_varchar_500_no_01"    />
+        <result property="reason"    column="reason"    />
+        <result property="originalOrderId"    column="original_order_id"    />
+        <result property="originalOrderCode"    column="original_order_code"    />
+    </resultMap>
+
+    <sql id="selectQReceiveVo">
+        select org_id, order_id, rds_id, org_name, recorded_date, order_date, order_code, service_type, order_type, weight_type, material_collection, maker, exit_maker, maker_date, remark, print_times, plate_number, supplier_id, supplier_name, labour_id, labour_name, gh_id, gh_full_id, gh_full_name, gh_name, enter_time, exit_time, is_red, is_audit, auditor, audit_date, ori_org_id, ori_supplier_id, ori_gh_id, ori_labour_id, ori_red_id, is_upload, discern_plate_number, stockbin_full_name, stockbin_name, stockbin_id, ori_stockbin_id, is_exit, is_split, is_tare, rough_quantity, tare_quantity, deduct_rate, deduct_quantity, auxiliary_net_quantity, ori_net_quantity, is_not_accounting, is_use_ori_net_quantity, sort_order_code, is_return, creator_id, creator_name, created_at, modifier_id, modifier_name, updated_at, is_removed, version, client_version, discern_mode, settlement_name, settlement_id, purchase_method, purchase_method_full_name, is_qrcode, QR_code_type, logist_id, qr_org_id, ori_team_id, team_name, team_leader, col_varchar_50_no_01, col_varchar_500_no_01, reason, original_order_id, original_order_code from q_receive
+    </sql>
+
+    <select id="selectQReceiveList" parameterType="QReceive" resultMap="QReceiveResult">
+        <include refid="selectQReceiveVo"/>
+        <where>  
+            <if test="rdsId != null  and rdsId != ''"> and rds_id = #{rdsId}</if>
+            <if test="orgName != null  and orgName != ''"> and org_name like concat('%', #{orgName}, '%')</if>
+            <if test="recordedDate != null  and recordedDate != ''"> and recorded_date = #{recordedDate}</if>
+            <if test="orderDate != null  and orderDate != ''"> and order_date = #{orderDate}</if>
+            <if test="orderCode != null  and orderCode != ''"> and order_code = #{orderCode}</if>
+            <if test="serviceType != null "> and service_type = #{serviceType}</if>
+            <if test="orderType != null "> and order_type = #{orderType}</if>
+            <if test="weightType != null  and weightType != ''"> and weight_type = #{weightType}</if>
+            <if test="materialCollection != null  and materialCollection != ''"> and material_collection = #{materialCollection}</if>
+            <if test="maker != null  and maker != ''"> and maker = #{maker}</if>
+            <if test="exitMaker != null  and exitMaker != ''"> and exit_maker = #{exitMaker}</if>
+            <if test="makerDate != null  and makerDate != ''"> and maker_date = #{makerDate}</if>
+            <if test="printTimes != null "> and print_times = #{printTimes}</if>
+            <if test="plateNumber != null  and plateNumber != ''"> and plate_number = #{plateNumber}</if>
+            <if test="supplierId != null  and supplierId != ''"> and supplier_id = #{supplierId}</if>
+            <if test="supplierName != null  and supplierName != ''"> and supplier_name like concat('%', #{supplierName}, '%')</if>
+            <if test="labourId != null  and labourId != ''"> and labour_id = #{labourId}</if>
+            <if test="labourName != null  and labourName != ''"> and labour_name like concat('%', #{labourName}, '%')</if>
+            <if test="ghId != null  and ghId != ''"> and gh_id = #{ghId}</if>
+            <if test="ghFullId != null  and ghFullId != ''"> and gh_full_id = #{ghFullId}</if>
+            <if test="ghFullName != null  and ghFullName != ''"> and gh_full_name like concat('%', #{ghFullName}, '%')</if>
+            <if test="ghName != null  and ghName != ''"> and gh_name like concat('%', #{ghName}, '%')</if>
+            <if test="enterTime != null  and enterTime != ''"> and enter_time = #{enterTime}</if>
+            <if test="exitTime != null  and exitTime != ''"> and exit_time = #{exitTime}</if>
+            <if test="isRed != null "> and is_red = #{isRed}</if>
+            <if test="isAudit != null "> and is_audit = #{isAudit}</if>
+            <if test="auditor != null  and auditor != ''"> and auditor = #{auditor}</if>
+            <if test="auditDate != null  and auditDate != ''"> and audit_date = #{auditDate}</if>
+            <if test="oriOrgId != null  and oriOrgId != ''"> and ori_org_id = #{oriOrgId}</if>
+            <if test="oriSupplierId != null  and oriSupplierId != ''"> and ori_supplier_id = #{oriSupplierId}</if>
+            <if test="oriGhId != null  and oriGhId != ''"> and ori_gh_id = #{oriGhId}</if>
+            <if test="oriLabourId != null  and oriLabourId != ''"> and ori_labour_id = #{oriLabourId}</if>
+            <if test="oriRedId != null  and oriRedId != ''"> and ori_red_id = #{oriRedId}</if>
+            <if test="isUpload != null "> and is_upload = #{isUpload}</if>
+            <if test="discernPlateNumber != null  and discernPlateNumber != ''"> and discern_plate_number = #{discernPlateNumber}</if>
+            <if test="stockbinFullName != null  and stockbinFullName != ''"> and stockbin_full_name like concat('%', #{stockbinFullName}, '%')</if>
+            <if test="stockbinName != null  and stockbinName != ''"> and stockbin_name like concat('%', #{stockbinName}, '%')</if>
+            <if test="stockbinId != null  and stockbinId != ''"> and stockbin_id = #{stockbinId}</if>
+            <if test="oriStockbinId != null  and oriStockbinId != ''"> and ori_stockbin_id = #{oriStockbinId}</if>
+            <if test="isExit != null "> and is_exit = #{isExit}</if>
+            <if test="isSplit != null "> and is_split = #{isSplit}</if>
+            <if test="isTare != null "> and is_tare = #{isTare}</if>
+            <if test="roughQuantity != null "> and rough_quantity = #{roughQuantity}</if>
+            <if test="tareQuantity != null "> and tare_quantity = #{tareQuantity}</if>
+            <if test="deductRate != null "> and deduct_rate = #{deductRate}</if>
+            <if test="deductQuantity != null "> and deduct_quantity = #{deductQuantity}</if>
+            <if test="auxiliaryNetQuantity != null "> and auxiliary_net_quantity = #{auxiliaryNetQuantity}</if>
+            <if test="oriNetQuantity != null "> and ori_net_quantity = #{oriNetQuantity}</if>
+            <if test="isNotAccounting != null "> and is_not_accounting = #{isNotAccounting}</if>
+            <if test="isUseOriNetQuantity != null "> and is_use_ori_net_quantity = #{isUseOriNetQuantity}</if>
+            <if test="sortOrderCode != null  and sortOrderCode != ''"> and sort_order_code = #{sortOrderCode}</if>
+            <if test="isReturn != null "> and is_return = #{isReturn}</if>
+            <if test="creatorId != null  and creatorId != ''"> and creator_id = #{creatorId}</if>
+            <if test="creatorName != null  and creatorName != ''"> and creator_name like concat('%', #{creatorName}, '%')</if>
+            <if test="createdAt != null "> and created_at = #{createdAt}</if>
+            <if test="modifierId != null  and modifierId != ''"> and modifier_id = #{modifierId}</if>
+            <if test="modifierName != null  and modifierName != ''"> and modifier_name like concat('%', #{modifierName}, '%')</if>
+            <if test="updatedAt != null "> and updated_at = #{updatedAt}</if>
+            <if test="isRemoved != null "> and is_removed = #{isRemoved}</if>
+            <if test="version != null "> and version = #{version}</if>
+            <if test="clientVersion != null  and clientVersion != ''"> and client_version = #{clientVersion}</if>
+            <if test="discernMode != null  and discernMode != ''"> and discern_mode = #{discernMode}</if>
+            <if test="settlementName != null  and settlementName != ''"> and settlement_name like concat('%', #{settlementName}, '%')</if>
+            <if test="settlementId != null "> and settlement_id = #{settlementId}</if>
+            <if test="purchaseMethod != null  and purchaseMethod != ''"> and purchase_method = #{purchaseMethod}</if>
+            <if test="purchaseMethodFullName != null  and purchaseMethodFullName != ''"> and purchase_method_full_name like concat('%', #{purchaseMethodFullName}, '%')</if>
+            <if test="isQrcode != null "> and is_qrcode = #{isQrcode}</if>
+            <if test="qrCodeType != null "> and QR_code_type = #{qrCodeType}</if>
+            <if test="logistId != null  and logistId != ''"> and logist_id = #{logistId}</if>
+            <if test="qrOrgId != null  and qrOrgId != ''"> and qr_org_id = #{qrOrgId}</if>
+            <if test="oriTeamId != null  and oriTeamId != ''"> and ori_team_id = #{oriTeamId}</if>
+            <if test="teamName != null  and teamName != ''"> and team_name like concat('%', #{teamName}, '%')</if>
+            <if test="teamLeader != null  and teamLeader != ''"> and team_leader = #{teamLeader}</if>
+            <if test="colVarchar50No01 != null  and colVarchar50No01 != ''"> and col_varchar_50_no_01 = #{colVarchar50No01}</if>
+            <if test="colVarchar500No01 != null  and colVarchar500No01 != ''"> and col_varchar_500_no_01 = #{colVarchar500No01}</if>
+            <if test="reason != null  and reason != ''"> and reason = #{reason}</if>
+            <if test="originalOrderId != null  and originalOrderId != ''"> and original_order_id = #{originalOrderId}</if>
+            <if test="originalOrderCode != null  and originalOrderCode != ''"> and original_order_code = #{originalOrderCode}</if>
+        </where>
+    </select>
+    
+    <select id="selectQReceiveByOrgId" parameterType="String" resultMap="QReceiveResult">
+        <include refid="selectQReceiveVo"/>
+        where org_id = #{orgId}
+    </select>
+
+    <insert id="insertQReceive" parameterType="QReceive">
+        insert into q_receive
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">org_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="rdsId != null">rds_id,</if>
+            <if test="orgName != null">org_name,</if>
+            <if test="recordedDate != null">recorded_date,</if>
+            <if test="orderDate != null">order_date,</if>
+            <if test="orderCode != null">order_code,</if>
+            <if test="serviceType != null">service_type,</if>
+            <if test="orderType != null">order_type,</if>
+            <if test="weightType != null">weight_type,</if>
+            <if test="materialCollection != null">material_collection,</if>
+            <if test="maker != null">maker,</if>
+            <if test="exitMaker != null">exit_maker,</if>
+            <if test="makerDate != null">maker_date,</if>
+            <if test="remark != null">remark,</if>
+            <if test="printTimes != null">print_times,</if>
+            <if test="plateNumber != null">plate_number,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="supplierName != null">supplier_name,</if>
+            <if test="labourId != null">labour_id,</if>
+            <if test="labourName != null">labour_name,</if>
+            <if test="ghId != null">gh_id,</if>
+            <if test="ghFullId != null">gh_full_id,</if>
+            <if test="ghFullName != null">gh_full_name,</if>
+            <if test="ghName != null">gh_name,</if>
+            <if test="enterTime != null">enter_time,</if>
+            <if test="exitTime != null">exit_time,</if>
+            <if test="isRed != null">is_red,</if>
+            <if test="isAudit != null">is_audit,</if>
+            <if test="auditor != null">auditor,</if>
+            <if test="auditDate != null">audit_date,</if>
+            <if test="oriOrgId != null">ori_org_id,</if>
+            <if test="oriSupplierId != null">ori_supplier_id,</if>
+            <if test="oriGhId != null">ori_gh_id,</if>
+            <if test="oriLabourId != null">ori_labour_id,</if>
+            <if test="oriRedId != null">ori_red_id,</if>
+            <if test="isUpload != null">is_upload,</if>
+            <if test="discernPlateNumber != null">discern_plate_number,</if>
+            <if test="stockbinFullName != null">stockbin_full_name,</if>
+            <if test="stockbinName != null">stockbin_name,</if>
+            <if test="stockbinId != null">stockbin_id,</if>
+            <if test="oriStockbinId != null">ori_stockbin_id,</if>
+            <if test="isExit != null">is_exit,</if>
+            <if test="isSplit != null">is_split,</if>
+            <if test="isTare != null">is_tare,</if>
+            <if test="roughQuantity != null">rough_quantity,</if>
+            <if test="tareQuantity != null">tare_quantity,</if>
+            <if test="deductRate != null">deduct_rate,</if>
+            <if test="deductQuantity != null">deduct_quantity,</if>
+            <if test="auxiliaryNetQuantity != null">auxiliary_net_quantity,</if>
+            <if test="oriNetQuantity != null">ori_net_quantity,</if>
+            <if test="isNotAccounting != null">is_not_accounting,</if>
+            <if test="isUseOriNetQuantity != null">is_use_ori_net_quantity,</if>
+            <if test="sortOrderCode != null">sort_order_code,</if>
+            <if test="isReturn != null">is_return,</if>
+            <if test="creatorId != null">creator_id,</if>
+            <if test="creatorName != null">creator_name,</if>
+            <if test="createdAt != null">created_at,</if>
+            <if test="modifierId != null">modifier_id,</if>
+            <if test="modifierName != null">modifier_name,</if>
+            <if test="updatedAt != null">updated_at,</if>
+            <if test="isRemoved != null">is_removed,</if>
+            <if test="version != null">version,</if>
+            <if test="clientVersion != null">client_version,</if>
+            <if test="discernMode != null">discern_mode,</if>
+            <if test="settlementName != null">settlement_name,</if>
+            <if test="settlementId != null">settlement_id,</if>
+            <if test="purchaseMethod != null">purchase_method,</if>
+            <if test="purchaseMethodFullName != null">purchase_method_full_name,</if>
+            <if test="isQrcode != null">is_qrcode,</if>
+            <if test="qrCodeType != null">QR_code_type,</if>
+            <if test="logistId != null">logist_id,</if>
+            <if test="qrOrgId != null">qr_org_id,</if>
+            <if test="oriTeamId != null">ori_team_id,</if>
+            <if test="teamName != null">team_name,</if>
+            <if test="teamLeader != null">team_leader,</if>
+            <if test="colVarchar50No01 != null">col_varchar_50_no_01,</if>
+            <if test="colVarchar500No01 != null">col_varchar_500_no_01,</if>
+            <if test="reason != null">reason,</if>
+            <if test="originalOrderId != null">original_order_id,</if>
+            <if test="originalOrderCode != null">original_order_code,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">#{orgId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="rdsId != null">#{rdsId},</if>
+            <if test="orgName != null">#{orgName},</if>
+            <if test="recordedDate != null">#{recordedDate},</if>
+            <if test="orderDate != null">#{orderDate},</if>
+            <if test="orderCode != null">#{orderCode},</if>
+            <if test="serviceType != null">#{serviceType},</if>
+            <if test="orderType != null">#{orderType},</if>
+            <if test="weightType != null">#{weightType},</if>
+            <if test="materialCollection != null">#{materialCollection},</if>
+            <if test="maker != null">#{maker},</if>
+            <if test="exitMaker != null">#{exitMaker},</if>
+            <if test="makerDate != null">#{makerDate},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="printTimes != null">#{printTimes},</if>
+            <if test="plateNumber != null">#{plateNumber},</if>
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="supplierName != null">#{supplierName},</if>
+            <if test="labourId != null">#{labourId},</if>
+            <if test="labourName != null">#{labourName},</if>
+            <if test="ghId != null">#{ghId},</if>
+            <if test="ghFullId != null">#{ghFullId},</if>
+            <if test="ghFullName != null">#{ghFullName},</if>
+            <if test="ghName != null">#{ghName},</if>
+            <if test="enterTime != null">#{enterTime},</if>
+            <if test="exitTime != null">#{exitTime},</if>
+            <if test="isRed != null">#{isRed},</if>
+            <if test="isAudit != null">#{isAudit},</if>
+            <if test="auditor != null">#{auditor},</if>
+            <if test="auditDate != null">#{auditDate},</if>
+            <if test="oriOrgId != null">#{oriOrgId},</if>
+            <if test="oriSupplierId != null">#{oriSupplierId},</if>
+            <if test="oriGhId != null">#{oriGhId},</if>
+            <if test="oriLabourId != null">#{oriLabourId},</if>
+            <if test="oriRedId != null">#{oriRedId},</if>
+            <if test="isUpload != null">#{isUpload},</if>
+            <if test="discernPlateNumber != null">#{discernPlateNumber},</if>
+            <if test="stockbinFullName != null">#{stockbinFullName},</if>
+            <if test="stockbinName != null">#{stockbinName},</if>
+            <if test="stockbinId != null">#{stockbinId},</if>
+            <if test="oriStockbinId != null">#{oriStockbinId},</if>
+            <if test="isExit != null">#{isExit},</if>
+            <if test="isSplit != null">#{isSplit},</if>
+            <if test="isTare != null">#{isTare},</if>
+            <if test="roughQuantity != null">#{roughQuantity},</if>
+            <if test="tareQuantity != null">#{tareQuantity},</if>
+            <if test="deductRate != null">#{deductRate},</if>
+            <if test="deductQuantity != null">#{deductQuantity},</if>
+            <if test="auxiliaryNetQuantity != null">#{auxiliaryNetQuantity},</if>
+            <if test="oriNetQuantity != null">#{oriNetQuantity},</if>
+            <if test="isNotAccounting != null">#{isNotAccounting},</if>
+            <if test="isUseOriNetQuantity != null">#{isUseOriNetQuantity},</if>
+            <if test="sortOrderCode != null">#{sortOrderCode},</if>
+            <if test="isReturn != null">#{isReturn},</if>
+            <if test="creatorId != null">#{creatorId},</if>
+            <if test="creatorName != null">#{creatorName},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="modifierId != null">#{modifierId},</if>
+            <if test="modifierName != null">#{modifierName},</if>
+            <if test="updatedAt != null">#{updatedAt},</if>
+            <if test="isRemoved != null">#{isRemoved},</if>
+            <if test="version != null">#{version},</if>
+            <if test="clientVersion != null">#{clientVersion},</if>
+            <if test="discernMode != null">#{discernMode},</if>
+            <if test="settlementName != null">#{settlementName},</if>
+            <if test="settlementId != null">#{settlementId},</if>
+            <if test="purchaseMethod != null">#{purchaseMethod},</if>
+            <if test="purchaseMethodFullName != null">#{purchaseMethodFullName},</if>
+            <if test="isQrcode != null">#{isQrcode},</if>
+            <if test="qrCodeType != null">#{qrCodeType},</if>
+            <if test="logistId != null">#{logistId},</if>
+            <if test="qrOrgId != null">#{qrOrgId},</if>
+            <if test="oriTeamId != null">#{oriTeamId},</if>
+            <if test="teamName != null">#{teamName},</if>
+            <if test="teamLeader != null">#{teamLeader},</if>
+            <if test="colVarchar50No01 != null">#{colVarchar50No01},</if>
+            <if test="colVarchar500No01 != null">#{colVarchar500No01},</if>
+            <if test="reason != null">#{reason},</if>
+            <if test="originalOrderId != null">#{originalOrderId},</if>
+            <if test="originalOrderCode != null">#{originalOrderCode},</if>
+         </trim>
+    </insert>
+
+    <update id="updateQReceive" parameterType="QReceive">
+        update q_receive
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="rdsId != null">rds_id = #{rdsId},</if>
+            <if test="orgName != null">org_name = #{orgName},</if>
+            <if test="recordedDate != null">recorded_date = #{recordedDate},</if>
+            <if test="orderDate != null">order_date = #{orderDate},</if>
+            <if test="orderCode != null">order_code = #{orderCode},</if>
+            <if test="serviceType != null">service_type = #{serviceType},</if>
+            <if test="orderType != null">order_type = #{orderType},</if>
+            <if test="weightType != null">weight_type = #{weightType},</if>
+            <if test="materialCollection != null">material_collection = #{materialCollection},</if>
+            <if test="maker != null">maker = #{maker},</if>
+            <if test="exitMaker != null">exit_maker = #{exitMaker},</if>
+            <if test="makerDate != null">maker_date = #{makerDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="printTimes != null">print_times = #{printTimes},</if>
+            <if test="plateNumber != null">plate_number = #{plateNumber},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="supplierName != null">supplier_name = #{supplierName},</if>
+            <if test="labourId != null">labour_id = #{labourId},</if>
+            <if test="labourName != null">labour_name = #{labourName},</if>
+            <if test="ghId != null">gh_id = #{ghId},</if>
+            <if test="ghFullId != null">gh_full_id = #{ghFullId},</if>
+            <if test="ghFullName != null">gh_full_name = #{ghFullName},</if>
+            <if test="ghName != null">gh_name = #{ghName},</if>
+            <if test="enterTime != null">enter_time = #{enterTime},</if>
+            <if test="exitTime != null">exit_time = #{exitTime},</if>
+            <if test="isRed != null">is_red = #{isRed},</if>
+            <if test="isAudit != null">is_audit = #{isAudit},</if>
+            <if test="auditor != null">auditor = #{auditor},</if>
+            <if test="auditDate != null">audit_date = #{auditDate},</if>
+            <if test="oriOrgId != null">ori_org_id = #{oriOrgId},</if>
+            <if test="oriSupplierId != null">ori_supplier_id = #{oriSupplierId},</if>
+            <if test="oriGhId != null">ori_gh_id = #{oriGhId},</if>
+            <if test="oriLabourId != null">ori_labour_id = #{oriLabourId},</if>
+            <if test="oriRedId != null">ori_red_id = #{oriRedId},</if>
+            <if test="isUpload != null">is_upload = #{isUpload},</if>
+            <if test="discernPlateNumber != null">discern_plate_number = #{discernPlateNumber},</if>
+            <if test="stockbinFullName != null">stockbin_full_name = #{stockbinFullName},</if>
+            <if test="stockbinName != null">stockbin_name = #{stockbinName},</if>
+            <if test="stockbinId != null">stockbin_id = #{stockbinId},</if>
+            <if test="oriStockbinId != null">ori_stockbin_id = #{oriStockbinId},</if>
+            <if test="isExit != null">is_exit = #{isExit},</if>
+            <if test="isSplit != null">is_split = #{isSplit},</if>
+            <if test="isTare != null">is_tare = #{isTare},</if>
+            <if test="roughQuantity != null">rough_quantity = #{roughQuantity},</if>
+            <if test="tareQuantity != null">tare_quantity = #{tareQuantity},</if>
+            <if test="deductRate != null">deduct_rate = #{deductRate},</if>
+            <if test="deductQuantity != null">deduct_quantity = #{deductQuantity},</if>
+            <if test="auxiliaryNetQuantity != null">auxiliary_net_quantity = #{auxiliaryNetQuantity},</if>
+            <if test="oriNetQuantity != null">ori_net_quantity = #{oriNetQuantity},</if>
+            <if test="isNotAccounting != null">is_not_accounting = #{isNotAccounting},</if>
+            <if test="isUseOriNetQuantity != null">is_use_ori_net_quantity = #{isUseOriNetQuantity},</if>
+            <if test="sortOrderCode != null">sort_order_code = #{sortOrderCode},</if>
+            <if test="isReturn != null">is_return = #{isReturn},</if>
+            <if test="creatorId != null">creator_id = #{creatorId},</if>
+            <if test="creatorName != null">creator_name = #{creatorName},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="modifierId != null">modifier_id = #{modifierId},</if>
+            <if test="modifierName != null">modifier_name = #{modifierName},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+            <if test="isRemoved != null">is_removed = #{isRemoved},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="clientVersion != null">client_version = #{clientVersion},</if>
+            <if test="discernMode != null">discern_mode = #{discernMode},</if>
+            <if test="settlementName != null">settlement_name = #{settlementName},</if>
+            <if test="settlementId != null">settlement_id = #{settlementId},</if>
+            <if test="purchaseMethod != null">purchase_method = #{purchaseMethod},</if>
+            <if test="purchaseMethodFullName != null">purchase_method_full_name = #{purchaseMethodFullName},</if>
+            <if test="isQrcode != null">is_qrcode = #{isQrcode},</if>
+            <if test="qrCodeType != null">QR_code_type = #{qrCodeType},</if>
+            <if test="logistId != null">logist_id = #{logistId},</if>
+            <if test="qrOrgId != null">qr_org_id = #{qrOrgId},</if>
+            <if test="oriTeamId != null">ori_team_id = #{oriTeamId},</if>
+            <if test="teamName != null">team_name = #{teamName},</if>
+            <if test="teamLeader != null">team_leader = #{teamLeader},</if>
+            <if test="colVarchar50No01 != null">col_varchar_50_no_01 = #{colVarchar50No01},</if>
+            <if test="colVarchar500No01 != null">col_varchar_500_no_01 = #{colVarchar500No01},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="originalOrderId != null">original_order_id = #{originalOrderId},</if>
+            <if test="originalOrderCode != null">original_order_code = #{originalOrderCode},</if>
+        </trim>
+        where org_id = #{orgId}
+    </update>
+
+    <delete id="deleteQReceiveByOrgId" parameterType="String">
+        delete from q_receive where org_id = #{orgId}
+    </delete>
+
+    <delete id="deleteQReceiveByOrgIds" parameterType="String">
+        delete from q_receive where org_id in 
+        <foreach item="orgId" collection="array" open="(" separator="," close=")">
+            #{orgId}
+        </foreach>
+    </delete>
+</mapper>

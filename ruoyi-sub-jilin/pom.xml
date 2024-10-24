@@ -138,6 +138,19 @@
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
             <version>1.2.5</version>
         </dependency>
+
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>3.8.0</version> <!-- 检查最新版本 -->
+        </dependency>
+
+        <!--        Access 数据库-->
+        <dependency>
+            <groupId>net.sf.ucanaccess</groupId>
+            <artifactId>ucanaccess</artifactId>
+            <version>5.0.1</version> <!-- 请检查最新版本 -->
+        </dependency>
     </dependencies>
 
 

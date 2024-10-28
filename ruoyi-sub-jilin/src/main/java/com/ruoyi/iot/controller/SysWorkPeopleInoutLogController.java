@@ -1,5 +1,6 @@
 package com.ruoyi.iot.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -123,6 +124,12 @@ public class SysWorkPeopleInoutLogController extends BaseController {
         final QueryWrapper<SysWorkPeopleInoutLog> query = new QueryWrapper<>(log);
         query.in(StringUtil.areNotEmpty(log.getSns()),"sn", new ArrayList<>(Arrays.asList(log.getSns().split("\\,"))));
         query.orderByDesc("log_time");
+        List<SysWorkPeopleInoutLog> sysWorkPeopleInoutLogs = sysWorkPeopleInoutLogMapper.selectList(query);
+        for (SysWorkPeopleInoutLog sysWorkPeopleInoutLog : sysWorkPeopleInoutLogs) {
+            SysWorkPeople one = sysWorkPeopleService.getOne(
+                    new LambdaQueryWrapper<SysWorkPeople>().eq(SysWorkPeople::getIdCard, sysWorkPeopleInoutLog.getIdCard()), false);
+            if (one != null) sysWorkPeopleInoutLog.setWorkType(one.getWorkType());
+        }
         return getDataTable(sysWorkPeopleInoutLogMapper.selectList(query));
     }
 }

@@ -127,7 +127,9 @@ public class DoorEvent {
             JSONObject door = getDoor(devIndexCode);
             DateTime eventTime = DateUtil.parse(getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
             String personName = object.get("personName").toString();
-            insertInOutLog(door, map, eventTime, personName);
+            SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName);
+            if(sysWorkPeopleInoutLog==null) return;
+            map.put("id",sysWorkPeopleInoutLog.getId());
             listt.add(map);
         }
         request.put("values", listt);
@@ -148,11 +150,11 @@ public class DoorEvent {
         ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG7636046");
     }
 
-    private void insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName) {
+    private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName) {
         SysWorkPeopleInoutLog sysWorkPeopleInoutLog = new SysWorkPeopleInoutLog();
         String sn = door.get("devSerialNum").toString();
         if (!ALLOWED_SN.contains(sn)) {
-            return;
+            return null;
         }
         sysWorkPeopleInoutLog.setSn(sn);
 
@@ -179,8 +181,9 @@ public class DoorEvent {
         sysWorkPeopleInoutLog.setPhotoUrl(jsonObject.get("record_Image_file").toString());
         sysWorkPeopleInoutLog.setCreatedDate(new Date());
         sysWorkPeopleInoutLog.setModifyDate(new Date());
-        logger.info("进行插入数据库操作：{}",sysWorkPeopleInoutLog);
         sysWorkPeopleInoutLogMapper.insert(sysWorkPeopleInoutLog);
+        logger.info("进行插入数据库操作：{}",sysWorkPeopleInoutLog);
+        return sysWorkPeopleInoutLog;
     }
 
     private static JSONObject getDoor(String devIndexCode) {

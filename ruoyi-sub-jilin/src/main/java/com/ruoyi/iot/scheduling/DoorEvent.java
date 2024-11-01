@@ -141,21 +141,21 @@ public class DoorEvent {
         logger.info("...返回值{}", JSON.toJSONString(body1));
     }
 
-    private static final Set<String> ALLOWED_SN = new HashSet<>();
-
-    static {
-        ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG4966329");
-        ALLOWED_SN.add("DS-K1T673M20230818V031000CHAG7090197");
-        ALLOWED_SN.add("DS-K1T67XSBM20220908V030309CHK75967405");
-        ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG7636046");
-    }
+//    private static final Set<String> ALLOWED_SN = new HashSet<>();
+//
+//    static {
+//        ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG4966329");
+//        ALLOWED_SN.add("DS-K1T673M20230818V031000CHAG7090197");
+//        ALLOWED_SN.add("DS-K1T67XSBM20220908V030309CHK75967405");
+//        ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG7636046");
+//    }
 
     private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName) {
         SysWorkPeopleInoutLog sysWorkPeopleInoutLog = new SysWorkPeopleInoutLog();
         String sn = door.get("devSerialNum").toString();
-        if (!ALLOWED_SN.contains(sn)) {
-            return null;
-        }
+//        if (!ALLOWED_SN.contains(sn)) {
+//            return null;
+//        }
         sysWorkPeopleInoutLog.setSn(sn);
 
         Device one = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn), false);

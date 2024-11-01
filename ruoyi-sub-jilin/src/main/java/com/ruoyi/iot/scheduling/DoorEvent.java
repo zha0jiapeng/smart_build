@@ -128,7 +128,7 @@ public class DoorEvent {
             DateTime eventTime = DateUtil.parse(getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
             String personName = object.get("personName").toString();
             SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName);
-            if(sysWorkPeopleInoutLog==null) return;
+            if(sysWorkPeopleInoutLog==null) continue;
             map.put("id",sysWorkPeopleInoutLog.getId());
             listt.add(map);
         }

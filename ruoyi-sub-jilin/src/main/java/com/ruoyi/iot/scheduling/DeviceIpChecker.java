@@ -24,19 +24,18 @@ public class DeviceIpChecker {
     private static final int RETRY_DELAY = 1000;
 
     static {
-        IP_PHONE.add("");
+        IP_PHONE.add("10.1.3.120");
+        IP_PHONE.add("10.1.3.121");
     }
-
 
 
     /**
      * 检查设备 IP 是否存在
      */
-    public void ping() {
-        for (String ip : IP_PHONE) {
-            boolean reachable = isReachableWithRetry(ip);
-            logger.info("IP: {} is reachable: {}", ip, reachable);
-        }
+    public boolean ping(String ip) {
+        boolean reachable = isReachableWithRetry(ip);
+        logger.info("IP: {} is reachable: {}", ip, reachable);
+        return reachable;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.ruoyi.quartz.task;
 
 import cn.hutool.http.HttpUtil;
+import com.ruoyi.iot.scheduling.DeviceIpChecker;
 import com.ruoyi.iot.scheduling.DoorEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,13 +49,6 @@ public class SyncTask {
      */
     public void sendWeighbridgeData(){
         String result = HttpUtil.get("http://127.0.0.1:8097/system/data/upload");
-    }
-
-    /**
-     * IP电话信息获取和推送
-     */
-    public void sendIPPhone(){
-
     }
 
 

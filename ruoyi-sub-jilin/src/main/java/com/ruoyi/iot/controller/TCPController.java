@@ -134,6 +134,7 @@ public class TCPController {
 
     private void handleClient(Socket socket, Map<String, Object> sendMap) {
         try {
+            String originalValue = "";
             for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
 
                 String command = entry.getKey();
@@ -154,13 +155,14 @@ public class TCPController {
                 InputStream inputStream = socket.getInputStream();
                 byte[] receivedBytes = new byte[1024];
                 int read = inputStream.read(receivedBytes);
-
+                originalValue = originalValue + command + "=" + bytesToHex(receivedBytes, read) + ";";
                 handler.accept(receivedBytes, read);
             }
             IotTsp iotTsp = new IotTsp();
             setIotTsp(iotTsp, sendMap);
 
             iotTsp.setCreatedDate(DateUtils.getNowDate());
+            iotTsp.setThree(originalValue);
             iotTspService.save(iotTsp);
 
             List<Map<String, Object>> valuesList = new ArrayList<>();

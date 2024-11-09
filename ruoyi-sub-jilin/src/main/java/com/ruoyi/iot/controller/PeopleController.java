@@ -43,6 +43,19 @@ public class PeopleController {
     @Resource
     private SysWorkPeopleService workPeopleService;
 
+    //今日进洞人数
+    @GetMapping("/countEnteredPeopleToday")
+    public AjaxResult countEnteredPeopleToday( ){
+        int inHoleNum = sysWorkPeopleInoutLogMapper.countEnteredPeopleToday();
+         return AjaxResult.success(inHoleNum);
+    }
+
+    //现在在洞人数
+    @GetMapping("/countOnlyEnteredPeopleToday")
+    public AjaxResult inHoleNum( ){
+        int inHoleNum = sysWorkPeopleInoutLogMapper.countOnlyEnteredPeopleToday();
+        return AjaxResult.success(inHoleNum);
+    }
 
     /**
      * 人员总览

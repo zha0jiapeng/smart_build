@@ -117,4 +117,10 @@ public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleIno
             ") l ON p.id = l.sys_work_people_id " +
             "ORDER BY hours_stayed DESC")
     List<Map<String, Object>> getStayStatistics();
+
+    @Select("SELECT COUNT(*) AS total_people_in " +
+            "FROM sys_work_people_inout_log " +
+            "WHERE mode = 1 " +
+            "  AND DATE(log_time) = CURDATE()")
+    int countEnteredPeopleToday();
 }

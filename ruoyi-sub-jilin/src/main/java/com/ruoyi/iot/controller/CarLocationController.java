@@ -104,7 +104,7 @@ public class CarLocationController {
         jsonData.put("deviceName", "车辆网关");
 
         jsonData.put("values", valuesList);
-//        swzkHttpUtils.pushIOT(jsonData);
+//        hdyHttpUtils.pushIOT(jsonData);
 
 
     }

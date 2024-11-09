@@ -16,9 +16,10 @@ import java.util.stream.Collectors;
 
 public class TuhuguancheUtil {
 
-    private static final String openapi_url = "http://open.tuhugc.com";
-    private static final String app_key = "421377c6faf0b354b8944ad58d120514";
-    private static final String app_secret = "83341a9d8d3cfeec4c5c54f74b9b1289";
+    private static final String openapi_url = "https://open.tuhugc.com";
+    private static final String app_key = "6c43ed6aef7fca9e320aad77380edff6";
+    private static final String app_secret = "a2ba4a789b01465de287774a4cd7543f";
+    private static final String userId = "15243257311";
 
 
     private synchronized static String getToken() {
@@ -30,7 +31,7 @@ public class TuhuguancheUtil {
         }
         Map<String, String> paramMap = getCommonParam();
         // 私有参数_获取token
-        paramMap.put("userId", "18747574274");
+        paramMap.put("userId", userId);
         paramMap.put("expiresIn", "7200");
 
         String sign = "";
@@ -69,13 +70,13 @@ public class TuhuguancheUtil {
     public static Map getDeviceLocation(){
         String token = getToken();
         Map<String, String> paramMap2 = getCommonParam();
-        paramMap2.put("userId", "13521470746");
+        paramMap2.put("userId", userId);
         JSONObject jsonObject2 = getParam(token, paramMap2, "/v1/vehicle/list");
         JSONArray result = jsonObject2.getJSONArray("result");
 
         Map<String, String> paramMap = getCommonParam();
         paramMap.put("mapType","WGS84");
-        paramMap.put("userId", "13521470746");
+        paramMap.put("userId", userId);
         JSONObject jsonObject = getParam(token, paramMap, "/v1/device/location/list");
         if(0==(Integer)jsonObject.get("code")){
             JSONArray array = jsonObject.getJSONArray("result");
@@ -104,7 +105,7 @@ public class TuhuguancheUtil {
         Map<String, String> paramMap2 = getCommonParam();
         Map<String, String> paramMap = getCommonParam();
         paramMap.put("mapType","WGS84");
-        paramMap.put("userId", "13521470746");
+        paramMap.put("userId", userId);
         JSONObject jsonObject = getParam(token, paramMap, "/v1/device/track/list");
         if(0==(Integer)jsonObject.get("code")){
 

@@ -238,15 +238,15 @@ public class TCPController {
                 .eq(Rain::getDeviceCode, rainDeviceCode)
                 .orderByDesc(Rain::getCreateTime).last("limit 1"));
         if (lastMonitor != null) {
-            BigDecimal currentRainfall = new BigDecimal(sendMap.get("rainfall").toString());
+//            BigDecimal currentRainfall = new BigDecimal(sendMap.get("rainfall").toString());
             BigDecimal lastRainfall = lastMonitor.getRainfall();
 
             // 进行减法运算
-            BigDecimal result = currentRainfall.subtract(lastRainfall).setScale(2, RoundingMode.HALF_UP);
+//            BigDecimal result = currentRainfall.subtract(lastRainfall).setScale(2, RoundingMode.HALF_UP);
 
             // 取绝对值以确保结果为正数
-            result = result.abs();
-            sendMap.put("rainfall", result);
+            lastRainfall = lastRainfall.abs();
+            sendMap.put("rainfall", lastRainfall);
         } else {
             BigDecimal bigDecimal = new BigDecimal(sendMap.get("rainfall").toString());
             sendMap.put("rainfall", bigDecimal.abs());
@@ -260,10 +260,22 @@ public class TCPController {
 
     private static void handleTemperatureResponse(byte[] receivedBytes, int read) {
         if (read >= 5) {
-            int highByte = receivedBytes[3] & 0xFF;
-            int lowByte = receivedBytes[4] & 0xFF;
+            // 获取高字节和低字节
+            int highByte = receivedBytes[3] & 0xFF; // 解析接收的高字节
+            int lowByte = receivedBytes[4] & 0xFF;  // 解析接收的低字节
+
+            // 组合高字节和低字节形成温度值
             int temperature = (highByte << 8) | lowByte;
+
+            // 检查并调整温度值以处理负值
+            if (temperature >= 32768) {
+                temperature -= 65536; // 调整温度为负数
+            }
+
+            // 计算实际温度
             double actualTemperature = temperature / 100.0;
+
+            // 存储温度值到相应的映射中
             sendMap4322_4321.put("temperature", actualTemperature);
             sendMap4323_4324.put("temperature", actualTemperature);
         }

@@ -71,9 +71,9 @@ public class PeopleLocationController {
         for (Map<String, Object> map : datee) {
             // 创建存储设备数据的 Map
             Map<String, Object> deviceData = new HashMap<>();
-            deviceData.put("device_id", "3009f9b0bb24");
+            deviceData.put("device_id", map.get("tid"));
             deviceData.put("sub_project_id", "1801194524869922817");
-            deviceData.put("device_code", map.get("tid"));
+            deviceData.put("device_code", "3009f9b0bb24");
             deviceData.put("work_status", "1");
             deviceData.put("power_on_status", "1");
             double[] doubles = XYToCoordinates(Double.parseDouble(map.get("result_x").toString()), Double.parseDouble(map.get("result_y").toString()));

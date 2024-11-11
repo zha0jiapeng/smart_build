@@ -4,6 +4,7 @@ package com.ruoyi.iot.controller;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -18,10 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 
 @RestController
 @Slf4j
@@ -54,6 +53,7 @@ public class PeopleLocationController {
         return jsonObject;
     }
 
+    List<String> validTids = Arrays.asList("11250", "10867", "10985", "11076", "11585");
 
     @Scheduled(cron = "0 */1 * * * *")
     private void pushSwzkOut() {
@@ -71,6 +71,14 @@ public class PeopleLocationController {
         for (Map<String, Object> map : datee) {
             // 创建存储设备数据的 Map
             Map<String, Object> deviceData = new HashMap<>();
+            String tid = map.get("tid").toString();
+            //判定为车辆
+            if (validTids.contains(tid)) {
+                String deviceLocationJson = JSON.toJSONString(deviceData);
+                // 使用 HttpUtil 发送 GET 请求
+                String result = HttpUtil.get("http://10.1.3.204:8097/carLocation/pushHdy?data=" + deviceLocationJson);
+                continue;
+            }
             deviceData.put("device_id", map.get("tid"));
             deviceData.put("sub_project_id", "1801194524869922817");
             deviceData.put("device_code", "3009f9b0bb24");
@@ -97,6 +105,9 @@ public class PeopleLocationController {
         }
 
     }
+
+
+
     public static double[] XYToCoordinates(double resultX, double resultY) {
         double[] center = {14002825, -5164160};  // 中心坐标
 

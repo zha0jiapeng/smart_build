@@ -37,11 +37,11 @@ public class SyncTask {
     }
 
     /**
-     * 门禁信息获取和推送（每十分钟一次）
+     * 道闸信息获取和推送（每十分钟一次）
      */
     public void sendDoor(){
         event.execute();
-        String result1 = HttpUtil.get("http://127.0.0.1:8097/carAccess/crossRecords/push");
+        String result1 = HttpUtil.get("http://127.0.0.1:8097/car/crossRecords/push");
     }
 
     /**
@@ -49,6 +49,13 @@ public class SyncTask {
      */
     public void sendWeighbridgeData(){
         String result = HttpUtil.get("http://127.0.0.1:8097/system/data/upload");
+    }
+
+    /**
+     * 车辆定位（五分钟一次）
+     */
+    public void sendPushHDY(){
+        String result1 = HttpUtil.get("http://127.0.0.1:8097/carLocation/pushHdy");
     }
 
 

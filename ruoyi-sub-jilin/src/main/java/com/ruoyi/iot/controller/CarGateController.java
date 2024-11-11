@@ -261,7 +261,7 @@ public class CarGateController {
     }
 
     /**
-     * 14号洞口海康道闸
+     * 14号洞口、15号大门口海康道闸
      *
      * @return
      */
@@ -270,6 +270,7 @@ public class CarGateController {
         Map<String, Object> rootMap = new HashMap<>();
         rootMap.put("pageNo", 1);
         rootMap.put("pageSize", 1000);
+        //14支洞隧道口
         rootMap.put("entranceSyscode", "de35c3216f0f47d7b89f77678ab4ef6f");
         ZonedDateTime endTime = ZonedDateTime.now();
         ZonedDateTime startTime = endTime.minusMinutes(15);
@@ -278,9 +279,18 @@ public class CarGateController {
         String formattedStartTime = startTime.format(formatter);
         rootMap.put("startTime", formattedStartTime);
         rootMap.put("endTime", formattedEndTime);
+        pushIOT(rootMap);
+
+        //15支洞大门口
+        rootMap.put("entranceSyscode", "1b2f411776be4f83a1e5453a4f3215f4");
+        pushIOT(rootMap);
+    }
+
+    public void pushIOT(Map<String, Object> rootMap) {
         DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
-        JSONObject JSONObject = doorFunctionApi.crossRecordsPage(rootMap);
-        JSONArray objects = (JSONArray) ((JSONObject) JSONObject.get("data")).get("list");
+        JSONObject object = doorFunctionApi.crossRecordsPage(rootMap);
+        System.out.println("车辆道闸设备信息："+object.toJSONString());
+        JSONArray objects = (JSONArray) ((JSONObject) object.get("data")).get("list");
         for (Object value : objects) {
             JSONObject jsonObject = (JSONObject) value;
             //抓拍照片
@@ -319,7 +329,18 @@ public class CarGateController {
             String allowInType = VehicleType.getRemarkByCode("hik" + releaseWay);
 
             //设备编号
-            String deviceCode = "0".equals(vehicleOut) ? "77091ae04d404a58925f59631975cf34" : "64b8b4e9988143bba67de8d96672be9f";
+            String entranceSyscode = rootMap.get("entranceSyscode").toString();
+            boolean isFourteenCaves = "de35c3216f0f47d7b89f77678ab4ef6f".equals(entranceSyscode);
+            String deviceCode = null;
+            if ("0".equals(vehicleOut)) {
+                deviceCode = isFourteenCaves
+                        ? "77091ae04d404a58925f59631975cf34"  // 十四支洞
+                        : "DS-TCG205-E 20220610AIK11586998";  // 十五支洞
+            } else {
+                deviceCode = isFourteenCaves
+                        ? "64b8b4e9988143bba67de8d96672be9f"  // 十四支洞
+                        : "DS-TCG205-E 20220610AIK11586950";  // 十五支洞
+            }
             //报警类型
             String alarmType = "";
             //驾驶员
@@ -348,7 +369,7 @@ public class CarGateController {
             valueMap.put("other", other);
             boolean isSaveSQL = saveSQL(valueMap);
             //加一个判断条件，查看是否有重复的
-            if (isSaveSQL) {
+            if (!isSaveSQL) {
                 continue;
             }
             List<Map<String, Object>> values = new ArrayList<>();
@@ -361,6 +382,7 @@ public class CarGateController {
         }
     }
 
+
     public boolean saveSQL(Map<String, Object> valueMap) {
         QueryWrapper<CarAccess> carAccessQueryWrapper = new QueryWrapper<>();
         CarAccess carAccess = new CarAccess();
@@ -370,11 +392,12 @@ public class CarGateController {
 
         String in_out_type = valueMap.get("in_out_type").toString();
         String create_time = valueMap.get("create_time").toString();
+        String recogTime = valueMap.get("data_time").toString();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = null;
         try {
-            date = dateFormat.parse(create_time);
+            date = dateFormat.parse(recogTime);
         } catch (ParseException e) {
             System.err.println("转换失败: " + e.getMessage());
         }

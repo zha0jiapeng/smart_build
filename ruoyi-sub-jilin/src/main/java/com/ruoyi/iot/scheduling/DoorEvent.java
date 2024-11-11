@@ -108,7 +108,7 @@ public class DoorEvent {
             }
             Map<String, Object> map = new HashMap<>();
             map.put("portal_id", "1751847977770553345");
-            map.put("device_code", object.get("doorIndexCode").toString());//
+          //  map.put("device_code", object.get("doorIndexCode").toString());
             map.put("device_status", "在线");
             String url = "http://10.1.3.2" + object.get("picUri");
             map.put("record_Image_file", url);
@@ -125,6 +125,8 @@ public class DoorEvent {
             map.put("push_time", now);
             String devIndexCode = object.getString("devIndexCode");
             JSONObject door = getDoor(devIndexCode);
+            String sn = door.get("devSerialNum").toString();
+            map.put("device_code", sn);
             DateTime eventTime = DateUtil.parse(getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
             String personName = object.get("personName").toString();
             SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName);
@@ -140,15 +142,6 @@ public class DoorEvent {
         String body1 = execute.body();
         logger.info("...返回值{}", JSON.toJSONString(body1));
     }
-
-//    private static final Set<String> ALLOWED_SN = new HashSet<>();
-//
-//    static {
-//        ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG4966329");
-//        ALLOWED_SN.add("DS-K1T673M20230818V031000CHAG7090197");
-//        ALLOWED_SN.add("DS-K1T67XSBM20220908V030309CHK75967405");
-//        ALLOWED_SN.add("DS-K1T673TMW20230818V031000CHAG7636046");
-//    }
 
     private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName) {
         SysWorkPeopleInoutLog sysWorkPeopleInoutLog = new SysWorkPeopleInoutLog();

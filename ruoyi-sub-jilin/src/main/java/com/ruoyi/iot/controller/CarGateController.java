@@ -286,10 +286,17 @@ public class CarGateController {
         pushIOT(rootMap);
     }
 
+
+//    public static void main(String[] args) {
+//        Map<String, Object> rootMap = new HashMap<>();
+//        pushIOT(rootMap);
+//    }
+
     public void pushIOT(Map<String, Object> rootMap) {
         DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
         JSONObject object = doorFunctionApi.crossRecordsPage(rootMap);
-        System.out.println("车辆道闸设备信息："+object.toJSONString());
+//        JSONObject object = JSONObject.parseObject("{\"code\":\"0\",\"msg\":\"success!\",\"data\":{\"total\":3,\"pageNo\":1,\"pageSize\":1000,\"list\":[{\"crossRecordSyscode\":\"018c8a0405f74ae28a5e404cb903c254_6269d4e9a0b11_74\",\"parkSyscode\":\"caff530965cc468aa39f24af4db2ffcd\",\"parkName\":\"隧道施工\",\"entranceSyscode\":\"1b2f411776be4f83a1e5453a4f3215f4\",\"entranceName\":\"门口\",\"vehicleOut\":1,\"releaseMode\":13,\"plateNo\":\"吉JBC950\",\"vehicleColor\":0,\"vehicleType\":1,\"vehiclePicUri\":\"/pic?5d2c33541a8do-7el*01-078of=8285*3l0=0503*1006391=3127*pt==711**1s9*5b3=bee7f20e3f9f92-8149of-2pi3ee4=91=139\",\"plateNoPicUri\":\"/pic?5d2c33541a8do-7el*21-038of=726=*706*1l0609133107*3t==711**ps9=5b1=b1e7*2033fef9f-8e399f-5pi1eeo=92193=314\",\"aswSyscode\":\"b09e55cd-5b29-4383-8a97-132d90863e8f\",\"crossTime\":\"2024-11-11T14:35:30+08:00\",\"createTime\":\"2024-11-11T14:35:31+08:00\",\"releaseResult\":1,\"releaseWay\":11,\"releaseReason\":101,\"roadwaySyscode\":\"018c8a0405f74ae28a5e404cb903c254\",\"roadwayName\":\"门口出口\",\"plateColor\":0,\"plateType\":0,\"carCategory\":\"11\",\"carCategoryName\":\"Temporary Vehicle\",\"stopType\":11,\"stopTypeName\":\"Temporary Vehicle\"},{\"crossRecordSyscode\":\"4e24f11cbd0c441b9ed41718564af186_6269d43358139_73\",\"parkSyscode\":\"caff530965cc468aa39f24af4db2ffcd\",\"parkName\":\"隧道施工\",\"entranceSyscode\":\"1b2f411776be4f83a1e5453a4f3215f4\",\"entranceName\":\"门口\",\"vehicleOut\":0,\"releaseMode\":2,\"plateNo\":\"冀RAA171\",\"vehicleColor\":0,\"vehicleType\":1,\"vehiclePicUri\":\"/pic?5d2c33541a8do-7el*01-066of=0281*3l6=0504*0006371=3107*pt==611**1s9*5b3=bee7f20e3f9f38-8144of-2pi3ee4=91=139\",\"plateNoPicUri\":\"/pic?5d2c33541a8do-7el*21-086of=220=*804*9l0607133107*3t==519**ps9=5b1=b1e7*2033fef3f-8e309f-3pi1eeo=92193=314\",\"aswSyscode\":\"b09e55cd-5b29-4383-8a97-132d90863e8f\",\"crossTime\":\"2024-11-11T14:32:19+08:00\",\"createTime\":\"2024-11-11T14:32:19+08:00\",\"releaseResult\":1,\"releaseWay\":11,\"releaseReason\":101,\"roadwaySyscode\":\"4e24f11cbd0c441b9ed41718564af186\",\"roadwayName\":\"门口入口\",\"plateColor\":0,\"plateType\":0,\"carCategory\":\"11\",\"carCategoryName\":\"Temporary Vehicle\",\"stopType\":11,\"stopTypeName\":\"Temporary Vehicle\"},{\"crossRecordSyscode\":\"4e24f11cbd0c441b9ed41718564af186_6269d3f0ca458_72\",\"parkSyscode\":\"caff530965cc468aa39f24af4db2ffcd\",\"parkName\":\"隧道施工\",\"entranceSyscode\":\"1b2f411776be4f83a1e5453a4f3215f4\",\"entranceName\":\"门口\",\"vehicleOut\":0,\"releaseMode\":35,\"plateNo\":\"渝B287WB\",\"vehicleColor\":0,\"vehicleType\":1,\"vehiclePicUri\":\"/pic?5d2c33541a8do-7el*51-040of=7224*6l4=0507*0006361=3187*pt==511**1s9*5b3=bee7f20e3f9f38-8184of-2pi3ee4=91=139\",\"plateNoPicUri\":\"/pic?9d19=4e33i12-=o4e18p43f9f7e0-f7feb33b2*9e1*=115==sp**715=1t3670037060=0l2*0*1629=fo080-15*le7-od8a14533c25\",\"aswSyscode\":\"b09e55cd-5b29-4383-8a97-132d90863e8f\",\"crossTime\":\"2024-11-11T14:31:09+08:00\",\"createTime\":\"2024-11-11T14:31:10+08:00\",\"releaseResult\":1,\"releaseWay\":11,\"releaseReason\":112,\"roadwaySyscode\":\"4e24f11cbd0c441b9ed41718564af186\",\"roadwayName\":\"门口入口\",\"plateColor\":0,\"plateType\":0,\"carCategory\":\"b9d899b0-82b9-11ef-9a9c-ff3e5cd32ff6\",\"carCategoryName\":\"项目部公务用车\",\"stopType\":13,\"stopTypeName\":\"Group Vehicle\"}]}}");
+        System.out.println("车辆道闸设备信息：" + object.toJSONString());
         JSONArray objects = (JSONArray) ((JSONObject) object.get("data")).get("list");
         for (Object value : objects) {
             JSONObject jsonObject = (JSONObject) value;
@@ -354,7 +361,11 @@ public class CarGateController {
             valueMap.put("portal_id", portalId);
             valueMap.put("sub_project_id", subProjectId);
             valueMap.put("device_code", deviceCode);
-            valueMap.put("device_name", "14支洞支洞口车辆道闸设备");
+            if (isFourteenCaves) {
+                valueMap.put("device_name", "14支洞支洞口车辆道闸设备");
+            } else {
+                valueMap.put("device_name", "15支洞大门口车辆道闸设备");
+            }
             valueMap.put("work_status", onlineStatus);
             valueMap.put("video_streaming", imageFile);
             valueMap.put("license_number", plateNumber);
@@ -391,7 +402,6 @@ public class CarGateController {
         carAccess.setCarCode(carCode);
 
         String in_out_type = valueMap.get("in_out_type").toString();
-        String create_time = valueMap.get("create_time").toString();
         String recogTime = valueMap.get("data_time").toString();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -118,7 +118,7 @@ public interface SysWorkPeopleInoutLogMapper extends BaseMapper<SysWorkPeopleIno
             "ORDER BY hours_stayed DESC")
     List<Map<String, Object>> getStayStatistics();
 
-    @Select("SSELECT COUNT(*) AS total_people_in " +
+    @Select("SELECT COUNT(*) AS total_people_in " +
             "FROM sys_work_people_inout_log AS inout_log " +
             "JOIN sys_device AS device ON inout_log.sn = device.sn " +
             "WHERE inout_log.mode = 1" +

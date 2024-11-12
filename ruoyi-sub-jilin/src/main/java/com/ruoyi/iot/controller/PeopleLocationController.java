@@ -32,15 +32,15 @@ public class PeopleLocationController {
 
 
     @PostMapping("/outTunnelLocation")
-    public JSONObject outPeopleLocation(@RequestBody Map request){
+    public JSONObject outPeopleLocation(@RequestBody Map request) {
         //Map<String,Object> parse = new HashMap();
         HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501/push/list")
                 .body(JSON.toJSONString(new Object()), "application/json")
                 .execute();
         String body = execute.body();
-        log.info("body :{}",body);
+        log.info("body :{}", body);
         JSONObject jsonObject = JSONObject.parseObject(body);
-        if(jsonObject!=null) {
+        if (jsonObject != null) {
             JSONArray data = jsonObject.getJSONArray("data");
             for (Object datum : data) {
                 JSONObject item = (JSONObject) datum;
@@ -57,7 +57,7 @@ public class PeopleLocationController {
 
     @Scheduled(cron = "0 */1 * * * *")
     private void pushSwzkOut() {
-        Map<String,Object> request = new HashMap();
+        Map<String, Object> request = new HashMap();
         HttpResponse execute = HttpRequest.post("http://10.1.3.207:9501/push/list")
                 .body(JSON.toJSONString(request), "application/json")
                 .execute();
@@ -65,7 +65,7 @@ public class PeopleLocationController {
         Map parse = JSONObject.parseObject(body, Map.class);
         List<Map<String, Object>> datee = (List<Map<String, Object>>) parse.get("data");
         String now = DateUtil.now();
-        if(datee==null){
+        if (datee == null) {
             return;
         }
         for (Map<String, Object> map : datee) {
@@ -73,9 +73,11 @@ public class PeopleLocationController {
             Map<String, Object> deviceData = new HashMap<>();
             String tid = map.get("tid").toString();
             //判定为车辆
+            System.out.println("车辆定位：" + tid);
             if (validTids.contains(tid)) {
                 String deviceLocationJson = JSON.toJSONString(deviceData);
                 // 使用 HttpUtil 发送 GET 请求
+                System.out.println("开始调用车辆定位");
                 String result = HttpUtil.get("http://10.1.3.204:8097/carLocation/pushHdy?data=" + deviceLocationJson);
                 continue;
             }
@@ -87,10 +89,10 @@ public class PeopleLocationController {
             double[] doubles = XYToCoordinates(Double.parseDouble(map.get("result_x").toString()), Double.parseDouble(map.get("result_y").toString()));
             deviceData.put("position_x", doubles[0]);
             deviceData.put("position_y", doubles[1]);
-            deviceData.put("position_z", map.get("result_z") );
+            deviceData.put("position_z", map.get("result_z"));
             deviceData.put("sos_status", "0");
             deviceData.put("distance", 0.0);
-            deviceData.put("data_time",  DateUtil.date(Long.parseLong(map.get("time").toString())*1000).toString("yyyy-MM-dd HH:mm:ss"));
+            deviceData.put("data_time", DateUtil.date(Long.parseLong(map.get("time").toString()) * 1000).toString("yyyy-MM-dd HH:mm:ss"));
             deviceData.put("push_time", now);
             deviceData.put("other", "");
 
@@ -101,11 +103,10 @@ public class PeopleLocationController {
             // 创建总的 Map 并将 List 放入其中
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("values", values);
-            hdyHttpUtils.pushIOT(resultMap,"199a5516-f4c3-45d0-ac7b-e30d73ffa595");
+            hdyHttpUtils.pushIOT(resultMap, "199a5516-f4c3-45d0-ac7b-e30d73ffa595");
         }
 
     }
-
 
 
     public static double[] XYToCoordinates(double resultX, double resultY) {
@@ -119,7 +120,7 @@ public class PeopleLocationController {
         y = (-180 / Math.PI) * (2 * Math.atan(Math.exp((y * Math.PI) / 180)) - Math.PI / 2);
 
         // 返回转换后的 x, y 坐标
-        return new double[] {x, y};
+        return new double[]{x, y};
     }
 
 

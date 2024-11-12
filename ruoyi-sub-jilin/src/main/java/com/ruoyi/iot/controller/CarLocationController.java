@@ -92,6 +92,7 @@ public class CarLocationController {
 
     @GetMapping("/pushHdy")
     private void pushHdy(String data) {
+        System.out.println("车辆定位接收数据：" + data);
         //获取的数据
         Map<String, Object> deviceLocation = com.alibaba.fastjson.JSON.parseObject(data, Map.class);
 

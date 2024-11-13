@@ -3,6 +3,7 @@ package com.ruoyi.iot.scheduling;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.iot.domain.ElectricityMonitoring;
 import com.ruoyi.iot.service.IElectricityMonitoringService;
 import com.ruoyi.iot.utils.HdyHttpUtils;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -146,7 +149,7 @@ public class MqttSubscriber {
         //设备工作状态  String
         valueMap.put("work_status", "正常");
         //电箱类型  String
-        valueMap.put("electric_box_type", "");
+        valueMap.put("electric_box_type", "二级电箱");
         //父级电箱  String
         valueMap.put("electric_box_parent", "");
         //正向无功总电能  Decimal 30
@@ -193,7 +196,7 @@ public class MqttSubscriber {
         valueMap.put("c_voltage", idValueMap.get(3));
         electricityMonitoring.setCVoltage(idValueMap.get(3));
         //用电负载功率  Decimal
-        valueMap.put("box_power", "");
+        valueMap.put("box_power", calculateLoadPower(idValueMap));
         //线缆A温度  Decimal 36
         valueMap.put("line_a_temperature", idValueMap.get(36));
         electricityMonitoring.setLineATemperature(idValueMap.get(36));
@@ -208,7 +211,7 @@ public class MqttSubscriber {
         electricityMonitoring.setLineNTemperature(idValueMap.get(39));
 
         //总瞬时功率  Decimal
-        valueMap.put("totalI_a_p", "");
+        valueMap.put("totalI_a_p", calculateTotalInstantaneousPower(idValueMap));
         //跳闸  String
         valueMap.put("switch_off", "");
         //合闸  String
@@ -233,11 +236,33 @@ public class MqttSubscriber {
         //其他  String
         valueMap.put("other", "");
         //总用电量  String
-        valueMap.put("total_wattage", "");
+        String totalElectricityUsageKWh = calculateTotalElectricityUsage(valueMap.get("box_power").toString());
+        electricityMonitoring.setTotalWattage(totalElectricityUsageKWh);
+        QueryWrapper<ElectricityMonitoring> queryWrapper = new QueryWrapper<>();
+        queryWrapper.isNotNull("total_wattage");
+        // 执行查询
+        List<ElectricityMonitoring> monitoringList = electricityMonitoringService.list(queryWrapper);
+        if (monitoringList.size() != 0) {
+            BigDecimal totalWattageSum = BigDecimal.ZERO;
+
+            for (ElectricityMonitoring monitoring : monitoringList) {
+                String wattageStr = monitoring.getTotalWattage();
+                if (wattageStr != null && !wattageStr.isEmpty()) {
+                    BigDecimal wattageValue = new BigDecimal(wattageStr);
+                    totalWattageSum = totalWattageSum.add(wattageValue);
+                }
+            }
+            valueMap.put("total_wattage", totalWattageSum.toString());
+        } else {
+            valueMap.put("total_wattage", "0");
+        }
+
+
         //预警类型（设备传输：漏电...  String
         valueMap.put("alarmCode", "");
         //数据类型(0、正常 1、报警)  String
         valueMap.put("data_type", "0");
+
 
         List<Map<String, Object>> values = new ArrayList<>();
         values.add(valueMap);
@@ -246,6 +271,89 @@ public class MqttSubscriber {
         //开始插入数据库
         electricityMonitoringService.insertElectricityMonitoring(electricityMonitoring);
         hdyHttpUtils.pushIOT(param, "2e2529ef-f03a-4159-8ebb-a050e0e0fc89");
+    }
+
+    public String calculateTotalElectricityUsage(String loadPower) {
+        // 将负载功率转换为 BigDecimal
+        BigDecimal loadPowerValue = new BigDecimal(loadPower);
+
+        // 将五分钟转换为小时 = 5/60 小时
+        BigDecimal timeInHours = BigDecimal.valueOf(5).divide(BigDecimal.valueOf(60), 10, RoundingMode.HALF_UP);
+
+        // 计算总用电量（单位为 kWh）
+        BigDecimal totalElectricityUsageKWh = loadPowerValue.multiply(timeInHours).divide(BigDecimal.valueOf(1000), 10, RoundingMode.HALF_UP);
+
+        return totalElectricityUsageKWh.toString(); // 返回结果为字符串
+    }
+
+
+    public String calculateTotalInstantaneousPower(Map<Integer, String> idValueMap) {
+        BigDecimal aVoltage = new BigDecimal(idValueMap.get(1));
+        BigDecimal bVoltage = new BigDecimal(idValueMap.get(2));
+        BigDecimal cVoltage = new BigDecimal(idValueMap.get(3));
+        BigDecimal aCurrent = new BigDecimal(idValueMap.get(7));
+        BigDecimal bCurrent = new BigDecimal(idValueMap.get(8));
+        BigDecimal cCurrent = new BigDecimal(idValueMap.get(9));
+
+        // 计算总瞬时功率
+        BigDecimal totalInstantaneousPower = aVoltage.multiply(aCurrent)
+                .add(bVoltage.multiply(bCurrent))
+                .add(cVoltage.multiply(cCurrent));
+
+        return totalInstantaneousPower.toString(); // 返回结果为字符串
+    }
+
+
+    public String calculateLoadPower(Map<Integer, String> idValueMap) {
+        BigDecimal aVoltage = new BigDecimal(idValueMap.get(1));
+        BigDecimal bVoltage = new BigDecimal(idValueMap.get(2));
+        BigDecimal cVoltage = new BigDecimal(idValueMap.get(3));
+        BigDecimal aCurrent = new BigDecimal(idValueMap.get(7));
+        //功率因数
+        BigDecimal powerFactor = calculatePowerFactor(idValueMap);
+
+        // 计算平均电压
+        BigDecimal avgVoltage = (aVoltage.add(bVoltage).add(cVoltage)).divide(BigDecimal.valueOf(3));
+
+        // 计算用电负载功率
+        BigDecimal loadPower = BigDecimal.valueOf(Math.sqrt(3)) // √3
+                .multiply(avgVoltage) // 平均电压
+                .multiply(aCurrent) // A相电流
+                .multiply(powerFactor); // 假设功率因数
+
+        return loadPower.toString(); // 返回结果为字符串
+    }
+
+
+    public BigDecimal calculatePowerFactor(Map<Integer, String> idValueMap) {
+        // 从 idValueMap 中获取正向有功功率（单位瓦特）
+        BigDecimal totalPAE = new BigDecimal(idValueMap.get(28).toString()); // 正向有功总电量
+
+        // 从 idValueMap 中获取 A、B、C 三项电压和电流
+        BigDecimal aVoltage = new BigDecimal(idValueMap.get(1).toString()); // A相电压
+        BigDecimal bVoltage = new BigDecimal(idValueMap.get(2).toString()); // B相电压
+        BigDecimal cVoltage = new BigDecimal(idValueMap.get(3).toString()); // C相电压
+
+        BigDecimal aCurrent = new BigDecimal(idValueMap.get(7).toString()); // A相电流
+        BigDecimal bCurrent = new BigDecimal(idValueMap.get(8).toString()); // B相电流
+        BigDecimal cCurrent = new BigDecimal(idValueMap.get(9).toString()); // C相电流
+
+        // 计算平均电压
+        BigDecimal avgVoltage = (aVoltage.add(bVoltage).add(cVoltage)).divide(BigDecimal.valueOf(3), 10, RoundingMode.HALF_UP);
+
+        // 计算总电流
+        BigDecimal totalCurrent = aCurrent.add(bCurrent).add(cCurrent);
+
+        // 计算视在功率 S = V * I
+        BigDecimal apparentPower = avgVoltage.multiply(totalCurrent); // 视在功率
+
+        // 计算功率因数
+        if (apparentPower.compareTo(BigDecimal.ZERO) != 0) {
+            BigDecimal powerFactor = totalPAE.divide(apparentPower, 4, RoundingMode.HALF_UP); // 保留四位小数
+            return powerFactor;
+        }
+        return BigDecimal.valueOf(0.0000); // 假设功率因数
+
     }
 
 

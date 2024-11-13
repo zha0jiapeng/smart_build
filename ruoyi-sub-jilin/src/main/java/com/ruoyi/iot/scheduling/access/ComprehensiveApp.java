@@ -24,33 +24,35 @@ public class ComprehensiveApp {
         // 下载和处理FTP服务器文件
         for (FTPServerConfig server : servers) {
             System.out.println(server.getServer());
-            processFTPServer(server);
+            String localFilePath = "/home/mashir0/project/Normal.mdb";
+//            processFTPServer(server, localFilePath);
         }
     }
 
     /**
      * 处理单个FTP服务器中的文件
      */
-    public static void processFTPServer(FTPServerConfig config) {
+    public void processFTPServer(FTPServerConfig config, String localFilePath) {
         FTPClient ftpClient = new FTPClient();
-        String localFilePath = "/home/mashir0/project/Normal.mdb";  // 本地保存文件的路径
+//        localFilePath = "/home/mashir0/project/Normal.mdb";  // 本地保存文件的路径
 
         try {
             // 连接到FTP服务器
             ftpClient.connect(config.getServer(), config.getPort());
-            System.out.println("Connected to " + config.getServer());
+//            System.out.println("Connected to " + config.getServer());
 
             // 登录到FTP服务器
             if (ftpClient.login(config.getUser(), config.getPass())) {
-                System.out.println("Logged in as " + config.getUser());
+//                System.out.println("Logged in as " + config.getUser());
 
                 // 下载文件
-                if (downloadFile(ftpClient, config.getRemoteDir() + "/Normal.mdb", localFilePath)) {
+                if (downloadFile(ftpClient, config.getRemoteDir(), localFilePath)) {
                     System.out.println("File downloaded successfully.");
 
                     // 处理本地数据库文件
-                    System.out.println("开始处理本地文件");
-                    print(localFilePath);
+//                    System.out.println("开始处理本地文件");
+//                    print(localFilePath);
+
                 } else {
                     System.out.println("Failed to download file.");
                 }
@@ -79,7 +81,7 @@ public class ComprehensiveApp {
     /**
      * 从FTP服务器下载文件到本地
      */
-    public static boolean downloadFile(FTPClient ftpClient, String remoteFilePath, String localFilePath) {
+    public boolean downloadFile(FTPClient ftpClient, String remoteFilePath, String localFilePath) {
         ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out), true));
 
         try (OutputStream outputStream = new FileOutputStream(localFilePath)) {
@@ -98,7 +100,7 @@ public class ComprehensiveApp {
     /**
      * 读取本地Access数据库并打印内容
      */
-    public static void print(String databasePath) {
+    public void print(String databasePath) {
         System.out.println("开始");
         System.out.println();
         // 构建 UCanAccess 连接 URL，明确设置密码为空

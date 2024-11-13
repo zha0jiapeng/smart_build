@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.iot.mapper.QReceivePhotoMapper">
+    
+    <resultMap type="QReceivePhoto" id="QReceivePhotoResult">
+        <result property="orgId"    column="org_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="id"    column="id"    />
+        <result property="cameraPosition"    column="camera_position"    />
+        <result property="photoType"    column="photo_type"    />
+        <result property="cameraCode"    column="camera_code"    />
+        <result property="photoUrl"    column="photo_url"    />
+        <result property="localUrl"    column="local_url"    />
+        <result property="isUpload"    column="is_upload"    />
+        <result property="creatorId"    column="creator_id"    />
+        <result property="creatorName"    column="creator_name"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="modifierId"    column="modifier_id"    />
+        <result property="modifierName"    column="modifier_name"    />
+        <result property="updatedAt"    column="updated_at"    />
+        <result property="isRemoved"    column="is_removed"    />
+        <result property="version"    column="version"    />
+    </resultMap>
+
+    <sql id="selectQReceivePhotoVo">
+        select org_id, order_id, id, camera_position, photo_type, camera_code, photo_url, local_url, is_upload, creator_id, creator_name, created_at, modifier_id, modifier_name, updated_at, is_removed, version from q_receive_photo
+    </sql>
+
+    <select id="selectQReceivePhotoList" parameterType="QReceivePhoto" resultMap="QReceivePhotoResult">
+        <include refid="selectQReceivePhotoVo"/>
+        <where>  
+            <if test="cameraPosition != null  and cameraPosition != ''"> and camera_position = #{cameraPosition}</if>
+            <if test="photoType != null  and photoType != ''"> and photo_type = #{photoType}</if>
+            <if test="cameraCode != null  and cameraCode != ''"> and camera_code = #{cameraCode}</if>
+            <if test="photoUrl != null  and photoUrl != ''"> and photo_url = #{photoUrl}</if>
+            <if test="localUrl != null  and localUrl != ''"> and local_url = #{localUrl}</if>
+            <if test="isUpload != null "> and is_upload = #{isUpload}</if>
+            <if test="creatorId != null  and creatorId != ''"> and creator_id = #{creatorId}</if>
+            <if test="creatorName != null  and creatorName != ''"> and creator_name like concat('%', #{creatorName}, '%')</if>
+            <if test="createdAt != null "> and created_at = #{createdAt}</if>
+            <if test="modifierId != null  and modifierId != ''"> and modifier_id = #{modifierId}</if>
+            <if test="modifierName != null  and modifierName != ''"> and modifier_name like concat('%', #{modifierName}, '%')</if>
+            <if test="updatedAt != null "> and updated_at = #{updatedAt}</if>
+            <if test="isRemoved != null "> and is_removed = #{isRemoved}</if>
+            <if test="version != null "> and version = #{version}</if>
+        </where>
+    </select>
+    
+    <select id="selectQReceivePhotoByOrgId" parameterType="String" resultMap="QReceivePhotoResult">
+        <include refid="selectQReceivePhotoVo"/>
+        where org_id = #{orgId}
+    </select>
+
+    <insert id="insertQReceivePhoto" parameterType="QReceivePhoto">
+        insert into q_receive_photo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">org_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="id != null">id,</if>
+            <if test="cameraPosition != null">camera_position,</if>
+            <if test="photoType != null">photo_type,</if>
+            <if test="cameraCode != null">camera_code,</if>
+            <if test="photoUrl != null">photo_url,</if>
+            <if test="localUrl != null">local_url,</if>
+            <if test="isUpload != null">is_upload,</if>
+            <if test="creatorId != null">creator_id,</if>
+            <if test="creatorName != null">creator_name,</if>
+            <if test="createdAt != null">created_at,</if>
+            <if test="modifierId != null">modifier_id,</if>
+            <if test="modifierName != null">modifier_name,</if>
+            <if test="updatedAt != null">updated_at,</if>
+            <if test="isRemoved != null">is_removed,</if>
+            <if test="version != null">version,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">#{orgId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="id != null">#{id},</if>
+            <if test="cameraPosition != null">#{cameraPosition},</if>
+            <if test="photoType != null">#{photoType},</if>
+            <if test="cameraCode != null">#{cameraCode},</if>
+            <if test="photoUrl != null">#{photoUrl},</if>
+            <if test="localUrl != null">#{localUrl},</if>
+            <if test="isUpload != null">#{isUpload},</if>
+            <if test="creatorId != null">#{creatorId},</if>
+            <if test="creatorName != null">#{creatorName},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="modifierId != null">#{modifierId},</if>
+            <if test="modifierName != null">#{modifierName},</if>
+            <if test="updatedAt != null">#{updatedAt},</if>
+            <if test="isRemoved != null">#{isRemoved},</if>
+            <if test="version != null">#{version},</if>
+         </trim>
+    </insert>
+
+    <update id="updateQReceivePhoto" parameterType="QReceivePhoto">
+        update q_receive_photo
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="id != null">id = #{id},</if>
+            <if test="cameraPosition != null">camera_position = #{cameraPosition},</if>
+            <if test="photoType != null">photo_type = #{photoType},</if>
+            <if test="cameraCode != null">camera_code = #{cameraCode},</if>
+            <if test="photoUrl != null">photo_url = #{photoUrl},</if>
+            <if test="localUrl != null">local_url = #{localUrl},</if>
+            <if test="isUpload != null">is_upload = #{isUpload},</if>
+            <if test="creatorId != null">creator_id = #{creatorId},</if>
+            <if test="creatorName != null">creator_name = #{creatorName},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="modifierId != null">modifier_id = #{modifierId},</if>
+            <if test="modifierName != null">modifier_name = #{modifierName},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+            <if test="isRemoved != null">is_removed = #{isRemoved},</if>
+            <if test="version != null">version = #{version},</if>
+        </trim>
+        where org_id = #{orgId}
+    </update>
+
+    <delete id="deleteQReceivePhotoByOrgId" parameterType="String">
+        delete from q_receive_photo where org_id = #{orgId}
+    </delete>
+
+    <delete id="deleteQReceivePhotoByOrgIds" parameterType="String">
+        delete from q_receive_photo where org_id in 
+        <foreach item="orgId" collection="array" open="(" separator="," close=")">
+            #{orgId}
+        </foreach>
+    </delete>
+</mapper>

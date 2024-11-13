@@ -73,11 +73,10 @@ public class PeopleLocationController {
             Map<String, Object> deviceData = new HashMap<>();
             String tid = map.get("tid").toString();
             //判定为车辆
-            System.out.println("车辆定位：" + tid);
             if (validTids.contains(tid)) {
                 String deviceLocationJson = JSON.toJSONString(deviceData);
                 // 使用 HttpUtil 发送 GET 请求
-                System.out.println("开始调用车辆定位");
+                System.out.println("开始调用车辆定位：" + deviceData.toString());
                 String result = HttpUtil.get("http://10.1.3.204:8097/carLocation/pushHdy?data=" + deviceLocationJson);
                 continue;
             }

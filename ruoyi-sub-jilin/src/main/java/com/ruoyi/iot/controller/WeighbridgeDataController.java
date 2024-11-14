@@ -2,10 +2,16 @@ package com.ruoyi.iot.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ruoyi.common.config.MinioConfig;
+import com.ruoyi.common.utils.MinioUtils;
 import com.ruoyi.iot.domain.QReceive;
 import com.ruoyi.iot.domain.QReceiveMoreMaterial;
+import com.ruoyi.iot.domain.QReceivePhoto;
 import com.ruoyi.iot.mapper.WeighbridgeDataMapper;
+import com.ruoyi.iot.scheduling.access.ComprehensiveApp;
+import com.ruoyi.iot.scheduling.access.FTPServerConfig;
 import com.ruoyi.iot.service.IQReceiveMoreMaterialService;
+import com.ruoyi.iot.service.IQReceivePhotoService;
 import com.ruoyi.iot.service.IQReceiveService;
 import com.ruoyi.iot.utils.HdyHttpUtils;
 import com.ruoyi.system.domain.basic.Rain;
@@ -13,6 +19,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -58,6 +67,9 @@ public class WeighbridgeDataController extends BaseController {
     private IQReceiveMoreMaterialService qReceiveMoreMaterialService;
 
     @Autowired
+    private IQReceivePhotoService iqReceivePhotoService;
+
+    @Autowired
     private IQReceiveService qReceiveService;
 
     @Autowired
@@ -65,6 +77,12 @@ public class WeighbridgeDataController extends BaseController {
 
     @Resource
     HdyHttpUtils hdyHttpUtils;
+
+    @Resource
+    MinioUtils minioUtils;
+
+    @Resource
+    MinioConfig minioConfig;
 
     /**
      * 查询地磅数据处理列表
@@ -139,7 +157,7 @@ public class WeighbridgeDataController extends BaseController {
 
     @GetMapping("/upload")
     @ApiOperation("上传地磅数据")
-    public void weighbridgeDataUpload() {
+    public void weighbridgeDataUpload() throws FileNotFoundException {
         Map<String, List<QReceive>> selectQReceiveList = qReceiveService.selectQReceiveList();
         Map<String, List<QReceive>> listMap = filterQReceiveList(selectQReceiveList);
         Map<String, List<QReceiveMoreMaterial>> selectQReceiveMoreMaterialList = qReceiveMoreMaterialService.selectQReceiveMoreMaterialList(listMap);
@@ -151,19 +169,21 @@ public class WeighbridgeDataController extends BaseController {
             for (int i = 0; i < SLAVEselectQReceiveList.size(); i++) {
                 QReceive qReceive = SLAVEselectQReceiveList.get(i);
                 QReceiveMoreMaterial qReceiveMoreMaterial = SLAVEselectQReceiveMoreMaterialList.get(i);
-                upload("SLAVE", qReceive, qReceiveMoreMaterial);
+                QReceivePhoto qReceivePhoto = iqReceivePhotoService.selectQReceivePhotoOrderIdSLAVE(qReceiveMoreMaterial.getOrderId());
+                upload("SLAVE", qReceive, qReceiveMoreMaterial, qReceivePhoto);
             }
         }
         if (SLAVEDATAselectQReceiveList != null && SLAVEDATAselectQReceiveList.size() != 0) {
             for (int i = 0; i < SLAVEDATAselectQReceiveList.size(); i++) {
                 QReceive qReceive = SLAVEDATAselectQReceiveList.get(i);
                 QReceiveMoreMaterial qReceiveMoreMaterial = SLAVEDATAselectQReceiveMoreMaterialList.get(i);
-                upload("SLAVEDATA", qReceive, qReceiveMoreMaterial);
+                QReceivePhoto qReceivePhoto = iqReceivePhotoService.selectQReceivePhotoOrderIdSLAVEDATA(qReceiveMoreMaterial.getOrderId());
+                upload("SLAVEDATA", qReceive, qReceiveMoreMaterial, qReceivePhoto);
             }
         }
     }
 
-    public void upload(String region, QReceive qReceive, QReceiveMoreMaterial qReceiveMoreMaterial) {
+    public void upload(String region, QReceive qReceive, QReceiveMoreMaterial qReceiveMoreMaterial, QReceivePhoto qReceivePhoto) throws FileNotFoundException {
         Map<String, Object> valueMap = new HashMap<>();
         //门户ID  String
         valueMap.put("portal_id", "1751847977770553345");
@@ -178,6 +198,7 @@ public class WeighbridgeDataController extends BaseController {
             valueMap.put("device_code", "DS-7804N-F1(D)0420240416CCRRFD0327551WVU");
             weighbridgeData.setDeviceCode("DS-7804N-F1(D)0420240416CCRRFD0327551WVU");
         }
+
 
         //设备工作状态  String
         valueMap.put("work_status", "正常");
@@ -206,7 +227,7 @@ public class WeighbridgeDataController extends BaseController {
         weighbridgeData.setOutWeightTime(qReceive.getExitTime());
         valueMap.put("order_code", qReceive.getOrderCode());
         weighbridgeData.setOrderCode(qReceive.getOrderCode());
-        valueMap.put("goods_picture","");
+        valueMap.put("goods_picture", "");
         valueMap.put("order_number", "");
         valueMap.put("deviation_number", "");
         valueMap.put("deviation_number_up", "");
@@ -226,7 +247,7 @@ public class WeighbridgeDataController extends BaseController {
         valueMap.put("push_time", timestampStr);
         valueMap.put("other", "");
         valueMap.put("weight_time", "");
-        valueMap.put("weight_picture", "");
+        valueMap.put("weight_picture", getPicture(region, qReceivePhoto));
         valueMap.put("waring_type", "");
         valueMap.put("data_type", "0");
         valueMap.put("driver_name", "");
@@ -242,6 +263,55 @@ public class WeighbridgeDataController extends BaseController {
         weighbridgeData.setOrderId(qReceive.getOrderId());
         weighbridgeDataService.insertWeighbridgeData(weighbridgeData);
         hdyHttpUtils.pushIOT(param, "c65c1c39-2f36-43c1-b231-b7b8737cefcf");
+    }
+
+    public String getPicture(String region, QReceivePhoto qReceivePhoto) throws FileNotFoundException {
+        if (qReceivePhoto == null) {
+            return "空";
+        }
+        FTPServerConfig ftpServerConfig = null;
+        String localUrl = qReceivePhoto.getLocalUrl();
+        localUrl = extractCameraPath(localUrl);
+        if (localUrl == null){
+            return "空";
+        }
+        if (region.equals("SLAVE")) {
+            ftpServerConfig = new FTPServerConfig("10.1.3.175", 21, "yuancheng15", "123456", localUrl, 1);
+        } else {
+            ftpServerConfig = new FTPServerConfig("10.1.3.181", 21, "yuancheng14", "123456", localUrl, 1);
+        }
+        //下载图片
+        ComprehensiveApp comprehensiveApp = new ComprehensiveApp();
+        String localFilePath = "/home/mashir0/images/picture.jpg";
+        comprehensiveApp.processFTPServer(ftpServerConfig, localFilePath);
+
+        //上传到minio
+        InputStream inputStream = new FileInputStream(localFilePath);
+        String filename = UUID.randomUUID().toString() + ".png";
+        minioUtils.uploadFile(minioConfig.getWeighbridgeDataBucketName(), filename, inputStream);
+        String imageFile = minioConfig.getEndpoint() + "/" + minioConfig.getWeighbridgeDataBucketName() + "/" + filename;
+        System.out.println("地磅imageFile：" + imageFile);
+        return imageFile;
+    }
+
+    public String extractCameraPath(String path) {
+        if (path == null || path.isEmpty()) {
+            return null;
+        }
+
+        // 将路径按 "/" 分隔
+        String[] parts = path.split("/");
+
+        // 查找 "camera" 并获取其后的部分
+        for (int i = 0; i < parts.length; i++) {
+            if ("camera".equals(parts[i])) {
+                // 拼接 "camera" 后面的所有部分
+                return "/" + String.join("/", java.util.Arrays.copyOfRange(parts, i + 1, parts.length));
+            }
+        }
+
+        // 如果没有找到 "camera"，可以返回 null 或相应的消息
+        return null;
     }
 
     //用来查询当前存储的数据库有没有重复的，根据orderId去重

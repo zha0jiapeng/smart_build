@@ -34,6 +34,9 @@ public class MinioConfig {
     @Value("car-access")
     private String carAccessBucketName;
 
+    @Value("weighbridge-data")
+    private String weighbridgeDataBucketName;
+
     @Value("people-access")
     private String peopleAccessBucketName;
 

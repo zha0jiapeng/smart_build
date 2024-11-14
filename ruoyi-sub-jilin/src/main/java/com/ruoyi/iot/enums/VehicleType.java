@@ -13,10 +13,14 @@ public enum VehicleType {
     SMALL_CAR("hik1", "小型车"),
     LARGE_CAR("hik2", "大型车"),
     MOTORCYCLE("hik3", "摩托车"),
-    NOT_OPEN("hik10", "未开闸"),
-    AUTO_OPEN("hik11", "自动开闸"),
-    MANUAL_OPEN("hik12", "人工/人工开闸"),
-    REMOTE_OPEN("hik13", "遥控器开闸");
+    //海康未开闸
+    NOT_OPEN("hik10", "1"),
+    //海康车牌识别
+    AUTO_OPEN("hik11", "0"),
+    //海康人工开闸
+    MANUAL_OPEN("hik12", "1"),
+    //海康遥控器开闸
+    REMOTE_OPEN("hik13", "1");
 
     private final String code;
     private final String remark;

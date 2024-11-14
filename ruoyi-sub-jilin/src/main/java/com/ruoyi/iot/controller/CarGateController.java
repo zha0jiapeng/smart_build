@@ -220,7 +220,15 @@ public class CarGateController {
         } else {
             System.out.println("No plates found.");
         }
-        String allowInType = String.valueOf(ctrltype);
+        String allowInType = "0";
+        //手动开闸（0：无开闸、1:服务器触发开闸）
+        if (ctrltype == 0 || ctrltype == 1) {
+            allowInType = "1";
+        } else {
+            //自动开闸（2：脱机状态白名单开闸）
+            allowInType = "0";
+        }
+
         //设备编号
         String deviceCode = "10.1.3.210".equals(ipaddr) ? "f106f4e2-49788a49" : "4e32e371-4291fb9a";
         //报警类型

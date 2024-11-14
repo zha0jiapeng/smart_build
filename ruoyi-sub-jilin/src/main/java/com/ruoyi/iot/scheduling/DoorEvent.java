@@ -110,7 +110,7 @@ public class DoorEvent {
             map.put("portal_id", "1751847977770553345");
           //  map.put("device_code", object.get("doorIndexCode").toString());
             map.put("device_status", "在线");
-            String url = "http://10.1.3.2" + object.get("picUri");
+            String url = "https://10.1.3.2" + object.get("picUri");
             map.put("record_Image_file", url);
             map.put("id_card", object.get("certNo"));
             map.put("in_out_direction", object.get("inAndOutType").toString().equals("1") ? "进" : "出");

@@ -121,11 +121,18 @@ public class DoorEvent {
             } else {
                 map.put("attendance_out_time", getDateStrFromISO8601Timestamp(object.get("receiveTime").toString()));
             }
-            map.put("type", "1");
+
             map.put("push_time", now);
             String devIndexCode = object.getString("devIndexCode");
             JSONObject door = getDoor(devIndexCode);
             String sn = door.get("devSerialNum").toString();
+            Device one = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn), false);
+            if(one==null){
+                logger.error("找不到设备sn:{}",sn);
+                continue;
+            }
+            map.put("type",one.getCameraType());
+
             map.put("device_code", sn);
             DateTime eventTime = DateUtil.parse(getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
             String personName = object.get("personName").toString();

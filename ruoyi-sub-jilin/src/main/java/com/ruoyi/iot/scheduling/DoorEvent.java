@@ -78,9 +78,6 @@ public class DoorEvent {
         eventsRequest.setPageSize(400);
         eventsRequest.setStartTime(getISO8601TimestampFromDateStr(pre));
         eventsRequest.setEndTime(getISO8601TimestampFromDateStr(now));
-//           ArrayList<String> indexcodList = new ArrayList<String>();
-//           indexcodList.add("ec8d96058dcb4dcca04468080c9570aa");
-//           eventsRequest.setDoorIndexCodes(indexcodList); // 所有门禁标识
         logger.info("...门禁事件入参{}", JSON.toJSONString(eventsRequest));
         String doorcount = doorFunctionApi.events(eventsRequest);//查询门禁事件V2
         logger.info("...门禁事件返回参{}", doorcount);
@@ -136,7 +133,7 @@ public class DoorEvent {
             map.put("device_code", sn);
             DateTime eventTime = DateUtil.parse(getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
             String personName = object.get("personName").toString();
-            SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName);
+            SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName,one);
             if(sysWorkPeopleInoutLog==null) continue;
             map.put("id",sysWorkPeopleInoutLog.getId());
             listt.add(map);
@@ -150,15 +147,13 @@ public class DoorEvent {
         logger.info("...返回值{}", JSON.toJSONString(body1));
     }
 
-    private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName) {
+    private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName,Device one) {
         SysWorkPeopleInoutLog sysWorkPeopleInoutLog = new SysWorkPeopleInoutLog();
         String sn = door.get("devSerialNum").toString();
 //        if (!ALLOWED_SN.contains(sn)) {
 //            return null;
 //        }
         sysWorkPeopleInoutLog.setSn(sn);
-
-        Device one = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn), false);
         if (one != null) {
             if (com.ruoyi.common.utils.StringUtils.isNotEmpty(one.getModifyBy())) {
                 sysWorkPeopleInoutLog.setSn(one.getModifyBy());

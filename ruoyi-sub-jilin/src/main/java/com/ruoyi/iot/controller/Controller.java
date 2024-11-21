@@ -10,13 +10,20 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hikvision.artemis.sdk.ArtemisHttpUtil;
 import com.hikvision.artemis.sdk.config.ArtemisConfig;
 
 import com.ruoyi.iot.bean.DoorFunctionApi;
 import com.ruoyi.iot.bean.EventsRequest;
 import com.ruoyi.iot.bean.ExcelBean;
+import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.listen.DemoDataListener;
+import com.ruoyi.iot.service.IDeviceService;
+import com.ruoyi.system.domain.SysWorkPeople;
+import com.ruoyi.system.domain.SysWorkPeopleInoutLog;
+import com.ruoyi.system.mapper.SysWorkPeopleInoutLogMapper;
+import com.ruoyi.system.service.SysWorkPeopleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -29,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -43,6 +51,15 @@ import java.util.*;
 @RequestMapping("/test")
 @Slf4j
 public class Controller {
+
+    @Resource
+    SysWorkPeopleInoutLogMapper sysWorkPeopleInoutLogMapper;
+
+    @Resource
+    SysWorkPeopleService workPeopleService;
+
+    @Resource
+    IDeviceService deviceService;
 
 
     @RequestMapping("/peopleImport")
@@ -65,20 +82,21 @@ public class Controller {
 
     }
 
-    private static void pushHdy(JSONArray list) {
+    private void pushHdy(JSONArray list) {
+        String now = DateUtil.now();
         Map<String, List<Map<String, Object>>> request = new HashMap<>();
         List<Map<String, Object>> listt = new ArrayList<>();
+        DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
         for (int i = 0; i < list.size(); i++) {
             JSONObject object = (JSONObject) list.get(i);
-            if(object.get("certNo")==null){
+            if (object.get("certNo") == null || StringUtils.isEmpty(object.get("certNo").toString())) {
                 continue;
             }
-            if(object.get("picUri")==null){
+            if (object.get("picUri") == null || StringUtils.isEmpty(object.get("picUri").toString())) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("pageNo",1);
                 map.put("pageSize",1);
                 map.put("certificateNo", object.get("certNo").toString());
-                DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
                 String s = doorFunctionApi.personList(map);
                 JSONObject jsonObject1 = JSONObject.parseObject(s);
                 JSONObject data = jsonObject1.getJSONObject("data");
@@ -91,21 +109,37 @@ public class Controller {
             }
             Map<String, Object> map = new HashMap<>();
             map.put("portal_id", "1751847977770553345");
-            map.put("device_code", object.get("doorIndexCode").toString());//
+            //  map.put("device_code", object.get("doorIndexCode").toString());
             map.put("device_status", "在线");
-            String url = "http://10.1.3.2" + object.get("picUri");
+            String url = "https://10.1.3.2" + object.get("picUri");
             map.put("record_Image_file", url);
             map.put("id_card", object.get("certNo"));
             map.put("in_out_direction", object.get("inAndOutType").toString().equals("1") ? "进" : "出");
-            map.put("attendance_out_time","");
-            map.put("attendance_in_time","");
+            map.put("attendance_out_time", "");
+            map.put("attendance_in_time", "");
             if (object.get("inAndOutType").toString().equals("1")) {
                 map.put("attendance_in_time", getDateStrFromISO8601Timestamp(object.get("receiveTime").toString()));
             } else {
                 map.put("attendance_out_time", getDateStrFromISO8601Timestamp(object.get("receiveTime").toString()));
             }
-            map.put("type", "1");
-            map.put("push_time", DateUtil.now());
+
+            map.put("push_time", now);
+            String devIndexCode = object.getString("devIndexCode");
+            JSONObject door = getDoor(devIndexCode);
+            String sn = door.get("devSerialNum").toString();
+            Device one = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn), false);
+            if(one==null){
+                log.error("找不到设备sn:{}",sn);
+                continue;
+            }
+            map.put("type",one.getCameraType());
+
+            map.put("device_code", sn);
+            DateTime eventTime = DateUtil.parse(getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
+            String personName = object.get("personName").toString();
+            SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName,one);
+            if(sysWorkPeopleInoutLog==null) continue;
+            map.put("id",sysWorkPeopleInoutLog.getId());
             listt.add(map);
         }
         request.put("values", listt);
@@ -195,6 +229,77 @@ public class Controller {
             throw new IllegalArgumentException("Invalid date time format.");
         }
     }
+
+
+    private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName,Device device) {
+        SysWorkPeopleInoutLog sysWorkPeopleInoutLog = new SysWorkPeopleInoutLog();
+        String sn = door.get("devSerialNum").toString();
+//        if (!ALLOWED_SN.contains(sn)) {
+//            return null;
+//        }
+        sysWorkPeopleInoutLog.setSn(sn);
+
+        if (device != null) {
+            if (com.ruoyi.common.utils.StringUtils.isNotEmpty(device.getModifyBy())) {
+                sysWorkPeopleInoutLog.setSn(device.getModifyBy());
+            }
+        }
+
+        SysWorkPeople workPeople = workPeopleService.getOne(
+                new LambdaQueryWrapper<SysWorkPeople>()
+                        .eq(SysWorkPeople::getIdCard, jsonObject.get("id_card").toString()));
+        if (workPeople != null) {
+            sysWorkPeopleInoutLog.setSysWorkPeopleId(workPeople.getId());
+        }
+
+
+        sysWorkPeopleInoutLog.setIdCard(jsonObject.get("id_card").toString());
+        sysWorkPeopleInoutLog.setMode(Integer.parseInt(jsonObject.get("in_out_direction").toString().equals("进") ? "1" : "0"));
+        sysWorkPeopleInoutLog.setLogTime(DateUtil.formatDateTime(eventTime));
+        sysWorkPeopleInoutLog.setName(personName);
+        //sysWorkPeopleInoutLog.setPhone(jsonObject.get("telephone").toString());
+        sysWorkPeopleInoutLog.setPhotoUrl(jsonObject.get("record_Image_file").toString());
+        sysWorkPeopleInoutLog.setCreatedDate(new Date());
+        sysWorkPeopleInoutLog.setModifyDate(new Date());
+        sysWorkPeopleInoutLogMapper.insert(sysWorkPeopleInoutLog);
+        log.info("进行插入数据库操作：{}",sysWorkPeopleInoutLog);
+        return sysWorkPeopleInoutLog;
+    }
+
+    private static JSONObject getDoor(String devIndexCode) {
+        // 创建根Map
+        Map<String, Object> rootMap = new HashMap<>();
+        rootMap.put("pageNo", 1);
+        rootMap.put("pageSize", 1);
+
+        // 创建expressions列表
+        List<Map<String, Object>> expressionsList = new ArrayList<>();
+
+        // 创建expression Map
+        Map<String, Object> expressionMap = new HashMap<>();
+        expressionMap.put("key", "indexCode");
+        expressionMap.put("operator", 0);
+
+        // 创建values列表
+        List<String> valuesList2 = new ArrayList<>();
+        valuesList2.add(devIndexCode);
+
+        // 将values列表添加到expression Map中
+        expressionMap.put("values", valuesList2);
+
+        // 将expression Map添加到expressions列表中
+        expressionsList.add(expressionMap);
+
+        // 将expressions列表添加到根Map中
+        rootMap.put("expressions", expressionsList);
+        DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
+
+        JSONObject JSONObject = doorFunctionApi.search(rootMap);
+        JSONArray objects = (JSONArray) ((JSONObject) JSONObject.get("data")).get("list");
+        JSONObject door = (JSONObject) objects.get(0);
+        return door;
+    }
+
 
     public static void main(String[] args) {
         String iso8601TimestampFromDateStr = getISO8601TimestampFromDateStr("2024-07-21 00:00:00");

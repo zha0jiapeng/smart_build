@@ -14,6 +14,7 @@ import com.ruoyi.iot.bean.EventsRequest;
 import com.ruoyi.iot.bean.ThreadPool;
 import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.service.IDeviceService;
+import com.ruoyi.iot.utils.HdyHttpUtils;
 import com.ruoyi.system.domain.SysWorkPeople;
 import com.ruoyi.system.domain.SysWorkPeopleInoutLog;
 import com.ruoyi.system.mapper.SysWorkPeopleInoutLogMapper;
@@ -57,6 +58,10 @@ public class DoorEvent {
 
     @Resource
     IDeviceService deviceService;
+
+
+    @Resource
+    HdyHttpUtils hdyHttpUtils;
 
     private static final int WELINK_MODEL_ID = 200362;
     private static final Logger logger = LogManager.getLogger(DoorEvent.class);
@@ -107,8 +112,9 @@ public class DoorEvent {
             map.put("portal_id", "1751847977770553345");
           //  map.put("device_code", object.get("doorIndexCode").toString());
             map.put("device_status", "在线");
-            String url = "https://10.1.3.2" + object.get("picUri");
-            map.put("record_Image_file", url);
+            String url = "http://10.1.3.2" + object.get("picUri");
+            map.put("record_Image_file", hdyHttpUtils.pushPicture(url));
+            map.put("record_Image_file_InOutLog", url);
             map.put("id_card", object.get("certNo"));
             map.put("in_out_direction", object.get("inAndOutType").toString().equals("1") ? "进" : "出");
             map.put("attendance_out_time", "");
@@ -173,7 +179,7 @@ public class DoorEvent {
         sysWorkPeopleInoutLog.setLogTime(DateUtil.formatDateTime(eventTime));
         sysWorkPeopleInoutLog.setName(personName);
         //sysWorkPeopleInoutLog.setPhone(jsonObject.get("telephone").toString());
-        sysWorkPeopleInoutLog.setPhotoUrl(jsonObject.get("record_Image_file").toString());
+        sysWorkPeopleInoutLog.setPhotoUrl(jsonObject.get("record_Image_file_InOutLog").toString());
         sysWorkPeopleInoutLog.setCreatedDate(new Date());
         sysWorkPeopleInoutLog.setModifyDate(new Date());
         sysWorkPeopleInoutLogMapper.insert(sysWorkPeopleInoutLog);

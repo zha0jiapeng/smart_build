@@ -291,7 +291,7 @@ public class WeighbridgeDataController extends BaseController {
         minioUtils.uploadFile(minioConfig.getWeighbridgeDataBucketName(), filename, inputStream);
         String imageFile = minioConfig.getEndpoint() + "/" + minioConfig.getWeighbridgeDataBucketName() + "/" + filename;
         System.out.println("地磅imageFile：" + imageFile);
-        return imageFile;
+        return hdyHttpUtils.pushPicture(imageFile);
     }
 
     public String extractCameraPath(String path) {

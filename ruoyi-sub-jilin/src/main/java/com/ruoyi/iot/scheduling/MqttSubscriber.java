@@ -40,7 +40,7 @@ public class MqttSubscriber {
         // 客户端 ID
         String clientId = "JavaClient";
         // 订阅的主题
-        String topic = "24090502540001";
+        String[] topics = {"24090502540001", "24110701080004"};
         // 用户名
         String username = "root";
         // 密码
@@ -55,24 +55,31 @@ public class MqttSubscriber {
             options.setAutomaticReconnect(true);
             options.setCleanSession(true);
             options.setConnectionTimeout(30);
-            // 以秒为单位的心跳间隔
             options.setKeepAliveInterval(60);
-            // 设置用户名
             options.setUserName(username);
-            // 设置密码
             options.setPassword(password.toCharArray());
 
             // 连接到 MQTT 代理
             client.connect(options);
-            // 订阅主题
-            client.subscribe(topic, new IMqttMessageListener() {
+
+            // 创建一个统一的消息处理函数
+            IMqttMessageListener messageListener = new IMqttMessageListener() {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    // 接收到的消息处理
                     String json = new String(message.getPayload());
-                    parseMessage(json);
+                    if (topic.equals("24090502540001")){
+                        parseMessage14(json);
+                    }else {
+                        parseMessage15(json);
+                    }
+
                 }
-            });
+            };
+
+            // 同时订阅多个主题
+            for (String topic : topics) {
+                client.subscribe(topic, messageListener);
+            }
 
         } catch (MqttException e) {
             e.printStackTrace();
@@ -83,9 +90,13 @@ public class MqttSubscriber {
     private static Map<Integer, String> idValueMap = new HashMap<>();
     private static String rawData = "";
 
-    private void parseMessage(String json) {
-        boolean isConfirm = false;
 
+    private static int callCount15 = 0;
+    private static Map<Integer, String> idValueMap15 = new HashMap<>();
+    private static String rawData15 = "";
+
+    private void parseMessage14(String json) {
+        boolean isConfirm = false;
         try {
             System.out.println("初始数据：" + json);
 
@@ -108,7 +119,7 @@ public class MqttSubscriber {
                         if (id == 36) {
                             isConfirm = true;
                         } else if (id == 1 && callCount != 0) {
-                            resetData();
+                            resetData14();
                         }
 
                         idValueMap.put(id, value);
@@ -124,7 +135,7 @@ public class MqttSubscriber {
                 ElectricityMonitoring electricityMonitoring = new ElectricityMonitoring();
                 electricityMonitoring.setRawData(rawData);
                 pushIOT(idValueMap, electricityMonitoring);
-                resetData();
+                resetData14();
             }
 
         } catch (Exception e) {
@@ -132,10 +143,64 @@ public class MqttSubscriber {
         }
     }
 
-    private void resetData() {
+    private void parseMessage15(String json) {
+        boolean isConfirm = false;
+        try {
+            System.out.println("初始数据：" + json);
+
+            com.alibaba.fastjson.JSONObject jsonObject = JSON.parseObject(json);
+
+            if (jsonObject.containsKey("data")) {
+                com.alibaba.fastjson.JSONArray dataArray = jsonObject.getJSONArray("data");
+
+                for (int i = 0; i < dataArray.size(); i++) {
+                    com.alibaba.fastjson.JSONObject obj = dataArray.getJSONObject(i);
+                    String timestamp = obj.getString("tp");
+                    idValueMap15.put(-1, timestamp);
+
+                    JSONArray pointsArray = obj.getJSONArray("point");
+                    for (int j = 0; j < pointsArray.size(); j++) {
+                        JSONObject pointObj = pointsArray.getJSONObject(j);
+                        int id = pointObj.getIntValue("id");
+                        String value = pointObj.getString("val");
+
+                        if (id == 36) {
+                            isConfirm = true;
+                        } else if (id == 1 && callCount15 != 0) {
+                            resetData15();
+                        }
+
+                        idValueMap15.put(id, value);
+                    }
+                }
+            }
+
+            rawData15 += json;
+            callCount15++;
+            System.out.println("当前状态：callCount" + callCount15 + "isConfirm：" + isConfirm);
+            if (callCount15 == 2 && isConfirm) {
+                System.out.println("开始执行用电监测数据解析");
+                ElectricityMonitoring electricityMonitoring = new ElectricityMonitoring();
+                electricityMonitoring.setRawData(rawData15);
+                pushIOT(idValueMap15, electricityMonitoring);
+                resetData15();
+            }
+
+        } catch (Exception e) {
+            System.out.println("Failed to parse message: " + e.getMessage());
+        }
+    }
+
+    private void resetData14() {
         idValueMap.clear();
         rawData = "";
         callCount = 0;
+    }
+
+    private void resetData15() {
+        idValueMap15.clear();
+        rawData15 = "";
+        callCount15 = 0;
     }
 
     public void pushIOT(Map<Integer, String> idValueMap, ElectricityMonitoring electricityMonitoring) {
@@ -196,7 +261,7 @@ public class MqttSubscriber {
         valueMap.put("c_voltage", idValueMap.get(3));
         electricityMonitoring.setCVoltage(idValueMap.get(3));
         //用电负载功率  Decimal
-        valueMap.put("box_power", calculateLoadPower(idValueMap));
+        valueMap.put("box_power", idValueMap.get(13));
         //线缆A温度  Decimal 36
         valueMap.put("line_a_temperature", idValueMap.get(36));
         electricityMonitoring.setLineATemperature(idValueMap.get(36));
@@ -259,7 +324,7 @@ public class MqttSubscriber {
 
 
         //预警类型（设备传输：漏电...  String
-        valueMap.put("alarmCode", "");
+        valueMap.put("alarmCode", "无");
         //数据类型(0、正常 1、报警)  String
         valueMap.put("data_type", "0");
 

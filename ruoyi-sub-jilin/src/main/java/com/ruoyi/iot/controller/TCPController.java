@@ -238,11 +238,11 @@ public class TCPController {
                 .eq(Rain::getDeviceCode, rainDeviceCode)
                 .orderByDesc(Rain::getCreateTime).last("limit 1"));
         if (lastMonitor != null) {
-//            BigDecimal currentRainfall = new BigDecimal(sendMap.get("rainfall").toString());
+            BigDecimal currentRainfall = new BigDecimal(sendMap.get("rainfall").toString());
             BigDecimal lastRainfall = lastMonitor.getRainfall();
 
             // 进行减法运算
-//            BigDecimal result = currentRainfall.subtract(lastRainfall).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal result = currentRainfall.subtract(lastRainfall).setScale(2, RoundingMode.HALF_UP);
 
             // 取绝对值以确保结果为正数
             lastRainfall = lastRainfall.abs();

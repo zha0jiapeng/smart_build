@@ -57,7 +57,7 @@ public class BroadcastAlarmUtil {
     }
 
     public JSONObject getLogList(Map<String, Object> request){
-        HttpResponse response = HttpUtil.createGet(serviceUrl + "/v1/task_log")
+        HttpResponse response = HttpUtil.createGet(serviceUrl + " ")
                 .form(request)
                 .header("access_token", getToken()).execute();
         return JSONUtil.parseObj(response.body());

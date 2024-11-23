@@ -175,6 +175,14 @@ public class DoorEvent {
             sysWorkPeopleInoutLog.setSysWorkPeopleId(workPeople.getId());
         }
 
+        Integer certNo = sysWorkPeopleInoutLogMapper.selectCount(
+                new LambdaQueryWrapper<SysWorkPeopleInoutLog>()
+                        .eq(SysWorkPeopleInoutLog::getIdCard, jsonObject.get("id_card").toString())
+                        .eq(SysWorkPeopleInoutLog::getLogTime, DateUtil.formatDateTime(eventTime))
+        );
+        if (certNo>1){
+            return null;
+        }
 
         sysWorkPeopleInoutLog.setIdCard(jsonObject.get("id_card").toString());
         sysWorkPeopleInoutLog.setMode(Integer.parseInt(jsonObject.get("in_out_direction").toString().equals("进") ? "1" : "0"));
@@ -219,6 +227,10 @@ public class DoorEvent {
 
         JSONObject JSONObject = doorFunctionApi.search(rootMap);
         JSONArray objects = (JSONArray) ((JSONObject) JSONObject.get("data")).get("list");
+        if(objects==null || objects.isEmpty()) {
+            logger.info("indexCode:{},找不到门禁信息.",devIndexCode);
+            return null;
+        }
         JSONObject door = (JSONObject) objects.get(0);
         return door;
     }

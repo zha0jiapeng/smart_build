@@ -5,10 +5,12 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.hikvision.artemis.sdk.ArtemisHttpUtil;
 import com.hikvision.artemis.sdk.config.ArtemisConfig;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class DoorFunctionApi {
     /**
      * STEP1：设置平台参数，根据实际情况,设置host appkey appsecret 三个参数.
@@ -87,6 +89,7 @@ public class DoorFunctionApi {
     }
 
     public JSONObject search(Map<String,Object> request){
+        log.info("acsDevice/search:{}",request);
         String eventsDataApi = ARTEMIS_PATH +"/api/resource/v2/acsDevice/search";
         Map<String,String> path = new HashMap<String,String>(2){
             {

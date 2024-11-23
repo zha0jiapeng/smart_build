@@ -254,7 +254,7 @@ public class Controller {
 
         Integer certNo = sysWorkPeopleInoutLogMapper.selectCount(
                 new LambdaQueryWrapper<SysWorkPeopleInoutLog>()
-                        .eq(SysWorkPeopleInoutLog::getIdCard, jsonObject.get("certNo").toString())
+                        .eq(SysWorkPeopleInoutLog::getIdCard, jsonObject.get("id_card").toString())
                         .eq(SysWorkPeopleInoutLog::getLogTime, DateUtil.formatDateTime(eventTime))
         );
         if (certNo>1){

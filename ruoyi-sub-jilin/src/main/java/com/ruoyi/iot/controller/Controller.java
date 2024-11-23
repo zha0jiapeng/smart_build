@@ -252,6 +252,15 @@ public class Controller {
             sysWorkPeopleInoutLog.setSysWorkPeopleId(workPeople.getId());
         }
 
+        Integer certNo = sysWorkPeopleInoutLogMapper.selectCount(
+                new LambdaQueryWrapper<SysWorkPeopleInoutLog>()
+                        .eq(SysWorkPeopleInoutLog::getIdCard, jsonObject.get("certNo").toString())
+                        .eq(SysWorkPeopleInoutLog::getLogTime, DateUtil.formatDateTime(eventTime))
+        );
+        if (certNo>1){
+            return null;
+        }
+
 
         sysWorkPeopleInoutLog.setIdCard(jsonObject.get("id_card").toString());
         sysWorkPeopleInoutLog.setMode(Integer.parseInt(jsonObject.get("in_out_direction").toString().equals("进") ? "1" : "0"));

@@ -126,6 +126,7 @@ public class Controller {
             map.put("push_time", now);
             String devIndexCode = object.getString("devIndexCode");
             JSONObject door = getDoor(devIndexCode);
+            if(door == null) continue;
             String sn = door.get("devSerialNum").toString();
             Device one = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn), false);
             if(one==null){
@@ -305,6 +306,10 @@ public class Controller {
 
         JSONObject JSONObject = doorFunctionApi.search(rootMap);
         JSONArray objects = (JSONArray) ((JSONObject) JSONObject.get("data")).get("list");
+        if(objects==null || objects.isEmpty()) {
+            log.info("indexCode:{},找不到门禁信息.",devIndexCode);
+            return null;
+        }
         JSONObject door = (JSONObject) objects.get(0);
         return door;
     }

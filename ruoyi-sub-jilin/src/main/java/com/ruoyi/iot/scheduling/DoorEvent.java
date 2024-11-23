@@ -142,8 +142,10 @@ public class DoorEvent {
             SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName,one);
             if(sysWorkPeopleInoutLog==null) continue;
             map.put("id",sysWorkPeopleInoutLog.getId());
+            map.remove("record_Image_file_InOutLog");
             listt.add(map);
         }
+
         request.put("values", listt);
         logger.info("...推送业主入参{}", JSON.toJSONString(request));
         if (listt.size() == 0) return;

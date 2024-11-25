@@ -138,13 +138,6 @@ public class TCPController {
             for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
 
                 String command = entry.getKey();
-                // 处理"15#支洞"特定的命令
-                if (sendMap.get("deviceArea").toString().equals("15#支洞") &&
-                        (command.equals("02 03 00 01 00 01 D5 F9") || command.equals("01 03 00 00 00 01 84 0A"))) {
-                    sendMap.put("wind_direction", "");
-                    sendMap.put("wind_speed", "");
-                    continue;
-                }
                 BiConsumer<byte[], Integer> handler = entry.getValue();
 
                 OutputStream outputStream = socket.getOutputStream();

@@ -104,6 +104,8 @@ public class QReceivePhotoServiceImpl extends ServiceImpl<QReceivePhotoMapper, Q
         QueryWrapper<QReceivePhoto> queryWrapper = new QueryWrapper<>();
         // 使用in方法查询ID在列表中的记录
         queryWrapper.in("order_id", orderId);
+        queryWrapper.eq("photo_type", "出场");
+        queryWrapper.eq("camera_position", "车前");
         return qReceivePhotoMapper.selectOne(queryWrapper);
     }
 
@@ -113,6 +115,8 @@ public class QReceivePhotoServiceImpl extends ServiceImpl<QReceivePhotoMapper, Q
         QueryWrapper<QReceivePhoto> queryWrapper = new QueryWrapper<>();
         // 使用in方法查询ID在列表中的记录
         queryWrapper.in("order_id", orderId);
+        queryWrapper.eq("photo_type", "出场");
+        queryWrapper.eq("camera_position", "车前");
         return qReceivePhotoMapper.selectOne(queryWrapper);
     }
 }

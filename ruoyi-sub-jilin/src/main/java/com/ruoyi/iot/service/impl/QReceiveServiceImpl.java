@@ -106,7 +106,7 @@ public class QReceiveServiceImpl extends ServiceImpl<QReceiveMapper, QReceive> i
     public Map<String, List<QReceive>> selectQReceiveList() {
         Instant now = Instant.now();
         //每五分钟调用一次接口，每次查十分钟的数据
-        Instant tenMinutesAgo = now.minusSeconds(43200);
+        Instant tenMinutesAgo = now.minusSeconds(600);
         QueryWrapper<QReceive> queryWrapper = new QueryWrapper<>();
         queryWrapper.between("exit_time", Timestamp.from(tenMinutesAgo), Timestamp.from(now));
         Map<String, List<QReceive>> listMap = new HashMap<>();

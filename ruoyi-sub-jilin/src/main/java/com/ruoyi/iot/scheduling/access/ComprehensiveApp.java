@@ -14,19 +14,20 @@ import java.util.List;
 public class ComprehensiveApp {
     public static void main(String[] args) {
         // 初始化FTP服务器配置列表
-        List<FTPServerConfig> servers = Arrays.asList(
-                new FTPServerConfig("10.1.3.150", 21, "yuancheng", "123456", "/", 1),
-                new FTPServerConfig("10.1.3.151", 21, "yuancheng", "123456", "/", 1),
-                new FTPServerConfig("10.1.3.152", 21, "yuancheng", "123456", "/", 2),
-                new FTPServerConfig("10.1.3.153", 21, "yuancheng", "123456", "/", 2),
-                new FTPServerConfig("10.1.3.154", 21, "yuancheng", "123456", "/", 2));
-
-        // 下载和处理FTP服务器文件
-        for (FTPServerConfig server : servers) {
-            System.out.println(server.getServer());
-            String localFilePath = "/home/mashir0/project/Normal.mdb";
-//            processFTPServer(server, localFilePath);
-        }
+//        List<FTPServerConfig> servers = Arrays.asList(
+//                new FTPServerConfig("10.1.3.150", 21, "yuancheng", "123456", "/", 1),
+//                new FTPServerConfig("10.1.3.151", 21, "yuancheng", "123456", "/", 1),
+//                new FTPServerConfig("10.1.3.152", 21, "yuancheng", "123456", "/", 2),
+//                new FTPServerConfig("10.1.3.153", 21, "yuancheng", "123456", "/", 2),
+//                new FTPServerConfig("10.1.3.154", 21, "yuancheng", "123456", "/", 2));
+//
+//        // 下载和处理FTP服务器文件
+//        for (FTPServerConfig server : servers) {
+//            System.out.println(server.getServer());
+//            String localFilePath = "/home/mashir0/project/Normal.mdb";
+////            processFTPServer(server, localFilePath);
+//        }
+        print("/Users/y/Desktop/项目/吉林/Normal.mdb");
     }
 
     /**
@@ -100,9 +101,7 @@ public class ComprehensiveApp {
     /**
      * 读取本地Access数据库并打印内容
      */
-    public void print(String databasePath) {
-        System.out.println("开始");
-        System.out.println();
+    public static void print(String databasePath) {
         // 构建 UCanAccess 连接 URL，明确设置密码为空
         // 如果数据库文件有密码保护，包含密码
         String url = "jdbc:ucanaccess://" + databasePath + ";password=oke";
@@ -112,7 +111,6 @@ public class ComprehensiveApp {
         ResultSet resultSet = null;
 
         try {
-            System.out.println("开始加载");
             // 加载 UCanAccess 驱动程序
             Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
             System.out.println("开始建立数据库连接");
@@ -125,7 +123,6 @@ public class ComprehensiveApp {
             // 查询 test_result 表中的所有数据
             String query = "SELECT * FROM test_result";
             resultSet = statement.executeQuery(query);
-            System.out.println("查询成功" + resultSet.toString());
             printResultSet(resultSet);
 
         } catch (Exception e) {
@@ -155,16 +152,16 @@ public class ComprehensiveApp {
 
             // 打印列名
             for (int i = 1; i <= columnCount; i++) {
+
                 System.out.print(metaData.getColumnName(i) + "\t");
             }
-            System.out.println();
 
             // 遍历 ResultSet 并打印每一行的每一列
             while (resultSet.next()) {
                 for (int i = 1; i <= columnCount; i++) {
                     System.out.print(resultSet.getString(i) + "\t");
                 }
-                System.out.println();
+
             }
         } catch (SQLException e) {
             e.printStackTrace();

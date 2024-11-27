@@ -246,7 +246,7 @@ public class WeighbridgeDataController extends BaseController {
         }
         valueMap.put("push_time", timestampStr);
         valueMap.put("other", "");
-        valueMap.put("weight_time", "");
+        valueMap.put("weight_time", qReceive.getEnterTime());
         valueMap.put("weight_picture", getPicture(region, qReceivePhoto));
         valueMap.put("waring_type", "");
         valueMap.put("data_type", "0");

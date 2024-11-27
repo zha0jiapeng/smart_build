@@ -25,6 +25,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.joda.time.format.DateTimeFormat;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +61,8 @@ public class DoorEvent {
     @Resource
     IDeviceService deviceService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Resource
     HdyHttpUtils hdyHttpUtils;
@@ -68,10 +72,13 @@ public class DoorEvent {
 
     //    @Scheduled(cron = "0 */10 * * * ?")
     public void execute() {
-
+        Object doorLastTime = redisTemplate.opsForValue().get("door_last_time");
+        if(doorLastTime==null) {
+            doorLastTime =  DateUtil.offsetMinute(new Date(),-10);
+        }
         DateTime date = DateUtil.date();
         String now = DateUtil.formatDateTime(date);
-        Date date1 = DateUtils.addMinutes(date, -10);
+        Date date1 = DateUtil.parse(doorLastTime.toString());
         String pre = DateUtil.formatDateTime(date1);
 
         logger.info("=========门禁通行事件===========");
@@ -153,6 +160,7 @@ public class DoorEvent {
         HttpResponse execute = HttpRequest.put(url).body(JSON.toJSONString(request), "application/json").execute();
         String body1 = execute.body();
         logger.info("...返回值{}", JSON.toJSONString(body1));
+        redisTemplate.opsForValue().set("door_last_time", DateUtil.offsetMinute(date,-10));
     }
 
     private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName,Device one) {

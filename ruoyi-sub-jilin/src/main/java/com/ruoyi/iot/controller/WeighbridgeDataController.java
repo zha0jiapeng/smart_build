@@ -1,6 +1,8 @@
 package com.ruoyi.iot.controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.config.MinioConfig;
 import com.ruoyi.common.utils.MinioUtils;
@@ -169,21 +171,21 @@ public class WeighbridgeDataController extends BaseController {
             for (int i = 0; i < SLAVEselectQReceiveList.size(); i++) {
                 QReceive qReceive = SLAVEselectQReceiveList.get(i);
                 QReceiveMoreMaterial qReceiveMoreMaterial = SLAVEselectQReceiveMoreMaterialList.get(i);
-                QReceivePhoto qReceivePhoto = iqReceivePhotoService.selectQReceivePhotoOrderIdSLAVE(qReceiveMoreMaterial.getOrderId());
-                upload("SLAVE", qReceive, qReceiveMoreMaterial, qReceivePhoto);
+                Map<String, String> map = iqReceivePhotoService.selectQReceivePhotoOrderIdSLAVE(qReceiveMoreMaterial.getOrderId());
+                upload("SLAVE", qReceive, qReceiveMoreMaterial, map);
             }
         }
         if (SLAVEDATAselectQReceiveList != null && SLAVEDATAselectQReceiveList.size() != 0) {
             for (int i = 0; i < SLAVEDATAselectQReceiveList.size(); i++) {
                 QReceive qReceive = SLAVEDATAselectQReceiveList.get(i);
                 QReceiveMoreMaterial qReceiveMoreMaterial = SLAVEDATAselectQReceiveMoreMaterialList.get(i);
-                QReceivePhoto qReceivePhoto = iqReceivePhotoService.selectQReceivePhotoOrderIdSLAVEDATA(qReceiveMoreMaterial.getOrderId());
-                upload("SLAVEDATA", qReceive, qReceiveMoreMaterial, qReceivePhoto);
+                Map<String, String> map = iqReceivePhotoService.selectQReceivePhotoOrderIdSLAVEDATA(qReceiveMoreMaterial.getOrderId());
+                upload("SLAVEDATA", qReceive, qReceiveMoreMaterial, map);
             }
         }
     }
 
-    public void upload(String region, QReceive qReceive, QReceiveMoreMaterial qReceiveMoreMaterial, QReceivePhoto qReceivePhoto) throws FileNotFoundException {
+    public void upload(String region, QReceive qReceive, QReceiveMoreMaterial qReceiveMoreMaterial, Map<String, String> map) throws FileNotFoundException {
         Map<String, Object> valueMap = new HashMap<>();
         //门户ID  String
         valueMap.put("portal_id", "1751847977770553345");
@@ -204,8 +206,8 @@ public class WeighbridgeDataController extends BaseController {
         valueMap.put("work_status", "正常");
         valueMap.put("license_number", qReceive.getPlateNumber());
         weighbridgeData.setLicenseNumber(qReceive.getPlateNumber());
-        valueMap.put("car_picture", "");
-        valueMap.put("box_picture", "");
+        valueMap.put("car_picture", getPicture(region, map.get("carPicture")));
+        valueMap.put("box_picture", getPicture(region, map.get("boxPicture")));
         valueMap.put("one_weight_time", qReceive.getEnterTime());
         weighbridgeData.setOneWeightTime(qReceive.getEnterTime());
         valueMap.put("two_weight_time", qReceive.getExitTime());
@@ -227,7 +229,7 @@ public class WeighbridgeDataController extends BaseController {
         weighbridgeData.setOutWeightTime(qReceive.getExitTime());
         valueMap.put("order_code", qReceive.getOrderCode());
         weighbridgeData.setOrderCode(qReceive.getOrderCode());
-        valueMap.put("goods_picture", "");
+        valueMap.put("goods_picture", getPicture(region, map.get("goodsPicture")));
         valueMap.put("order_number", "");
         valueMap.put("deviation_number", "");
         valueMap.put("deviation_number_up", "");
@@ -247,7 +249,7 @@ public class WeighbridgeDataController extends BaseController {
         valueMap.put("push_time", timestampStr);
         valueMap.put("other", "");
         valueMap.put("weight_time", qReceive.getEnterTime());
-        valueMap.put("weight_picture", getPicture(region, qReceivePhoto));
+        valueMap.put("weight_picture", valueMap.get("box_picture"));
         valueMap.put("waring_type", "");
         valueMap.put("data_type", "0");
         valueMap.put("driver_name", "");
@@ -262,17 +264,16 @@ public class WeighbridgeDataController extends BaseController {
         weighbridgeData.setRegion(region);
         weighbridgeData.setOrderId(qReceive.getOrderId());
         weighbridgeDataService.insertWeighbridgeData(weighbridgeData);
+
         hdyHttpUtils.pushIOT(param, "c65c1c39-2f36-43c1-b231-b7b8737cefcf");
     }
 
-    public String getPicture(String region, QReceivePhoto qReceivePhoto) throws FileNotFoundException {
-        if (qReceivePhoto == null) {
-            return "空";
-        }
+    public String getPicture(String region, String localUrl) throws FileNotFoundException {
+
         FTPServerConfig ftpServerConfig = null;
-        String localUrl = qReceivePhoto.getLocalUrl();
+
         localUrl = extractCameraPath(localUrl);
-        if (localUrl == null){
+        if (localUrl == null) {
             return "空";
         }
         if (region.equals("SLAVE")) {

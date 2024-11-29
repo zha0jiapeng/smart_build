@@ -2,6 +2,7 @@ package com.ruoyi.iot.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
+import java.util.Map;
 
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.enums.DataSourceType;
@@ -66,8 +67,8 @@ public interface IQReceivePhotoService  extends IService<QReceivePhoto>
 
 
     @DataSource(value = DataSourceType.SLAVE)
-    QReceivePhoto selectQReceivePhotoOrderIdSLAVE(String orderId);
+    Map<String, String>  selectQReceivePhotoOrderIdSLAVE(String orderId);
 
     @DataSource(value = DataSourceType.SLAVEDATA)
-    QReceivePhoto selectQReceivePhotoOrderIdSLAVEDATA(String orderId);
+    Map<String, String> selectQReceivePhotoOrderIdSLAVEDATA(String orderId);
 }

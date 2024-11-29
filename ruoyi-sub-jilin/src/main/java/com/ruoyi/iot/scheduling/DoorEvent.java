@@ -188,7 +188,7 @@ public class DoorEvent {
                         .eq(SysWorkPeopleInoutLog::getIdCard, jsonObject.get("id_card").toString())
                         .eq(SysWorkPeopleInoutLog::getLogTime, DateUtil.formatDateTime(eventTime))
         );
-        if (certNo>1){
+        if (certNo>=1){
             return null;
         }
 

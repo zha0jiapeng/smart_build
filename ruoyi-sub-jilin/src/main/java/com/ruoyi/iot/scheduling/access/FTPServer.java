@@ -8,10 +8,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class ComprehensiveApp {
+public class FTPServer {
     public static void main(String[] args) {
         // 初始化FTP服务器配置列表
 //        List<FTPServerConfig> servers = Arrays.asList(
@@ -27,7 +26,7 @@ public class ComprehensiveApp {
 //            String localFilePath = "/home/mashir0/project/Normal.mdb";
 ////            processFTPServer(server, localFilePath);
 //        }
-        print("/Users/y/Desktop/项目/吉林/Normal.mdb");
+//        print("/Users/y/Desktop/项目/吉林/Normal.mdb");
     }
 
     /**
@@ -95,76 +94,6 @@ public class ComprehensiveApp {
             e.printStackTrace();
             System.out.println("开始报错");
             return false;
-        }
-    }
-
-    /**
-     * 读取本地Access数据库并打印内容
-     */
-    public static void print(String databasePath) {
-        // 构建 UCanAccess 连接 URL，明确设置密码为空
-        // 如果数据库文件有密码保护，包含密码
-        String url = "jdbc:ucanaccess://" + databasePath + ";password=oke";
-
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-
-        try {
-            // 加载 UCanAccess 驱动程序
-            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
-            System.out.println("开始建立数据库连接");
-            // 建立数据库连接
-            connection = DriverManager.getConnection(url);
-            System.out.println("建立成功");
-            // 创建 Statement 对象并执行查询
-            statement = connection.createStatement();
-            System.out.println("开始查询");
-            // 查询 test_result 表中的所有数据
-            String query = "SELECT * FROM test_result";
-            resultSet = statement.executeQuery(query);
-            printResultSet(resultSet);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // 确保关闭资源
-            try {
-                if (resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if (connection != null) connection.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 打印ResultSet内容
-     */
-    public static void printResultSet(ResultSet resultSet) {
-        try {
-            // 获取 ResultSet 的元数据
-            ResultSetMetaData metaData = resultSet.getMetaData();
-
-            // 获取列数
-            int columnCount = metaData.getColumnCount();
-
-            // 打印列名
-            for (int i = 1; i <= columnCount; i++) {
-
-                System.out.print(metaData.getColumnName(i) + "\t");
-            }
-
-            // 遍历 ResultSet 并打印每一行的每一列
-            while (resultSet.next()) {
-                for (int i = 1; i <= columnCount; i++) {
-                    System.out.print(resultSet.getString(i) + "\t");
-                }
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 }

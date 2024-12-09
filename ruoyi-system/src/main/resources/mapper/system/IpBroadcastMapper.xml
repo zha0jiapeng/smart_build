@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.iot.mapper.IpBroadcastMapper">
+
+    <resultMap type="IpBroadcast" id="IpBroadcastResult">
+        <result property="id"    column="id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="taskName"    column="task_name"    />
+        <result property="taskType"    column="task_type"    />
+        <result property="taskNo"    column="task_no"    />
+        <result property="taskExecuteTime"    column="task_execute_time"    />
+        <result property="taskEquipment"    column="task_equipment"    />
+        <result property="equipmentNo"    column="equipment_no"    />
+        <result property="audioType"    column="audio_type"    />
+        <result property="audioNo"    column="audio_no"    />
+        <result property="playTimes"    column="play_times"    />
+    </resultMap>
+
+    <sql id="selectIpBroadcastVo">
+        select id, del_flag, create_by, create_time, update_by, update_time, remark, task_name, task_type, task_no, task_execute_time, task_equipment, equipment_no, audio_type, audio_no, play_times from ip_broadcast
+    </sql>
+
+    <select id="selectIpBroadcastList" parameterType="IpBroadcast" resultMap="IpBroadcastResult">
+        <include refid="selectIpBroadcastVo"/>
+        <where>
+            <if test="taskName != null  and taskName != ''"> and task_name like concat('%', #{taskName}, '%')</if>
+            <if test="taskType != null  and taskType != ''"> and task_type = #{taskType}</if>
+            <if test="taskNo != null  and taskNo != ''"> and task_no = #{taskNo}</if>
+            <if test="taskExecuteTime != null  and taskExecuteTime != ''"> and task_execute_time = #{taskExecuteTime}</if>
+            <if test="taskEquipment != null  and taskEquipment != ''"> and task_equipment = #{taskEquipment}</if>
+            <if test="equipmentNo != null  and equipmentNo != ''"> and equipment_no = #{equipmentNo}</if>
+            <if test="audioType != null  and audioType != ''"> and audio_type = #{audioType}</if>
+            <if test="audioNo != null  and audioNo != ''"> and audio_no = #{audioNo}</if>
+            <if test="playTimes != null  and playTimes != ''"> and play_times = #{playTimes}</if>
+        </where>
+    </select>
+
+    <select id="selectIpBroadcastById" parameterType="Long" resultMap="IpBroadcastResult">
+        <include refid="selectIpBroadcastVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertIpBroadcast" parameterType="IpBroadcast">
+        insert into ip_broadcast
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="taskName != null">task_name,</if>
+            <if test="taskType != null">task_type,</if>
+            <if test="taskNo != null">task_no,</if>
+            <if test="taskExecuteTime != null">task_execute_time,</if>
+            <if test="taskEquipment != null">task_equipment,</if>
+            <if test="equipmentNo != null">equipment_no,</if>
+            <if test="audioType != null">audio_type,</if>
+            <if test="audioNo != null">audio_no,</if>
+            <if test="playTimes != null">play_times,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="taskName != null">#{taskName},</if>
+            <if test="taskType != null">#{taskType},</if>
+            <if test="taskNo != null">#{taskNo},</if>
+            <if test="taskExecuteTime != null">#{taskExecuteTime},</if>
+            <if test="taskEquipment != null">#{taskEquipment},</if>
+            <if test="equipmentNo != null">#{equipmentNo},</if>
+            <if test="audioType != null">#{audioType},</if>
+            <if test="audioNo != null">#{audioNo},</if>
+            <if test="playTimes != null">#{playTimes},</if>
+        </trim>
+    </insert>
+
+    <update id="updateIpBroadcast" parameterType="IpBroadcast">
+        update ip_broadcast
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="taskName != null">task_name = #{taskName},</if>
+            <if test="taskType != null">task_type = #{taskType},</if>
+            <if test="taskNo != null">task_no = #{taskNo},</if>
+            <if test="taskExecuteTime != null">task_execute_time = #{taskExecuteTime},</if>
+            <if test="taskEquipment != null">task_equipment = #{taskEquipment},</if>
+            <if test="equipmentNo != null">equipment_no = #{equipmentNo},</if>
+            <if test="audioType != null">audio_type = #{audioType},</if>
+            <if test="audioNo != null">audio_no = #{audioNo},</if>
+            <if test="playTimes != null">play_times = #{playTimes},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteIpBroadcastById" parameterType="Long">
+        delete from ip_broadcast where id = #{id}
+    </delete>
+
+    <delete id="deleteIpBroadcastByIds" parameterType="String">
+        delete from ip_broadcast where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

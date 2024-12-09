@@ -1,22 +1,18 @@
 package com.ruoyi.iot.controller;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.config.MinioConfig;
 import com.ruoyi.common.utils.MinioUtils;
 import com.ruoyi.iot.domain.QReceive;
 import com.ruoyi.iot.domain.QReceiveMoreMaterial;
-import com.ruoyi.iot.domain.QReceivePhoto;
 import com.ruoyi.iot.mapper.WeighbridgeDataMapper;
-import com.ruoyi.iot.scheduling.access.ComprehensiveApp;
+import com.ruoyi.iot.scheduling.access.FTPServer;
 import com.ruoyi.iot.scheduling.access.FTPServerConfig;
 import com.ruoyi.iot.service.IQReceiveMoreMaterialService;
 import com.ruoyi.iot.service.IQReceivePhotoService;
 import com.ruoyi.iot.service.IQReceiveService;
 import com.ruoyi.iot.utils.HdyHttpUtils;
-import com.ruoyi.system.domain.basic.Rain;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
@@ -282,7 +277,7 @@ public class WeighbridgeDataController extends BaseController {
             ftpServerConfig = new FTPServerConfig("10.1.3.181", 21, "yuancheng14", "123456", localUrl, 1);
         }
         //下载图片
-        ComprehensiveApp comprehensiveApp = new ComprehensiveApp();
+        FTPServer comprehensiveApp = new FTPServer();
         String localFilePath = "/home/mashir0/images/picture.jpg";
         comprehensiveApp.processFTPServer(ftpServerConfig, localFilePath);
 

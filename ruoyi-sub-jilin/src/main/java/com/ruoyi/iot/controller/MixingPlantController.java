@@ -1,8 +1,6 @@
 package com.ruoyi.iot.controller;
 
 
-import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.iot.domain.AdmissionEducation;
 import com.ruoyi.iot.scheduling.DeviceIpChecker;
 import com.ruoyi.iot.scheduling.access.FTPServer;
 import com.ruoyi.iot.scheduling.access.FTPServerConfig;
@@ -21,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 智能实验室
+ * 拌合站
  */
 @RestController
-@RequestMapping("/SmartLab")
-public class SmartLabController {
+@RequestMapping("/MixingPlant")
+public class MixingPlantController {
 
     @Resource
     HdyHttpUtils hdyHttpUtils;
@@ -105,9 +103,9 @@ public class SmartLabController {
     public void getElectroHydraulicServoUniversalTester() {
 
         Map<String, String> map = new HashMap<>();
-        map.put("10.1.3.152", "2401059");
-        map.put("10.1.3.153", "2401053");
-        map.put("10.1.3.154", "2401052");
+        map.put("10.1.3.152","2401059");
+        map.put("10.1.3.153","2401053");
+        map.put("10.1.3.154","2401052");
         for (Map.Entry<String, String> entry : map.entrySet()) {
             String ip = entry.getKey();
             String deviceCode = entry.getValue();
@@ -125,7 +123,7 @@ public class SmartLabController {
                 Map<String, Object> valueMap = new HashMap<>();
                 valueMap.put("portal_id", "1751847977770553345");
                 valueMap.put("date_time", dataTime);
-                valueMap.put("device_code", deviceCode);
+                valueMap.put("device_code", value.get("SBBH"));
                 valueMap.put("num_code", value.get("TestNo"));
                 valueMap.put("test_piece_code", value.get("CurOrder"));
                 valueMap.put("test_piece_seq", value.get("CurOrder"));
@@ -151,54 +149,10 @@ public class SmartLabController {
                 Map<String, List<Map<String, Object>>> param = new HashMap<>();
                 param.put("values", values);
 
-                hdyHttpUtils.pushIOT(param, "16a59ec9-08af-45d6-8af3-6631d868643a");
+                hdyHttpUtils.pushIOT(param, "2f745c53-8376-4c10-b650-8cc66aed2cce");
             }
         }
 
-    }
-
-    /**
-     * 实验室混凝土抗压强度实验上传
-     */
-    @GetMapping("/getConcreteCompressiveStrength")
-    public void getConcreteCompressiveStrength() {
-        //先下载文件
-        FTPServer ftpServer = new FTPServer();
-        String localUrl = "/";
-        FTPServerConfig ftpServerConfig = new FTPServerConfig("10.1.3.151", 21, "yuancheng", "123456", localUrl, 1);
-        String localFilePath = "/home/mashir0/project/Normal.mdb";
-        ftpServer.processFTPServer(ftpServerConfig, localFilePath);
-        //然后读取
-        String[] columnsToPrint = {"wbbh"};
-        List<Map<String, String>> mapList = getAccess(localFilePath, columnsToPrint);
-        //然后解析
-        for (Map<String, String> value : mapList) {
-            String dataTime = getNowTimeExtractor();
-            Map<String, Object> valueMap = new HashMap<>();
-            valueMap.put("portal_id", "1751847977770553345");
-            valueMap.put("date_time", dataTime);
-            valueMap.put("device_code ", "2405066");
-            valueMap.put("num_code ", value.get("wbbh"));
-            valueMap.put("test_piece_code ", " ");
-            valueMap.put("test_piece_seq ", " ");
-            valueMap.put("compressive_age ", " ");
-            valueMap.put("conversion_coefficient ", " ");
-            valueMap.put("test_day ", " ");
-            valueMap.put("compressive_avg ", " ");
-            valueMap.put("tester ", " ");
-            valueMap.put("checker ", " ");
-            valueMap.put("specimen_size ", " ");
-            valueMap.put("failure_load ", " ");
-            valueMap.put("compressive_strength ", " ");
-            valueMap.put("push_time ", " ");
-            valueMap.put("other ", " ");
-            valueMap.put("curve ", " ");
-            List<Map<String, Object>> values = new ArrayList<>();
-            values.add(valueMap);
-            Map<String, List<Map<String, Object>>> param = new HashMap<>();
-            param.put("values", values);
-            hdyHttpUtils.pushIOT(param, "1923f943-9a93-4640-93cd-b659a18fc258");
-        }
     }
 
 
@@ -211,11 +165,11 @@ public class SmartLabController {
 
         FTPServer ftpServer = new FTPServer();
         String localUrl = "/";
-        FTPServerConfig ftpServerConfig = new FTPServerConfig("10.1.3.150", 21, "yuancheng", "123456", localUrl, 1);
+        FTPServerConfig ftpServerConfig = new FTPServerConfig("10.1.3.151", 21, "yuancheng", "123456", localUrl, 1);
         String localFilePath = "/home/mashir0/project/Normal.mdb";
         ftpServer.processFTPServer(ftpServerConfig, localFilePath);
         //然后读取
-        String[] columnsToPrint = {"wbbh"};
+        String[] columnsToPrint = {""};
         List<Map<String, String>> mapList = getAccess(localFilePath, columnsToPrint);
         //然后解析
         for (Map<String, String> value : mapList) {
@@ -224,7 +178,7 @@ public class SmartLabController {
             valueMap.put("portal_id", "1751847977770553345");
             valueMap.put("date_time ", dataTime);
             valueMap.put("device_code ", "2404129");
-            valueMap.put("num_code ", value.get("wbbh"));
+            valueMap.put("num_code ", " ");
             valueMap.put("test_piece_code ", " ");
             valueMap.put("test_piece_seq ", " ");
             valueMap.put("molding_date_time ", " ");
@@ -247,7 +201,7 @@ public class SmartLabController {
             values.add(valueMap);
             Map<String, List<Map<String, Object>>> param = new HashMap<>();
             param.put("values", values);
-            hdyHttpUtils.pushIOT(param, "54994e23-256b-42b3-bff3-9cda81bf9118");
+            hdyHttpUtils.pushIOT(param, "2f745c53-8376-4c10-b650-8cc66aed2cce");
         }
     }
 

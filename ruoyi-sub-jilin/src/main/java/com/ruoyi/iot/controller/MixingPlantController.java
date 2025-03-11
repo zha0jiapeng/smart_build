@@ -28,216 +28,168 @@ public class MixingPlantController {
     @Resource
     HdyHttpUtils hdyHttpUtils;
 
+    private static String databasePath = "/home/mashir0/mdb/BCS7.2.mdb";
 
     /**
-     * 实验室设备运行状态推送
+     * 生产运输单
      */
-    @GetMapping("/getEquipmentStatus")
-    public void getEquipmentStatus() {
-        //全自动抗折抗压恒应力试验机10.1.3.150 出厂编号：2404129
-        pushEquipmentStatus("2404129", "10.1.3.150");
+    @GetMapping("/transportOrderProcessing")
+    public void transportOrderProcessing() {
+        List<Map<String, Object>> maps = getAccess(databasePath);
+        for (Map<String, Object> v : maps) {
 
-        //全自动恒应力压力试验机10.1.3.151 出厂编号：2405066
-        pushEquipmentStatus("2405066", "10.1.3.151");
-
-        //电液伺服万能材料试验机-出厂编号：2401059 10.1.3.152
-        pushEquipmentStatus("2401059", "10.1.3.152");
-
-        //电液伺服万能材料试验机-出厂编号：2401053 10.1.3.153
-        pushEquipmentStatus("2401053", "10.1.3.153");
-
-        //电液伺服万能材料试验机-出厂编号：2401052 10.1.3.154
-        pushEquipmentStatus("2401052", "10.1.3.154");
-    }
-
-    public void pushEquipmentStatus(String factoryNumber, String ip) {
-        String dataTime = getNowTimeExtractor();
-        // 发送请求
-        boolean value = new DeviceIpChecker().ping(ip);
-        String status = "关机";
-        if (value) {
-            status = "工作中";
-        }
-
-        Map<String, Object> valueMap = new HashMap<>();
-        valueMap.put("portal_id", "1751847977770553345");
-        valueMap.put("device_code", factoryNumber);
-        valueMap.put("data_time", dataTime);
-        valueMap.put("status", status);
-        valueMap.put("push_time", getNowTimeExtractor());
-        valueMap.put("other", "");
-        List<Map<String, Object>> values = new ArrayList<>();
-        values.add(valueMap);
-        Map<String, List<Map<String, Object>>> param = new HashMap<>();
-        param.put("values", values);
-
-        hdyHttpUtils.pushIOT(param, "4249b29e-391d-41ab-9e34-6b9b6df49920");
-    }
-
-
-    /**
-     * 实验室环境监测推送
-     */
-    @GetMapping("/getEnvironmentalMonitoring")
-    public void getEnvironmentalMonitoring() {
-        Map<String, Object> valueMap = new HashMap<>();
-        valueMap.put("portal_id", "1751847977770553345");
-        //温度
-        valueMap.put("temperature", "");
-        //湿度
-        valueMap.put("humidness", "");
-        valueMap.put("push_time", getNowTimeExtractor());
-        valueMap.put("other", "");
-        List<Map<String, Object>> values = new ArrayList<>();
-        values.add(valueMap);
-        Map<String, List<Map<String, Object>>> param = new HashMap<>();
-        param.put("values", values);
-
-        hdyHttpUtils.pushIOT(param, "2f745c53-8376-4c10-b650-8cc66aed2cce");
-    }
-
-    /**
-     * 电液伺服万能材料试验机
-     */
-    @GetMapping("/getElectroHydraulicServoUniversalTester")
-    public void getElectroHydraulicServoUniversalTester() {
-
-        Map<String, String> map = new HashMap<>();
-        map.put("10.1.3.152","2401059");
-        map.put("10.1.3.153","2401053");
-        map.put("10.1.3.154","2401052");
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            String ip = entry.getKey();
-            String deviceCode = entry.getValue();
-            FTPServer ftpServer = new FTPServer();
-            String localUrl = "/";
-            FTPServerConfig ftpServerConfig = new FTPServerConfig(ip, 21, "yuancheng", "123456", localUrl, 1);
-            String localFilePath = "/home/mashir0/project/Normal.mdb";
-            ftpServer.processFTPServer(ftpServerConfig, localFilePath);
-            //然后读取
-            String[] columnsToPrint = {"SBBH", "TestNo", "CurOrder", "Area", "TestBTime", "Operator", "MaxLoad", "KYQD", "断后标距", "Ae", "Agt", "Lagt", "Gauge", "TestPoint"}; // 你想打印的列
-            List<Map<String, String>> mapList = getAccess(localFilePath, columnsToPrint);
-            //然后解析
-            for (Map<String, String> value : mapList) {
-                String dataTime = getNowTimeExtractor();
-                Map<String, Object> valueMap = new HashMap<>();
-                valueMap.put("portal_id", "1751847977770553345");
-                valueMap.put("date_time", dataTime);
-                valueMap.put("device_code", value.get("SBBH"));
-                valueMap.put("num_code", value.get("TestNo"));
-                valueMap.put("test_piece_code", value.get("CurOrder"));
-                valueMap.put("test_piece_seq", value.get("CurOrder"));
-                valueMap.put("nominal_area", value.get("Area"));
-                valueMap.put("test_day", value.get("TestBTime"));
-                valueMap.put("tester", value.get("Operator"));
-                valueMap.put("checker", "");
-                valueMap.put("yield_force", "");
-                valueMap.put("yield_strength", "");
-                valueMap.put("max_force", value.get("MaxLoad"));
-                valueMap.put("tensile_strength", value.get("KYQD"));
-                valueMap.put("pe_at_ogl", value.get("Gauge"));
-                valueMap.put("pe_at_fracture", value.get("断后标距"));
-                valueMap.put("percent_elongation", value.get("Ae"));
-                valueMap.put("max_force_total_extension", value.get("Gauge"));
-                valueMap.put("ext_at_max_force", value.get("Lagt"));
-                valueMap.put("total_extension", value.get("Agt"));
-                valueMap.put("push_time", getNowTimeExtractor());
-                valueMap.put("other", "");
-                valueMap.put("curve", value.get("TestPoint"));
-                List<Map<String, Object>> values = new ArrayList<>();
-                values.add(valueMap);
-                Map<String, List<Map<String, Object>>> param = new HashMap<>();
-                param.put("values", values);
-
-                hdyHttpUtils.pushIOT(param, "2f745c53-8376-4c10-b650-8cc66aed2cce");
-            }
-        }
-
-    }
-
-
-    /**
-     * 实验室水泥抗压抗折试验上传
-     */
-    @GetMapping("/getCementStrengthTestingInterface")
-    public void getCementStrengthTestingInterface() {
-        //先下载文件
-
-        FTPServer ftpServer = new FTPServer();
-        String localUrl = "/";
-        FTPServerConfig ftpServerConfig = new FTPServerConfig("10.1.3.151", 21, "yuancheng", "123456", localUrl, 1);
-        String localFilePath = "/home/mashir0/project/Normal.mdb";
-        ftpServer.processFTPServer(ftpServerConfig, localFilePath);
-        //然后读取
-        String[] columnsToPrint = {""};
-        List<Map<String, String>> mapList = getAccess(localFilePath, columnsToPrint);
-        //然后解析
-        for (Map<String, String> value : mapList) {
-            String dataTime = getNowTimeExtractor();
             Map<String, Object> valueMap = new HashMap<>();
+
+            valueMap.put("id", v.get("ID"));
+            valueMap.put("create_by", "");
+            valueMap.put("create_date", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));
+            valueMap.put("update_by", "");
+            valueMap.put("update_date", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));
+            valueMap.put("delete_flag", "");
+            valueMap.put("delivery_order_no", v.get("Code"));
+            //门户ID  String
             valueMap.put("portal_id", "1751847977770553345");
-            valueMap.put("date_time ", dataTime);
-            valueMap.put("device_code ", "2404129");
-            valueMap.put("num_code ", " ");
-            valueMap.put("test_piece_code ", " ");
-            valueMap.put("test_piece_seq ", " ");
-            valueMap.put("molding_date_time ", " ");
-            valueMap.put("compressive_age ", " ");
-            valueMap.put("test_day ", " ");
-            valueMap.put("tester ", " ");
-            valueMap.put("checker ", " ");
-            valueMap.put("flexural_strength_at_side_len ", " ");
-            valueMap.put("flexural_strength_at_span ", " ");
-            valueMap.put("flexural_strength_at_load_failure ", " ");
-            valueMap.put("flexural_strength_at_single ", " ");
-            valueMap.put("flexural_strength_at_avg ", " ");
-            valueMap.put("compressive_strength_at_area ", " ");
-            valueMap.put("compressive_strength_at_load_failure ", " ");
-            valueMap.put("compressive_strength_at_single ", " ");
-            valueMap.put("compressive_strength_at_avg ", " ");
-            valueMap.put("push_time", getNowTimeExtractor());
-            valueMap.put("other", "");
-            List<Map<String, Object>> values = new ArrayList<>();
-            values.add(valueMap);
-            Map<String, List<Map<String, Object>>> param = new HashMap<>();
-            param.put("values", values);
-            hdyHttpUtils.pushIOT(param, "2f745c53-8376-4c10-b650-8cc66aed2cce");
+            //子工程ID  String
+            valueMap.put("sub_project_id", "1801194524869922817");
+            valueMap.put("task_order_no", v.get("Code"));
+            valueMap.put("customer_name", v.get("Customer"));
+            valueMap.put("project_name", v.get("ProjName"));
+            valueMap.put("pouring_section", v.get("ConsPos"));
+            valueMap.put("pouring_method", v.get("Pour"));
+            valueMap.put("dispatch_time", convertSerialNumberToDate(Double.valueOf(v.get("LeftTim").toString())));
+            if (v.get("Lands").toString() == null || v.get("Lands").toString().equals("")) {
+                continue;
+            }
+            valueMap.put("slump", v.get("Lands"));
+            valueMap.put("mixer_no", "无");
+            valueMap.put("strength_class", v.get("BetLev"));
+            valueMap.put("special_item", "无");
+
+            Map<String, Object> vehicleMap = getAccessVehicleById(databasePath, v.get("Vehicle").toString());
+            valueMap.put("license_plate", vehicleMap.get("Code"));
+            valueMap.put("driver_name", v.get("Vehicle"));
+            valueMap.put("dispatched_volume", v.get("ProdMete"));
+            valueMap.put("cumulative_volume", v.get("TotMete"));
+            valueMap.put("signed_volume", v.get("ProdMete"));
+            valueMap.put("cumulative_trips", v.get("TotVehs"));
+            valueMap.put("signoff_time", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));
+            valueMap.put("pump_truck_license_plate", "");
+            valueMap.put("pump_truck_model", "");
+            valueMap.put("creator", v.get("Operator"));
+            valueMap.put("area_name", v.get("Code"));
+
+            System.out.println(valueMap.toString());
+            send(valueMap, "1d5c0973-f40e-496c-acd3-5f9ad6bf13a0");
         }
     }
 
+    /**
+     * 生产任务单
+     */
+    @GetMapping("/listProductionTasks")
+    public void listProductionTasks() {
+        List<Map<String, Object>> maps = getAccessTask(databasePath);
+        for (Map<String, Object> v : maps) {
+
+            Map<String, Object> valueMap = new HashMap<>();
+
+            valueMap.put("id", v.get("ID"));
+            valueMap.put("create_by", "");
+            valueMap.put("create_time", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));
+            valueMap.put("update_by", "");
+            valueMap.put("update_time", "");
+            valueMap.put("delete_flag", "");
+            //门户ID  String
+            valueMap.put("portal_id", "1751847977770553345");
+            //子工程ID  String
+            valueMap.put("sub_project_id", "1801194524869922817");
+            valueMap.put("task_order_no", v.get("Code"));
+            valueMap.put("status", "");
+            valueMap.put("work_section", v.get("ConsPos"));
+            valueMap.put("design_amount", v.get("Mete"));
+            valueMap.put("finish_amount",  v.get("Mete"));
+            valueMap.put("remain_amount", "");
+            valueMap.put("intensity", v.get("BetLev"));
+            valueMap.put("impermeability", v.get("Filter"));
+            valueMap.put("freeze_resistance_class", v.get("Freeze"));
+            valueMap.put("pouring_method", v.get("Pour"));
+            valueMap.put("special_item", "");
+            valueMap.put("shaping", "");
+            valueMap.put("report_id", "");
+            valueMap.put("apply_time", "");
+            valueMap.put("apply_name", "");
+            valueMap.put("construction_address", v.get("ProjAdr"));
+            valueMap.put("transportation_distance", v.get("Distance"));
+            valueMap.put("product_type", v.get("Variety"));
+            valueMap.put("slump", v.get("Lands"));
+            valueMap.put("estimated_pouring_time", v.get("BegTim"));
+            valueMap.put("technical_requirements", v.get("Request"));
+
+            System.out.println(valueMap.toString());
+//            send(valueMap,"3e8f335f-edbc-4270-ba56-b98cbac6f5ee");
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getAccess("/Users/y/Desktop/BCS7.2.mdb").toString());
+
+    }
+
+    public void send(Map<String, Object> valueMap, String rid) {
+        List<Map<String, Object>> values = new ArrayList<>();
+        values.add(valueMap);
+        Map<String, List<Map<String, Object>>> param = new HashMap<>();
+        param.put("values", values);
+
+        hdyHttpUtils.pushIOT(param, rid);
+    }
+
+    public static String convertSerialNumberToDate(double serialNumber) {
+        // 基础日期为1899年12月30日
+        LocalDateTime baseDate = LocalDateTime.of(1899, 12, 30, 0, 0, 0);
+
+        // 将序列号分为完整天数和时间部分
+        int days = (int) serialNumber;
+        double fractionalDay = serialNumber - days;
+
+        // 计算时间部分（将小数转换为秒数）
+        long secondsInDay = (long) (fractionalDay * 24 * 60 * 60);
+
+        // 将天数和时间相加
+        LocalDateTime resultDate = baseDate.plusDays(days).plusSeconds(secondsInDay);
+
+        // 定义格式化器
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 格式化日期时间为字符串
+        return resultDate.format(formatter);
+    }
 
     /**
-     * 读取本地Access数据库并打印内容
+     * 读取本地Access数据库Produce表并打印最后50条内容
      */
-    public List<Map<String, String>> getAccess(String databasePath, String[] columnsToPrint) {
-        // 构建 UCanAccess 连接 URL，明确设置密码为空
-        // 如果数据库文件有密码保护，包含密码
-        String url = "jdbc:ucanaccess://" + databasePath + ";password=oke";
+    public static List<Map<String, Object>> getAccess(String databasePath) {
+        String url = "jdbc:ucanaccess://" + databasePath + ";password=BCS7.2_SDBS";
 
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
-        List<Map<String, String>> mapList = new ArrayList<>();
+        List<Map<String, Object>> mapList = new ArrayList<>();
 
         try {
-            // 加载 UCanAccess 驱动程序
             Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
-            System.out.println("开始建立数据库连接");
-            // 建立数据库连接
             connection = DriverManager.getConnection(url);
-            System.out.println("建立成功");
-            // 创建 Statement 对象并执行查询
+
             statement = connection.createStatement();
-            System.out.println("开始查询");
-            // 查询 test_result 表中的所有数据
-            String query = "SELECT * FROM test_result";
+
+            // 获取最后50条数据
+            String query = "SELECT * FROM (SELECT TOP 50 * FROM Produce ORDER BY DatTim DESC) ORDER BY id ASC";
             resultSet = statement.executeQuery(query);
-            mapList = printSelectedColumns(resultSet, columnsToPrint);
+            mapList = printAllColumns(resultSet);
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            // 确保关闭资源
             try {
                 if (resultSet != null) resultSet.close();
                 if (statement != null) statement.close();
@@ -250,22 +202,99 @@ public class MixingPlantController {
     }
 
     /**
-     * 打印ResultSet内容
+     * 读取本地Access数据库Task表并打印最后50条内容
      */
-    public List<Map<String, String>> printSelectedColumns(ResultSet resultSet, String[] columnsToPrint) {
-        List<Map<String, String>> mapList = new ArrayList<>();
+    public static List<Map<String, Object>> getAccessTask(String databasePath) {
+        String url = "jdbc:ucanaccess://" + databasePath + ";password=BCS7.2_SDBS";
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        List<Map<String, Object>> mapList = new ArrayList<>();
+
         try {
-            // 遍历 ResultSet 并打印每一行的指定列
-            while (resultSet.next()) {
-                Map<String, String> map = new HashMap<>();
-                for (String columnName : columnsToPrint) {
-                    String value = resultSet.getString(columnName);
-                    map.put(columnName, value);
-                }
-                mapList.add(map);
+            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+            connection = DriverManager.getConnection(url);
+
+            statement = connection.createStatement();
+
+            // 获取最后50条数据
+            String query = "SELECT * FROM (SELECT TOP 10 * FROM Task ORDER BY id DESC) ORDER BY id ASC";
+            resultSet = statement.executeQuery(query);
+            mapList = printAllColumns(resultSet);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            System.out.println(mapList.toString());
+        }
+        return mapList;
+    }
+
+    /**
+     * 读取本地Access数据库Vehicle指定id
+     */
+    public static Map<String, Object> getAccessVehicleById(String databasePath, String id) {
+        String url = "jdbc:ucanaccess://" + databasePath + ";password=BCS7.2_SDBS";
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        List<Map<String, Object>> mapList = new ArrayList<>();
+
+        try {
+            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+            connection = DriverManager.getConnection(url);
+
+            statement = connection.createStatement();
+
+            String query = "SELECT * FROM Vehicle WHERE id = " + id;
+            resultSet = statement.executeQuery(query);
+            mapList = printAllColumns(resultSet);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return mapList.get(0);
+    }
+
+    /**
+     * 打印 ResultSet 内容
+     */
+    public static List<Map<String, Object>> printAllColumns(ResultSet resultSet) {
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        try {
+            // 获取ResultSet的元数据，以便动态获取列名
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            // 遍历ResultSet的每一行
+            while (resultSet.next()) {
+                Map<String, Object> rowMap = new HashMap<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnName(i);
+                    Object value = resultSet.getObject(i);
+                    rowMap.put(columnName, value);
+                }
+                mapList.add(rowMap);
+            }
+//            System.out.println("Retrieved Data: " + mapList.toString());
         } catch (SQLException e) {
+            System.err.println("SQL Exception: " + e.getMessage());
             e.printStackTrace();
         }
         return mapList;

@@ -109,15 +109,16 @@ public class SmartLabController {
         map.put("10.1.3.153", "2401053");
         map.put("10.1.3.154", "2401052");
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            String ip = entry.getKey();
+//            String ip = entry.getKey();
             String deviceCode = entry.getValue();
-            FTPServer ftpServer = new FTPServer();
-            String localUrl = "/";
-            FTPServerConfig ftpServerConfig = new FTPServerConfig(ip, 21, "yuancheng", "123456", localUrl, 1);
-            String localFilePath = "/home/mashir0/project/Normal.mdb";
-            ftpServer.processFTPServer(ftpServerConfig, localFilePath);
+//            FTPServer ftpServer = new FTPServer();
+//            String localUrl = "/";
+//            FTPServerConfig ftpServerConfig = new FTPServerConfig(ip, 21, "yuancheng", "123456", localUrl, 1);
+//            String localFilePath = "/home/mashir0/mdb/sctemp.mdb";
+            String localFilePath = "/Users/y/Desktop/项目/吉林/更新/sctemp.mdb";
+//            ftpServer.processFTPServer(ftpServerConfig, localFilePath);
             //然后读取
-            String[] columnsToPrint = {"SBBH", "TestNo", "CurOrder", "Area", "TestBTime", "Operator", "MaxLoad", "KYQD", "断后标距", "Ae", "Agt", "Lagt", "Gauge", "TestPoint"}; // 你想打印的列
+            String[] columnsToPrint = {"SBBH", "TestNo", "CurOrder", "Area", "TestBTime", "Operator", "MaxLoad", "KYQD", "断后标距", "FinalRate", "Agt", "Lagt", "Gauge", "TestPoint"}; // 你想打印的列
             List<Map<String, String>> mapList = getAccess(localFilePath, columnsToPrint);
             //然后解析
             for (Map<String, String> value : mapList) {
@@ -133,13 +134,13 @@ public class SmartLabController {
                 valueMap.put("test_day", value.get("TestBTime"));
                 valueMap.put("tester", value.get("Operator"));
                 valueMap.put("checker", "");
-                valueMap.put("yield_force", "");
-                valueMap.put("yield_strength", "");
+                valueMap.put("yield_force", value.get("FeL"));
+                valueMap.put("yield_strength", value.get("PeL"));
                 valueMap.put("max_force", value.get("MaxLoad"));
                 valueMap.put("tensile_strength", value.get("KYQD"));
                 valueMap.put("pe_at_ogl", value.get("Gauge"));
                 valueMap.put("pe_at_fracture", value.get("断后标距"));
-                valueMap.put("percent_elongation", value.get("Ae"));
+                valueMap.put("percent_elongation", value.get("FinalRate"));
                 valueMap.put("max_force_total_extension", value.get("Gauge"));
                 valueMap.put("ext_at_max_force", value.get("Lagt"));
                 valueMap.put("total_extension", value.get("Agt"));
@@ -150,7 +151,66 @@ public class SmartLabController {
                 values.add(valueMap);
                 Map<String, List<Map<String, Object>>> param = new HashMap<>();
                 param.put("values", values);
+                System.out.println(param);
+//                hdyHttpUtils.pushIOT(param, "16a59ec9-08af-45d6-8af3-6631d868643a");
+            }
+        }
 
+    }
+
+
+    /**
+     * 电液伺服万能材料试验机
+     */
+    @GetMapping("/getElectroHydraulicServoUniversalTesterTest")
+    public void getElectroHydraulicServoUniversalTesterTest() {
+        Map<String, String> map = new HashMap<>();
+        map.put("10.1.3.152", "2401059");
+//        map.put("10.1.3.153", "2401053");
+//        map.put("10.1.3.154", "2401052");
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+//            String ip = entry.getKey();
+            String deviceCode = entry.getValue();
+//            FTPServer ftpServer = new FTPServer();
+//            String localUrl = "/";
+//            FTPServerConfig ftpServerConfig = new FTPServerConfig(ip, 21, "yuancheng", "123456", localUrl, 1);
+            String localFilePath = "/home/mashir0/mdb/sctemp.mdb";
+//            ftpServer.processFTPServer(ftpServerConfig, localFilePath);
+            //然后读取
+            String[] columnsToPrint = {"SBBH", "TestNo", "CurOrder", "Area", "PeL","TestBTime","FeL", "Operator", "MaxLoad", "KYQD", "断后标距", "FtLoad", "Agt", "FpLoad", "Gauge", "TestPoint"}; // 你想打印的列
+            List<Map<String, String>> mapList = getAccess(localFilePath, columnsToPrint);
+            //然后解析
+            for (Map<String, String> value : mapList) {
+                String dataTime = getNowTimeExtractor();
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("portal_id", "1751847977770553345");
+                valueMap.put("data_time", dataTime);
+                valueMap.put("device_code", deviceCode);
+                valueMap.put("num_code", value.get("TestNo"));
+                valueMap.put("test_piece_code", value.get("CurOrder"));
+                valueMap.put("test_piece_seq", value.get("CurOrder"));
+                valueMap.put("nominal_area", value.get("Area"));
+                valueMap.put("test_day", value.get("TestBTime"));
+                valueMap.put("tester", value.get("Operator"));
+                valueMap.put("checker", "");
+                valueMap.put("yield_force", value.get("FeL"));
+                valueMap.put("yield_strength", value.get("PeL"));
+                valueMap.put("max_force", value.get("MaxLoad"));
+                valueMap.put("tensile_strength", value.get("KYQD"));
+                valueMap.put("pe_at_ogl", value.get("Gauge"));
+                valueMap.put("pe_at_fracture", "0");
+                valueMap.put("percent_elongation", "0");
+                valueMap.put("max_force_total_extension", value.get("Gauge"));
+                valueMap.put("ext_at_max_force", value.get("FpLoad"));
+                valueMap.put("total_extension", value.get("Agt"));
+                valueMap.put("push_time", getNowTimeExtractor());
+                valueMap.put("other", "");
+                valueMap.put("curve", value.get("TestPoint"));
+                List<Map<String, Object>> values = new ArrayList<>();
+                values.add(valueMap);
+                Map<String, List<Map<String, Object>>> param = new HashMap<>();
+                param.put("values", values);
+                System.out.println(param.toString());
                 hdyHttpUtils.pushIOT(param, "16a59ec9-08af-45d6-8af3-6631d868643a");
             }
         }
@@ -251,13 +311,64 @@ public class SmartLabController {
         }
     }
 
+    public static void main(String[] args) {
+        Map<String, String> map = new HashMap<>();
+        map.put("10.1.3.152", "2401059");
+//        map.put("10.1.3.153", "2401053");
+//        map.put("10.1.3.154", "2401052");
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+//            String ip = entry.getKey();
+            String deviceCode = entry.getValue();
+//            FTPServer ftpServer = new FTPServer();
+//            String localUrl = "/";
+//            FTPServerConfig ftpServerConfig = new FTPServerConfig(ip, 21, "yuancheng", "123456", localUrl, 1);
+            String localFilePath = "/Users/y/Desktop/项目/吉林/更新/sctemp.mdb";
+//            ftpServer.processFTPServer(ftpServerConfig, localFilePath);
+            //然后读取
+            String[] columnsToPrint = {"SBBH", "TestNo", "CurOrder", "Area", "PeL","TestBTime","FeL", "Operator", "MaxLoad", "KYQD", "断后标距", "FtLoad", "Agt", "FpLoad", "Gauge", "TestPoint"}; // 你想打印的列
+            List<Map<String, String>> mapList = getAccess(localFilePath, columnsToPrint);
+            //然后解析
+            for (Map<String, String> value : mapList) {
+                String dataTime = getNowTimeExtractor();
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("portal_id", "1751847977770553345");
+                valueMap.put("date_time", dataTime);
+                valueMap.put("device_code", deviceCode);
+                valueMap.put("num_code", value.get("TestNo"));
+                valueMap.put("test_piece_code", value.get("CurOrder"));
+                valueMap.put("test_piece_seq", value.get("CurOrder"));
+                valueMap.put("nominal_area", value.get("Area"));
+                valueMap.put("test_day", value.get("TestBTime"));
+                valueMap.put("tester", value.get("Operator"));
+                valueMap.put("checker", "");
+                valueMap.put("yield_force", value.get("FeL"));
+                valueMap.put("yield_strength", value.get("PeL"));
+                valueMap.put("max_force", value.get("MaxLoad"));
+                valueMap.put("tensile_strength", value.get("KYQD"));
+                valueMap.put("pe_at_ogl", value.get("Gauge"));
+                valueMap.put("pe_at_fracture", value.get("断后标距"));
+                valueMap.put("percent_elongation", value.get("FinalRate"));
+                valueMap.put("max_force_total_extension", value.get("Gauge"));
+                valueMap.put("ext_at_max_force", value.get("FpLoad"));
+                valueMap.put("total_extension", value.get("Agt"));
+                valueMap.put("push_time", getNowTimeExtractor());
+                valueMap.put("other", "");
+                valueMap.put("curve", value.get("TestPoint"));
+                List<Map<String, Object>> values = new ArrayList<>();
+                values.add(valueMap);
+                Map<String, List<Map<String, Object>>> param = new HashMap<>();
+                param.put("values", values);
+                System.out.println(param.toString());
+//                hdyHttpUtils.pushIOT(param, "16a59ec9-08af-45d6-8af3-6631d868643a");
+            }
+        }
+    }
+
 
     /**
      * 读取本地Access数据库并打印内容
      */
-    public List<Map<String, String>> getAccess(String databasePath, String[] columnsToPrint) {
-        // 构建 UCanAccess 连接 URL，明确设置密码为空
-        // 如果数据库文件有密码保护，包含密码
+    public static List<Map<String, String>> getAccess(String databasePath, String[] columnsToPrint) {
         String url = "jdbc:ucanaccess://" + databasePath + ";password=oke";
 
         Connection connection = null;
@@ -266,24 +377,18 @@ public class SmartLabController {
         List<Map<String, String>> mapList = new ArrayList<>();
 
         try {
-            // 加载 UCanAccess 驱动程序
             Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
-            System.out.println("开始建立数据库连接");
-            // 建立数据库连接
             connection = DriverManager.getConnection(url);
-            System.out.println("建立成功");
-            // 创建 Statement 对象并执行查询
+
             statement = connection.createStatement();
-            System.out.println("开始查询");
-            // 查询 test_result 表中的所有数据
-            String query = "SELECT * FROM test_result";
+
+            String query = "SELECT * FROM Normal";
             resultSet = statement.executeQuery(query);
-            mapList = printSelectedColumns(resultSet, columnsToPrint);
+            mapList = printSelectedColumns(resultSet,columnsToPrint);
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            // 确保关闭资源
             try {
                 if (resultSet != null) resultSet.close();
                 if (statement != null) statement.close();
@@ -298,7 +403,7 @@ public class SmartLabController {
     /**
      * 打印ResultSet内容
      */
-    public List<Map<String, String>> printSelectedColumns(ResultSet resultSet, String[] columnsToPrint) {
+    public static List<Map<String, String>> printSelectedColumns(ResultSet resultSet, String[] columnsToPrint) {
         List<Map<String, String>> mapList = new ArrayList<>();
         try {
             // 遍历 ResultSet 并打印每一行的指定列
@@ -317,7 +422,7 @@ public class SmartLabController {
         return mapList;
     }
 
-    public String getNowTimeExtractor() {
+    public static String getNowTimeExtractor() {
         //推送时间
         LocalDateTime currentTime = LocalDateTime.now();
         DateTimeFormatter formatterNow = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

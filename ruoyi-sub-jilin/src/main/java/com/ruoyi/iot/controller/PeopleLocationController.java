@@ -71,6 +71,59 @@ public class PeopleLocationController {
         for (Map<String, Object> map : datee) {
             // 创建存储设备数据的 Map
             Map<String, Object> deviceData = new HashMap<>();
+//            String tid = map.get("tid").toString();
+//            //判定为车辆
+//            if (validTids.contains(tid)) {
+//                String deviceLocationJson = JSON.toJSONString(map);
+//                // 使用 HttpUtil 发送 GET 请求
+//                System.out.println("开始调用车辆定位：" + deviceLocationJson);
+//                String result = HttpUtil.get("http://10.1.3.204:8097/carLocation/pushHdy?data=" + deviceLocationJson);
+//                continue;
+//            }
+            deviceData.put("device_id", map.get("tid"));
+            deviceData.put("sub_project_id", "1801194524869922817");
+            deviceData.put("device_code", "3009f9b0bb24");
+            deviceData.put("work_status", "1");
+            deviceData.put("power_on_status", "1");
+            double[] doubles = XYToCoordinates(Double.parseDouble(map.get("result_x").toString()), Double.parseDouble(map.get("result_y").toString()));
+            deviceData.put("position_x", doubles[0]);
+            deviceData.put("position_y", doubles[1]);
+            deviceData.put("position_z", map.get("result_z"));
+            deviceData.put("sos_status", "0");
+            deviceData.put("distance", map.get("distance").toString());
+            deviceData.put("data_time", DateUtil.date(Long.parseLong(map.get("time").toString()) * 1000).toString("yyyy-MM-dd HH:mm:ss"));
+            deviceData.put("push_time", now);
+            deviceData.put("other", "");
+
+            // 将设备数据放入 List 中
+            List<Map<String, Object>> values = new ArrayList<>();
+            values.add(deviceData);
+
+            // 创建总的 Map 并将 List 放入其中
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("values", values);
+            hdyHttpUtils.pushIOT(resultMap, "199a5516-f4c3-45d0-ac7b-e30d73ffa595");
+        }
+
+    }
+
+
+    @Scheduled(cron = "0 */1 * * * *")
+    private void pushSwzkIn() {
+        Map<String, Object> request = new HashMap();
+        HttpResponse execute = HttpRequest.post("http://10.1.3.205:9501/push/list")
+                .body(JSON.toJSONString(request), "application/json")
+                .execute();
+        String body = execute.body();
+        Map parse = JSONObject.parseObject(body, Map.class);
+        List<Map<String, Object>> datee = (List<Map<String, Object>>) parse.get("data");
+        String now = DateUtil.now();
+        if (datee == null) {
+            return;
+        }
+        for (Map<String, Object> map : datee) {
+            // 创建存储设备数据的 Map
+            Map<String, Object> deviceData = new HashMap<>();
             String tid = map.get("tid").toString();
             //判定为车辆
             if (validTids.contains(tid)) {
@@ -90,7 +143,16 @@ public class PeopleLocationController {
             deviceData.put("position_y", doubles[1]);
             deviceData.put("position_z", map.get("result_z"));
             deviceData.put("sos_status", "0");
-            deviceData.put("distance", 0.0);
+
+            // 假设 x1 和 y1 的值
+            double x1 = 2.0; // 替换为实际的 x1 值
+            double y1 = 1.0; // 替换为实际的 y1 值
+
+            // 使用公式计算距离
+            double distance = Math.sqrt(Math.pow(x1 - doubles[0], 2) + Math.pow(y1 - doubles[1], 2));
+
+
+            deviceData.put("distance", distance);
             deviceData.put("data_time", DateUtil.date(Long.parseLong(map.get("time").toString()) * 1000).toString("yyyy-MM-dd HH:mm:ss"));
             deviceData.put("push_time", now);
             deviceData.put("other", "");

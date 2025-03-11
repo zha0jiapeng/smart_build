@@ -42,7 +42,7 @@ import java.util.function.Consumer;
 @RequestMapping("/TCP")
 public class TCPController {
     // 初始化指令和处理方法的映射
-    private static final Map<String, BiConsumer<byte[], Integer>> commandHandlers = new HashMap<>();
+    private static final Map<String, BiConsumer<byte[], Map<String, Integer>>> commandHandlers = new HashMap<>();
 
     static {
         // 初始化指令和对应的处理方法
@@ -86,11 +86,11 @@ public class TCPController {
             sendMap4323_4324.put("deviceArea", "15#支洞");
 
             //14#扬尘
-            portHandlers.put(4322, socket -> handleClient(socket, sendMap4322_4321));
+            portHandlers.put(4322, socket -> handleClient(socket, sendMap4322_4321, 14));
             //14#雨量
             portHandlers.put(4321, socket -> handleClient4321(socket, sendMap4322_4321));
             //15#支洞扬尘
-            portHandlers.put(4323, socket -> handleClient(socket, sendMap4323_4324));
+            portHandlers.put(4323, socket -> handleClient(socket, sendMap4323_4324, 15));
             //15#支洞雨量
             portHandlers.put(4324, socket -> handleClient4321(socket, sendMap4323_4324));
 
@@ -132,13 +132,13 @@ public class TCPController {
         }
     }
 
-    private void handleClient(Socket socket, Map<String, Object> sendMap) {
+    private void handleClient(Socket socket, Map<String, Object> sendMap, int area) {
         try {
             String originalValue = "";
-            for (Map.Entry<String, BiConsumer<byte[], Integer>> entry : commandHandlers.entrySet()) {
+            for (Map.Entry<String, BiConsumer<byte[], Map<String, Integer>>> entry : commandHandlers.entrySet()) {
 
                 String command = entry.getKey();
-                BiConsumer<byte[], Integer> handler = entry.getValue();
+                BiConsumer<byte[], Map<String, Integer>> handler = entry.getValue();
 
                 OutputStream outputStream = socket.getOutputStream();
                 byte[] initialData = hexStringToByteArray(command);
@@ -149,7 +149,10 @@ public class TCPController {
                 byte[] receivedBytes = new byte[1024];
                 int read = inputStream.read(receivedBytes);
                 originalValue = originalValue + command + "=" + bytesToHex(receivedBytes, read) + ";";
-                handler.accept(receivedBytes, read);
+                Map<String, Integer> map = new HashMap<>();
+                map.put("area", area);
+                map.put("read", read);
+                handler.accept(receivedBytes, map);
             }
             IotTsp iotTsp = new IotTsp();
             setIotTsp(iotTsp, sendMap);
@@ -251,8 +254,8 @@ public class TCPController {
         sendMap.put("other", "");
     }
 
-    private static void handleTemperatureResponse(byte[] receivedBytes, int read) {
-        if (read >= 5) {
+    private static void handleTemperatureResponse(byte[] receivedBytes, Map<String, Integer> map) {
+        if (map.get("read") >= 5) {
             // 获取高字节和低字节
             int highByte = receivedBytes[3] & 0xFF; // 解析接收的高字节
             int lowByte = receivedBytes[4] & 0xFF;  // 解析接收的低字节
@@ -269,82 +272,109 @@ public class TCPController {
             double actualTemperature = temperature / 100.0;
 
             // 存储温度值到相应的映射中
-            sendMap4322_4321.put("temperature", actualTemperature);
-            sendMap4323_4324.put("temperature", actualTemperature);
+            if (map.get("area") == 14){
+                sendMap4322_4321.put("temperature", actualTemperature);
+            }else{
+                sendMap4323_4324.put("temperature", actualTemperature);
+            }            
         }
     }
 
-    private static void handleHumidityResponse(byte[] receivedBytes, int read) {
-        if (read >= 5) {
+    private static void handleHumidityResponse(byte[] receivedBytes, Map<String, Integer> map) {
+        if (map.get("read") >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int humidity = (highByte << 8) | lowByte;
             double actualHumidity = humidity / 100.0;
-            sendMap4322_4321.put("humidity", actualHumidity);
-            sendMap4323_4324.put("humidity", actualHumidity);
+            if (map.get("area") == 14) {
+                sendMap4322_4321.put("humidity", actualHumidity);
+            }else{
+                sendMap4323_4324.put("humidity", actualHumidity);
+            }
+            
         }
     }
 
-    private static void handlePressureResponse(byte[] receivedBytes, int read) {
-        if (read >= 5) {
+    private static void handlePressureResponse(byte[] receivedBytes, Map<String, Integer> map) {
+        if (map.get("read") >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int pressure = (highByte << 8) | lowByte;
             double actualPressure = pressure / 100.0;
-            sendMap4322_4321.put("pressure", actualPressure);
-            sendMap4323_4324.put("pressure", actualPressure);
+            if (map.get("area") == 14) {
+                sendMap4322_4321.put("pressure", actualPressure);
+            }else{
+                sendMap4323_4324.put("pressure", actualPressure);
+            }
+            
         }
     }
 
-    private static void handleNoiseResponse(byte[] receivedBytes, int read) {
-        if (read >= 5) {
+    private static void handleNoiseResponse(byte[] receivedBytes, Map<String, Integer> map) {
+        if (map.get("read") >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int noise = (highByte << 8) | lowByte;
             double actualNoise = noise / 10.0;
-            sendMap4322_4321.put("noise", actualNoise);
-            sendMap4323_4324.put("noise", actualNoise);
+            if (map.get("area") == 14) {
+                sendMap4322_4321.put("noise", actualNoise);
+            }else{
+                sendMap4323_4324.put("noise", actualNoise);
+            }
         }
     }
 
-    private static void handlePM2_5Response(byte[] receivedBytes, int read) {
-        if (read >= 5) {
+    private static void handlePM2_5Response(byte[] receivedBytes, Map<String, Integer> map) {
+        if (map.get("read") >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int PM2_5 = (highByte << 8) | lowByte;
-            sendMap4322_4321.put("pm25", PM2_5);
-            sendMap4323_4324.put("pm25", PM2_5);
+
+            if (map.get("area") == 14) {
+                sendMap4322_4321.put("pm25", PM2_5);
+            }else{
+                sendMap4323_4324.put("pm25", PM2_5);
+            }
         }
     }
 
-    private static void handlePM10Response(byte[] receivedBytes, int read) {
-        if (read >= 5) {
+    private static void handlePM10Response(byte[] receivedBytes, Map<String, Integer> map) {
+        if (map.get("read") >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int PM10 = (highByte << 8) | lowByte;
-            sendMap4322_4321.put("pm10", PM10);
-            sendMap4323_4324.put("pm10", PM10);
+            if (map.get("area") == 14) {
+                sendMap4322_4321.put("pm10", PM10);
+            }else{
+                sendMap4323_4324.put("pm10", PM10);
+            }
         }
     }
 
-    private static void handleWindDirectionResponse(byte[] receivedBytes, int read) {
-        if (read >= 5) {
+    private static void handleWindDirectionResponse(byte[] receivedBytes, Map<String, Integer> map) {
+        if (map.get("read") >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int WindWirection = (highByte << 8) | lowByte;
             String direction = Direction.fromAngle(String.valueOf(WindWirection));
-            sendMap4322_4321.put("wind_direction", direction);
-            sendMap4323_4324.put("wind_direction", direction);
+            if (map.get("area") == 14) {
+                sendMap4322_4321.put("wind_direction", direction);
+            }else{
+                sendMap4323_4324.put("wind_direction", direction);
+            }
         }
     }
 
-    private static void handleWindSpeedResponse(byte[] receivedBytes, int read) {
-        if (read >= 5) {
+    private static void handleWindSpeedResponse(byte[] receivedBytes, Map<String, Integer> map) {
+        if (map.get("read") >= 5) {
             int highByte = receivedBytes[3] & 0xFF;
             int lowByte = receivedBytes[4] & 0xFF;
             int WindSpeed = (highByte << 8) | lowByte;
-            sendMap4322_4321.put("wind_speed", WindSpeed);
-            sendMap4323_4324.put("wind_speed", WindSpeed);
+            if (map.get("area") == 14) {
+                sendMap4322_4321.put("wind_speed", WindSpeed);
+            }else{
+                sendMap4323_4324.put("wind_speed", WindSpeed);
+            }
         }
     }
 

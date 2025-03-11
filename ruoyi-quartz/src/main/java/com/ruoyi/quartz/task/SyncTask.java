@@ -59,4 +59,12 @@ public class SyncTask {
     }
 
 
+    /**
+     * 污水检测推送
+     */
+    public void sendSewageMonitoring(){
+        String result1 = HttpUtil.get("http://127.0.0.1:8097/SewageMonitoring/list");
+    }
+
+
 }

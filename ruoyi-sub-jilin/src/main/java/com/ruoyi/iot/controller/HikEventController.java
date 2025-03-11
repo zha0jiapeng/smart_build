@@ -137,11 +137,11 @@ public class HikEventController extends BaseController {
     // 静态初始化块
     static {
         map = new HashMap<>();
-        // 15支洞雨量监测旁球机
+        // 15支洞雨量监测旁球机13
         map.put(34, 65L);
-        //14支洞洞口
+        //14支洞洞口101
         map.put(33, 76L);
-        //14支洞进厂路
+        //14支洞进厂路02
         map.put(35, 115L);
     }
 

@@ -358,6 +358,7 @@ public class WeighbridgeDataController extends BaseController {
         return success(latestWeighbridgeData);
     }
 
+    //http://10.1.3.204:8097/system/data/getLatestWeighbridgeData/14
     @GetMapping("/getLatestWeighbridgeData/14")
     public AjaxResult getLatestWeighbridgeData14() {
         QueryWrapper<WeighbridgeData> queryWrapper = new QueryWrapper<>();

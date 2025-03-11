@@ -152,7 +152,43 @@ public class BroadcastAlarmController extends BaseController {
         log.info("============BroadcastAlarmController.queryScheduledTaskLogs================");
         if (isBroadcastingTime()) {
             broadcast15FieldArea();
+            broadcast14Opening();
         }
+    }
+
+    //14支洞洞口广播
+    public void broadcast14Opening() {
+        IpBroadcast ipBroadcast = new IpBroadcast();
+        // 获取当前日期
+        LocalDate currentDate = LocalDate.now();
+
+        if (isTimeBetween()) {
+            ipBroadcast.setTaskName("播放14支洞洞口进场安全须知（上午）");
+            ipBroadcast.setTaskExecuteTime(currentDate.toString() + " 07:30:00");
+        }else {
+            ipBroadcast.setTaskName("播放14支洞洞口进场安全须知（下午）");
+            ipBroadcast.setTaskExecuteTime(currentDate.toString() + " 14:00:00");
+        }
+
+
+        ipBroadcast.setTaskNo("1");
+        ipBroadcast.setTaskType("1");
+        ipBroadcast.setTaskEquipment("14支洞洞口");
+        QueryWrapper<IpBroadcast> ipBroadcastQueryWrapper = new QueryWrapper<>();
+        ipBroadcastQueryWrapper.eq("equipment_no", "93B1237D")
+                .orderByDesc("id")
+                .last("LIMIT 1");
+        IpBroadcast latestIpBroadcast = ipBroadcastService.getOne(ipBroadcastQueryWrapper);
+        int playTimes = 0;
+        if (latestIpBroadcast != null) {
+            playTimes = Integer.parseInt(latestIpBroadcast.getPlayTimes());
+        }
+        //音频文件1分22秒
+        playTimes = playTimes + 10;
+        ipBroadcast.setPlayTimes(String.valueOf(playTimes));
+        ipBroadcast.setEquipmentNo("93B1237D");
+        ipBroadcast.setAudioType("1");
+        processLogResult(ipBroadcast);
     }
 
     //15支洞场区广播

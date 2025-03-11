@@ -19,6 +19,9 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author y
@@ -40,7 +43,7 @@ public class MqttSubscriber {
         // 客户端 ID
         String clientId = "JavaClient";
         // 订阅的主题
-        String[] topics = {"24090502540001", "24110701080004"};
+        String[] topics = {"24090502540001", "24110701080004","12345678901234","12345678901235","12345678901236","12345678901237","12345678901238","12345678901239","12345678901240","12345678901241","12345678901242","12345678901243","12345678901244"};
         // 用户名
         String username = "root";
         // 密码
@@ -67,12 +70,12 @@ public class MqttSubscriber {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     String json = new String(message.getPayload());
-                    if (topic.equals("24090502540001")){
-                        parseMessage14(json);
-                    }else {
-                        parseMessage15(json);
-                    }
-
+//                    if (topic.equals("24090502540001")) {
+//                        parseMessage14(json);
+//                    } else {
+//                        parseMessage15(json);
+//                    }
+                    parseMessage(topic, json);
                 }
             };
 
@@ -86,29 +89,63 @@ public class MqttSubscriber {
         }
     }
 
-    private static int callCount = 0;
-    private static Map<Integer, String> idValueMap = new HashMap<>();
-    private static String rawData = "";
 
 
-    private static int callCount15 = 0;
-    private static Map<Integer, String> idValueMap15 = new HashMap<>();
-    private static String rawData15 = "";
+    private static Map<String, Map<Integer, String>> map = new HashMap<>();
+    private static final long EXPIRATION_TIME = 2 * 60 * 1000; // 10 minutes
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    private void parseMessage14(String json) {
+    public MqttSubscriber() {
+        startCleanupTask();
+    }
+
+    private void startCleanupTask() {
+        scheduler.scheduleAtFixedRate(this::cleanupExpiredEntries, EXPIRATION_TIME, EXPIRATION_TIME, TimeUnit.MILLISECONDS);
+    }
+
+    private void cleanupExpiredEntries() {
+        synchronized (map) {
+            long currentTime = System.currentTimeMillis();
+            map.entrySet().removeIf(entry -> {
+                Map<Integer, String> valueMap = entry.getValue();
+                long timestamp = Long.parseLong(valueMap.getOrDefault(-1, "0"));
+                return currentTime - timestamp > EXPIRATION_TIME;
+            });
+        }
+    }
+
+
+
+    private void parseMessage(String topic, String json) {
         boolean isConfirm = false;
         try {
             System.out.println("初始数据：" + json);
+            Map<Integer, String> stringMap;
+            int callCount = 0;
+            String rawData = "";
+
+            synchronized (map) {
+                if (map.get(topic) == null) {
+                    stringMap = new HashMap<>();
+                    map.put(topic, stringMap);
+                } else {
+                    stringMap = map.get(topic);
+                    callCount = Integer.parseInt(stringMap.getOrDefault(-2, "0"));
+                    rawData = stringMap.getOrDefault(-3, "");
+                }
+            }
 
             com.alibaba.fastjson.JSONObject jsonObject = JSON.parseObject(json);
 
             if (jsonObject.containsKey("data")) {
                 com.alibaba.fastjson.JSONArray dataArray = jsonObject.getJSONArray("data");
-
                 for (int i = 0; i < dataArray.size(); i++) {
                     com.alibaba.fastjson.JSONObject obj = dataArray.getJSONObject(i);
                     String timestamp = obj.getString("tp");
-                    idValueMap.put(-1, timestamp);
+
+                    synchronized (map) {
+                        stringMap.put(-1, timestamp);
+                    }
 
                     JSONArray pointsArray = obj.getJSONArray("point");
                     for (int j = 0; j < pointsArray.size(); j++) {
@@ -116,91 +153,45 @@ public class MqttSubscriber {
                         int id = pointObj.getIntValue("id");
                         String value = pointObj.getString("val");
 
-                        if (id == 36) {
-                            isConfirm = true;
-                        } else if (id == 1 && callCount != 0) {
-                            resetData14();
+                        synchronized (map) {
+                            if (id == 36) {
+                                isConfirm = true;
+                            } else if (id == 1 && callCount != 0) {
+                                map.remove(topic);
+                                return;
+                            }
+                            stringMap.put(id, value);
                         }
-
-                        idValueMap.put(id, value);
                     }
                 }
             }
 
             rawData += json;
-            callCount++;
-            System.out.println("当前状态：callCount" + callCount + "isConfirm：" + isConfirm);
+
+            synchronized (map) {
+                stringMap.put(-3, rawData);
+                callCount++;
+                stringMap.put(-2, String.valueOf(callCount));
+                map.put(topic, stringMap);
+            }
+
+            System.out.println("当前topic" + topic + "当前状态：callCount" + callCount + "isConfirm：" + isConfirm);
             if (callCount == 2 && isConfirm) {
                 System.out.println("开始执行用电监测数据解析");
                 ElectricityMonitoring electricityMonitoring = new ElectricityMonitoring();
                 electricityMonitoring.setRawData(rawData);
-                pushIOT(idValueMap, electricityMonitoring);
-                resetData14();
-            }
-
-        } catch (Exception e) {
-            System.out.println("Failed to parse message: " + e.getMessage());
-        }
-    }
-
-    private void parseMessage15(String json) {
-        boolean isConfirm = false;
-        try {
-            System.out.println("初始数据：" + json);
-
-            com.alibaba.fastjson.JSONObject jsonObject = JSON.parseObject(json);
-
-            if (jsonObject.containsKey("data")) {
-                com.alibaba.fastjson.JSONArray dataArray = jsonObject.getJSONArray("data");
-
-                for (int i = 0; i < dataArray.size(); i++) {
-                    com.alibaba.fastjson.JSONObject obj = dataArray.getJSONObject(i);
-                    String timestamp = obj.getString("tp");
-                    idValueMap15.put(-1, timestamp);
-
-                    JSONArray pointsArray = obj.getJSONArray("point");
-                    for (int j = 0; j < pointsArray.size(); j++) {
-                        JSONObject pointObj = pointsArray.getJSONObject(j);
-                        int id = pointObj.getIntValue("id");
-                        String value = pointObj.getString("val");
-
-                        if (id == 36) {
-                            isConfirm = true;
-                        } else if (id == 1 && callCount15 != 0) {
-                            resetData15();
-                        }
-
-                        idValueMap15.put(id, value);
-                    }
+                pushIOT(stringMap, electricityMonitoring);
+                synchronized (map) {
+                    map.remove(topic);
                 }
             }
 
-            rawData15 += json;
-            callCount15++;
-            System.out.println("当前状态：callCount" + callCount15 + "isConfirm：" + isConfirm);
-            if (callCount15 == 2 && isConfirm) {
-                System.out.println("开始执行用电监测数据解析");
-                ElectricityMonitoring electricityMonitoring = new ElectricityMonitoring();
-                electricityMonitoring.setRawData(rawData15);
-                pushIOT(idValueMap15, electricityMonitoring);
-                resetData15();
-            }
-
         } catch (Exception e) {
             System.out.println("Failed to parse message: " + e.getMessage());
+            synchronized (map) {
+                map.remove(topic);
+            }
         }
-    }
-
-    private void resetData14() {
-        idValueMap.clear();
-        rawData = "";
-        callCount = 0;
-    }
-
-    private void resetData15() {
-        idValueMap15.clear();
-        rawData15 = "";
-        callCount15 = 0;
     }
 
     public void pushIOT(Map<Integer, String> idValueMap, ElectricityMonitoring electricityMonitoring) {

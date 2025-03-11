@@ -125,10 +125,24 @@ public class ElectricityMonitoringController extends BaseController
     /**
      * 用电监测最新一条数据
      */
-    @GetMapping("/getLatestElectricityMonitoring")
-    public AjaxResult getLatestElectricityMonitoring()
+    @GetMapping("/getLatestElectricityMonitoring/14")
+    public AjaxResult getLatestElectricityMonitoring14()
     {
         QueryWrapper<ElectricityMonitoring> electricityMonitoringQueryWrapper = new QueryWrapper<>();
+        electricityMonitoringQueryWrapper.like("raw_data","24090502540001");
+        electricityMonitoringQueryWrapper.orderByDesc("id").last("limit 1");
+        ElectricityMonitoring latestElectricityMonitoring = electricityMonitoringMapper.selectOne(electricityMonitoringQueryWrapper);
+        return success(latestElectricityMonitoring);
+    }
+
+    /**
+     * 用电监测最新一条数据
+     */
+    @GetMapping("/getLatestElectricityMonitoring/15")
+    public AjaxResult getLatestElectricityMonitoring15()
+    {
+        QueryWrapper<ElectricityMonitoring> electricityMonitoringQueryWrapper = new QueryWrapper<>();
+        electricityMonitoringQueryWrapper.like("raw_data","24110701080004");
         electricityMonitoringQueryWrapper.orderByDesc("id").last("limit 1");
         ElectricityMonitoring latestElectricityMonitoring = electricityMonitoringMapper.selectOne(electricityMonitoringQueryWrapper);
         return success(latestElectricityMonitoring);

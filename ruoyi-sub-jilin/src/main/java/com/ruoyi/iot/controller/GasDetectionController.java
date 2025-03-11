@@ -42,8 +42,9 @@ public class GasDetectionController {
     RedisCache redisCache;
     @Autowired
     IDeviceService deviceService;
+
     @RequestMapping("/list")
-    public AjaxResult list(String sn){
+    public AjaxResult list(String sn) {
         Device device = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn).eq(Device::getDeviceType, "GASDETECTOR").eq(Device::getYn, 1));
         Map<String, Object> item = new HashMap<>();
         item.put("sn", device.getSn());
@@ -59,26 +60,26 @@ public class GasDetectionController {
         Number so2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 15, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化硫");
         Number nh3 = Modbus4jReadUtil.readHoldingRegister(master, 1, 16, DataType.TWO_BYTE_INT_UNSIGNED, "氨气");
         Number no2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 21, DataType.TWO_BYTE_INT_UNSIGNED, "二氧化氮");
-        item.put("temp", new BigDecimal(temp.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
-        item.put("humi",  new BigDecimal(humi.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
+        item.put("temp", new BigDecimal(temp.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP));
+        item.put("humi", new BigDecimal(humi.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP));
         item.put("dust", dust.doubleValue());
-        item.put("o2", new BigDecimal(o2.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
-        item.put("ch4", new BigDecimal(ch4.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
-        item.put("co", new BigDecimal(co.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
-        item.put("h2s", new BigDecimal(h2s.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
+        item.put("o2", new BigDecimal(o2.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP));
+        item.put("ch4", new BigDecimal(ch4.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP));
+        item.put("co", new BigDecimal(co.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP));
+        item.put("h2s", new BigDecimal(h2s.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP));
         item.put("co2", co2.doubleValue());
-        item.put("so2", new BigDecimal(so2.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
-        item.put("nh3", new BigDecimal(nh3.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
-        item.put("no2", new BigDecimal(no2.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1,RoundingMode.HALF_UP));
+        item.put("so2", new BigDecimal(so2.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP));
+        item.put("nh3", new BigDecimal(nh3.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP));
+        item.put("no2", new BigDecimal(no2.doubleValue()).multiply(new BigDecimal(0.1)).setScale(1, RoundingMode.HALF_UP));
 
         return AjaxResult.success(item);
     }
 
 
     @RequestMapping("/listByThingsBoard")
-    public Map getGasGasDetection(){
+    public Map getGasGasDetection() {
         Object thingsboardToken = redisCache.getCacheObject("thingsboard_token");
-        if(thingsboardToken==null) {
+        if (thingsboardToken == null) {
             String url = "10.1.3.201:8080/api/auth/login";
             Map<String, Object> map = new HashMap();
             map.put("username", "1939291579@qq.com");
@@ -86,18 +87,19 @@ public class GasDetectionController {
             HttpResponse execute = HttpRequest.post(url).body(JSON.toJSONString(map), "application/json").execute();
             JSONObject jsonObject = JSON.parseObject(execute.body());
             Object token = jsonObject.get("token");
-            redisCache.setCacheObject("thingsboard_token",token,2, TimeUnit.HOURS);
+            redisCache.setCacheObject("thingsboard_token", token, 2, TimeUnit.HOURS);
         }
         String url = "http://10.1.3.201:8080/api/plugins/telemetry/DEVICE/8e018740-4b26-11ef-8d02-a5729e1018f3/values/timeseries";
         HttpResponse execute = HttpRequest.get(url).bearerAuth(thingsboardToken.toString()).execute();
         String body = execute.body();
-        return JSON.parseObject(body,Map.class);
+        return JSON.parseObject(body, Map.class);
     }
 
     @GetMapping("/pushSwzk")
     public void pushSwzk() {
         String now = DateUtil.now();
-        List<Device> list = deviceService.list(new LambdaQueryWrapper<Device>().eq(Device::getDeviceType,"GASDETECTOR").eq(Device::getYn,1));
+        List<Device> list = deviceService.list(new LambdaQueryWrapper<Device>().eq(Device::getDeviceType, "GASDETECTOR").eq(Device::getYn, 1));
+        int i = 0;
         for (Device device : list) {
             ModbusMaster master = new ModbusTcpMaster().getSlave(device.getDeviceIp(), device.getDevicePort());
             Number temp = Modbus4jReadUtil.readHoldingRegister(master, 1, 0, DataType.TWO_BYTE_INT_UNSIGNED, "温度");
@@ -114,14 +116,19 @@ public class GasDetectionController {
 
             master.destroy();
             Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("device_code", "5414A7750BBF");
+            if (i == 0) {
+                dataMap.put("device_code", "5414A7750BBF");
+                i++;
+            } else if (i == 1) {
+                dataMap.put("device_code", "5414A7750BBF123");
+            }
             dataMap.put("status", "在线");
             dataMap.put("so2", new BigDecimal(so2.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
             dataMap.put("no2", no2);
             dataMap.put("co", new BigDecimal(co.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
             dataMap.put("co2", co2);
             dataMap.put("o2", o2);
-            dataMap.put("ch4",  new BigDecimal(ch4.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
+            dataMap.put("ch4", new BigDecimal(ch4.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
             dataMap.put("h2s", h2s);
             //dataMap.put("tvoc", "1");
             dataMap.put("nh3", new BigDecimal(nh3.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
@@ -137,7 +144,7 @@ public class GasDetectionController {
             // 创建根Map
             Map<String, Object> rootMap = new HashMap<>();
             rootMap.put("values", valuesList);
-            hdyHttpUtils.pushIOT(rootMap,"832944e052d04cccbb3e215e8a3e037f");
+            hdyHttpUtils.pushIOT(rootMap, "832944e052d04cccbb3e215e8a3e037f");
         }
     }
 

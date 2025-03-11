@@ -70,11 +70,11 @@ public class DoorEvent {
     private static final int WELINK_MODEL_ID = 200362;
     private static final Logger logger = LogManager.getLogger(DoorEvent.class);
 
-    //    @Scheduled(cron = "0 */10 * * * ?")
+    @Scheduled(cron = "0 */10 * * * ?")
     public void execute() {
         Object doorLastTime = redisTemplate.opsForValue().get("door_last_time");
-        if(doorLastTime==null) {
-            doorLastTime =  DateUtil.offsetMinute(new Date(),-10);
+        if (doorLastTime == null) {
+            doorLastTime = DateUtil.offsetMinute(new Date(), -10);
         }
         DateTime date = DateUtil.date();
         String now = DateUtil.formatDateTime(date);
@@ -102,22 +102,22 @@ public class DoorEvent {
             }
             if (object.get("picUri") == null || StringUtils.isEmpty(object.get("picUri").toString())) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("pageNo",1);
-                map.put("pageSize",1);
+                map.put("pageNo", 1);
+                map.put("pageSize", 1);
                 map.put("certificateNo", object.get("certNo").toString());
                 String s = doorFunctionApi.personList(map);
                 JSONObject jsonObject1 = JSONObject.parseObject(s);
                 JSONObject data = jsonObject1.getJSONObject("data");
                 if (data != null) {
                     JSONArray list1 = data.getJSONArray("list");
-                    if(list1!=null && list1.size()>0) {
-                        object.put("picUri",list1.getJSONObject(0).getJSONArray("personPhoto").getJSONObject(0).getString("picUri") );
+                    if (list1 != null && list1.size() > 0) {
+                        object.put("picUri", list1.getJSONObject(0).getJSONArray("personPhoto").getJSONObject(0).getString("picUri"));
                     }
                 }
             }
             Map<String, Object> map = new HashMap<>();
             map.put("portal_id", "1751847977770553345");
-          //  map.put("device_code", object.get("doorIndexCode").toString());
+            //  map.put("device_code", object.get("doorIndexCode").toString());
             map.put("device_status", "在线");
             String url = "http://10.1.3.2" + object.get("picUri");
             map.put("record_Image_file", hdyHttpUtils.pushPicture(url));
@@ -137,18 +137,18 @@ public class DoorEvent {
             JSONObject door = getDoor(devIndexCode);
             String sn = door.get("devSerialNum").toString();
             Device one = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn), false);
-            if(one==null){
-                logger.error("找不到设备sn:{}",sn);
+            if (one == null) {
+                logger.error("找不到设备sn:{}", sn);
                 continue;
             }
-            map.put("type",one.getCameraType());
+            map.put("type", one.getCameraType());
 
             map.put("device_code", sn);
             DateTime eventTime = DateUtil.parse(getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
             String personName = object.get("personName").toString();
-            SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName,one);
-            if(sysWorkPeopleInoutLog==null) continue;
-            map.put("id",sysWorkPeopleInoutLog.getId());
+            SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName, one);
+            if (sysWorkPeopleInoutLog == null) continue;
+            map.put("id", sysWorkPeopleInoutLog.getId());
             map.remove("record_Image_file_InOutLog");
             listt.add(map);
         }
@@ -160,10 +160,10 @@ public class DoorEvent {
         HttpResponse execute = HttpRequest.put(url).body(JSON.toJSONString(request), "application/json").execute();
         String body1 = execute.body();
         logger.info("...返回值{}", JSON.toJSONString(body1));
-        redisTemplate.opsForValue().set("door_last_time", DateUtil.offsetMinute(date,-10));
+        redisTemplate.opsForValue().set("door_last_time", DateUtil.offsetMinute(date, -10));
     }
 
-    private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName,Device one) {
+    private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName, Device one) {
         SysWorkPeopleInoutLog sysWorkPeopleInoutLog = new SysWorkPeopleInoutLog();
         String sn = door.get("devSerialNum").toString();
 //        if (!ALLOWED_SN.contains(sn)) {
@@ -188,7 +188,7 @@ public class DoorEvent {
                         .eq(SysWorkPeopleInoutLog::getIdCard, jsonObject.get("id_card").toString())
                         .eq(SysWorkPeopleInoutLog::getLogTime, DateUtil.formatDateTime(eventTime))
         );
-        if (certNo>=1){
+        if (certNo >= 1) {
             return null;
         }
 
@@ -201,7 +201,7 @@ public class DoorEvent {
         sysWorkPeopleInoutLog.setCreatedDate(new Date());
         sysWorkPeopleInoutLog.setModifyDate(new Date());
         sysWorkPeopleInoutLogMapper.insert(sysWorkPeopleInoutLog);
-        logger.info("进行插入数据库操作：{}",sysWorkPeopleInoutLog);
+        logger.info("进行插入数据库操作：{}", sysWorkPeopleInoutLog);
         return sysWorkPeopleInoutLog;
     }
 
@@ -235,8 +235,8 @@ public class DoorEvent {
 
         JSONObject JSONObject = doorFunctionApi.search(rootMap);
         JSONArray objects = (JSONArray) ((JSONObject) JSONObject.get("data")).get("list");
-        if(objects==null || objects.isEmpty()) {
-            logger.info("indexCode:{},找不到门禁信息.",devIndexCode);
+        if (objects == null || objects.isEmpty()) {
+            logger.info("indexCode:{},找不到门禁信息.", devIndexCode);
             return null;
         }
         JSONObject door = (JSONObject) objects.get(0);

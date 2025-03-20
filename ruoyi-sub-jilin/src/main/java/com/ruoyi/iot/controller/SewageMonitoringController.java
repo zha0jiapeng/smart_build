@@ -60,9 +60,9 @@ public class SewageMonitoringController extends BaseController {
         pushIOT(mA1, mA2, deviceCode);
 
         //15
-//        master = new ModbusTcpMaster().getSlave(DEVICE_IP_15, MODBUS_TCP_PORT);
-//        mA1 = Modbus4jReadUtil.readHoldingRegister(master, 1, 16, DataType.TWO_BYTE_INT_UNSIGNED, "mA1");
-//        mA2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 18, DataType.TWO_BYTE_INT_UNSIGNED, "mA2");
+        master = new ModbusTcpMaster().getSlave(DEVICE_IP_15, MODBUS_TCP_PORT);
+        mA1 = Modbus4jReadUtil.readHoldingRegister(master, 1, 16, DataType.TWO_BYTE_INT_UNSIGNED, "mA1");
+        mA2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 18, DataType.TWO_BYTE_INT_UNSIGNED, "mA2");
         deviceCode = "sewage_15";
         pushIOT(mA1, mA2, deviceCode);
         return success();

@@ -52,6 +52,7 @@ public class TCPController {
         commandHandlers.put("8A 03 00 02 00 01 3B 71", TCPController::handlePM10Response);
         commandHandlers.put("02 03 00 01 00 01 D5 F9", TCPController::handleWindDirectionResponse);
         commandHandlers.put("01 03 00 00 00 01 84 0A", TCPController::handleWindSpeedResponse);
+        commandHandlers.put("25 03 00 00 00 02 C2 EF", TCPController::rainResponse);
     }
 
     private static Map<String, Object> sendMap4322_4321 = new HashMap<>();
@@ -66,11 +67,19 @@ public class TCPController {
     @Autowired
     private IRainService rainService;
 
+
+    private static IRainService staticRainService;
+
+    @PostConstruct
+    public void initStaticReferences() {
+        staticRainService = this.rainService;
+    }
+
     private static final Map<Integer, Consumer<Socket>> portHandlers = new HashMap<>();
     private static ServerSocket serverSocket4322;
     private static ServerSocket serverSocket4321;
     private static ServerSocket serverSocket4323;
-    private static ServerSocket serverSocket4324;
+//    private static ServerSocket serverSocket4324;
 
     @PostConstruct
     public void init() {
@@ -78,7 +87,7 @@ public class TCPController {
             serverSocket4322 = new ServerSocket(4322);
             serverSocket4321 = new ServerSocket(4321);
             serverSocket4323 = new ServerSocket(4323);
-            serverSocket4324 = new ServerSocket(4324);
+//            serverSocket4324 = new ServerSocket(4324);
 
             sendMap4322_4321.put("deviceArea", "14#支洞");
             sendMap4323_4324.put("deviceArea", "15#支洞");
@@ -90,12 +99,12 @@ public class TCPController {
             //15#支洞扬尘
             portHandlers.put(4323, socket -> handleClient(socket, sendMap4323_4324, 15));
             //15#支洞雨量
-            portHandlers.put(4324, socket -> handleClient4321(socket, sendMap4323_4324));
+//            portHandlers.put(4324, socket -> handleClient4321(socket, sendMap4323_4324));
 
             new Thread(() -> handleConnection(serverSocket4322, portHandlers.get(4322))).start();
             new Thread(() -> handleConnection(serverSocket4321, portHandlers.get(4321))).start();
             new Thread(() -> handleConnection(serverSocket4323, portHandlers.get(4323))).start();
-            new Thread(() -> handleConnection(serverSocket4324, portHandlers.get(4324))).start();
+//            new Thread(() -> handleConnection(serverSocket4324, portHandlers.get(4324))).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -116,10 +125,10 @@ public class TCPController {
         new Thread(() -> handleConnection(serverSocket4323, portHandlers.get(4323))).start();
     }
 
-    @GetMapping("/server4324")
-    public void server4324() throws IOException {
-        new Thread(() -> handleConnection(serverSocket4324, portHandlers.get(4324))).start();
-    }
+//    @GetMapping("/server4324")
+//    public void server4324() throws IOException {
+//        new Thread(() -> handleConnection(serverSocket4324, portHandlers.get(4324))).start();
+//    }
 
     private void handleConnection(ServerSocket serverSocket, Consumer<Socket> handler) {
         try {
@@ -134,8 +143,10 @@ public class TCPController {
         try {
             String originalValue = "";
             for (Map.Entry<String, BiConsumer<byte[], Map<String, Integer>>> entry : commandHandlers.entrySet()) {
-
                 String command = entry.getKey();
+                if (area != 15 && command.equals("25 03 00 00 00 02 C2 EF")) {
+                    continue;
+                }
                 BiConsumer<byte[], Map<String, Integer>> handler = entry.getValue();
 
                 OutputStream outputStream = socket.getOutputStream();
@@ -222,11 +233,11 @@ public class TCPController {
 
                 sendMap.put("rainfall", currentCumulativeRainfall);
 
-                System.out.println("雨量:currentCumulativeRainfall:"+currentCumulativeRainfall+";lastCumulativeRainfall01:"+lastCumulativeRainfall01+";lastCumulativeRainfall02:"+lastCumulativeRainfall01);
+                System.out.println("雨量:currentCumulativeRainfall:" + currentCumulativeRainfall + ";lastCumulativeRainfall01:" + lastCumulativeRainfall01 + ";lastCumulativeRainfall02:" + lastCumulativeRainfall01);
 
                 rain.setRainfall(new BigDecimal(sendMap.get("rainfall").toString()));
                 rain.setRemark(bytesToHex(receivedBytes, read));
-                System.out.println("插入内容反馈："+rainService.insertRain(rain));
+                System.out.println("插入内容反馈：" + rainService.insertRain(rain));
 
             }
             inputStream.close();
@@ -324,19 +335,34 @@ public class TCPController {
 
 
     private static void rainResponse(byte[] receivedBytes, Map<String, Integer> map) {
-        if (map.get("read") >= 5) {
-            int highByte = receivedBytes[3] & 0xFF;
-            int lowByte = receivedBytes[4] & 0xFF;
-            int humidity = (highByte << 8) | lowByte;
-            double actualHumidity = humidity / 100.0;
-            if (map.get("area") == 14) {
-                sendMap4322_4321.put("humidity", actualHumidity);
-            } else {
-                sendMap4323_4324.put("humidity", actualHumidity);
-            }
 
+        if (map.get("read") >= 8) {
+            int value1 = receivedBytes[4] & 0xFF;
+            int value2 = receivedBytes[6] & 0xFF;
+            int result = (value1 * 256) + value2;
+            double currentCumulativeRainfall = result / 10.0;
+
+            Rain rain = new Rain();
+
+
+            rain.setDeviceCode("2407052002LXY-01");
+            double rainfallDifference = currentCumulativeRainfall - lastCumulativeRainfall01;
+            if (rainfallDifference < 0 || lastCumulativeRainfall01 == 0) {
+                rainfallDifference = 0;
+            }
+            lastCumulativeRainfall01 = currentCumulativeRainfall;
+
+            currentCumulativeRainfall = rainfallDifference;
+
+
+            sendMap4323_4324.put("rainfall", currentCumulativeRainfall);
+
+            rain.setRainfall(new BigDecimal(sendMap4323_4324.get("rainfall").toString()));
+
+            System.out.println("插入内容反馈：" + staticRainService.insertRain(rain));
         }
     }
+
 
     private static void handlePressureResponse(byte[] receivedBytes, Map<String, Integer> map) {
         if (map.get("read") >= 5) {
@@ -529,7 +555,7 @@ public class TCPController {
                     currentCumulativeRainfall = rainfallDifference;
 
 
-                   String rainfall = String.valueOf(currentCumulativeRainfall);
+                    String rainfall = String.valueOf(currentCumulativeRainfall);
 
                     rain.setRainfall(new BigDecimal(rainfall));
 

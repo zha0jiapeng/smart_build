@@ -26,7 +26,10 @@ public class SyncTask {
         //15#支洞扬尘
         String result3 = HttpUtil.get("http://127.0.0.1:8097/TCP/server4323");
         //15#支洞雨量
-        String result4 = HttpUtil.get("http://127.0.0.1:8097/TCP/server4324");
+//        String result4 = HttpUtil.get("http://127.0.0.1:8097/TCP/server4324");
+
+
+
     }
 
     /**
@@ -64,6 +67,13 @@ public class SyncTask {
      */
     public void sendSewageMonitoring(){
         String result1 = HttpUtil.get("http://127.0.0.1:8097/SewageMonitoring/list");
+    }
+
+    /**
+     * 指定设备在线状态检测
+     */
+    public void sendOfflinePolicy(){
+        String result1 = HttpUtil.get("http://127.0.0.1:8097/offlinePolicy/sendOfflinePolicy");
     }
 
 

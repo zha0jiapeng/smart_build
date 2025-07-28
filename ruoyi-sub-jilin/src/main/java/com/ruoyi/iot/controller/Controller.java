@@ -73,41 +73,55 @@ public class Controller {
         EasyExcel.read(fileName, ExcelBean.class, new DemoDataListener()).sheet().doRead();
         return null;
     }
+
     @PostMapping("/hikPush")
-    public void hikPush(@RequestBody Map<String,String> requestt ) throws Exception {
+    public void hikPush(@RequestBody Map<String, String> requestt) throws Exception {
         String end = requestt.get("end");
         String start = requestt.get("start");
         String name = requestt.get("name");
-        log.info("...start{}...end:{}",start,end);
+        String deviceCode = "";
+        if (StringUtils.isNotEmpty(requestt.get("deviceCode"))){
+            deviceCode = requestt.get("deviceCode");
+        }
+        log.info("...start{}...end:{}", start, end);
         log.info("=========门禁通行事件===========");
 
-        fetchEventsRecursively(start, end, name,1);  // 从第一页开始递归
+        fetchEventsRecursively(start, end, name, 1, deviceCode);  // 从第一页开始递归
 
 
     }
 
-    private void pushHdy(JSONArray list) {
+    private void pushHdy(JSONArray list, String deviceCode) {
         String now = DateUtil.now();
         Map<String, List<Map<String, Object>>> request = new HashMap<>();
         List<Map<String, Object>> listt = new ArrayList<>();
         DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
         for (int i = 0; i < list.size(); i++) {
             JSONObject object = (JSONObject) list.get(i);
+            String devIndexCode = object.getString("devIndexCode");
+            JSONObject door = getDoor(devIndexCode);
+            if (door == null) continue;
+            String sn = door.get("devSerialNum").toString();
+            if (deviceCode != null && !deviceCode.equals("")) {
+                if (!deviceCode.equals(sn)) {
+                    continue;
+                }
+            }
             if (object.get("certNo") == null || StringUtils.isEmpty(object.get("certNo").toString())) {
                 continue;
             }
             if (object.get("picUri") == null || StringUtils.isEmpty(object.get("picUri").toString())) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("pageNo",1);
-                map.put("pageSize",1);
+                map.put("pageNo", 1);
+                map.put("pageSize", 1);
                 map.put("certificateNo", object.get("certNo").toString());
                 String s = doorFunctionApi.personList(map);
                 JSONObject jsonObject1 = JSONObject.parseObject(s);
                 JSONObject data = jsonObject1.getJSONObject("data");
                 if (data != null) {
                     JSONArray list1 = data.getJSONArray("list");
-                    if(list1!=null && list1.size()>0) {
-                        object.put("picUri",list1.getJSONObject(0).getJSONArray("personPhoto").getJSONObject(0).getString("picUri") );
+                    if (list1 != null && list1.size() > 0) {
+                        object.put("picUri", list1.getJSONObject(0).getJSONArray("personPhoto").getJSONObject(0).getString("picUri"));
                     }
                 }
             }
@@ -123,42 +137,39 @@ public class Controller {
             map.put("attendance_out_time", "");
             map.put("attendance_in_time", "");
             if (object.get("inAndOutType").toString().equals("1")) {
-                map.put("attendance_in_time", getDateStrFromISO8601Timestamp(object.get("receiveTime").toString()));
+                map.put("attendance_in_time", getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
             } else {
-                map.put("attendance_out_time", getDateStrFromISO8601Timestamp(object.get("receiveTime").toString()));
+                map.put("attendance_out_time", getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
             }
 
             map.put("push_time", now);
-            String devIndexCode = object.getString("devIndexCode");
-            JSONObject door = getDoor(devIndexCode);
-            if(door == null) continue;
-            String sn = door.get("devSerialNum").toString();
+
             Device one = deviceService.getOne(new LambdaQueryWrapper<Device>().eq(Device::getSn, sn), false);
-            if(one==null){
-                log.error("找不到设备sn:{}",sn);
+            if (one == null) {
+                log.error("找不到设备sn:{}", sn);
                 continue;
             }
-            map.put("type",one.getCameraType());
+            map.put("type", one.getCameraType());
 
             map.put("device_code", sn);
             DateTime eventTime = DateUtil.parse(getDateStrFromISO8601Timestamp(object.get("eventTime").toString()));
             String personName = object.get("personName").toString();
-            SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName,one);
-            if(sysWorkPeopleInoutLog==null) continue;
-            map.put("id",sysWorkPeopleInoutLog.getId());
+            SysWorkPeopleInoutLog sysWorkPeopleInoutLog = insertInOutLog(door, map, eventTime, personName, one);
+            if (sysWorkPeopleInoutLog == null) continue;
+            map.put("id", sysWorkPeopleInoutLog.getId());
             map.remove("record_Image_file_InOutLog");
             listt.add(map);
         }
         request.put("values", listt);
-        log.info("...推送业主入参{}",JSON.toJSONString(request));
+        log.info("...推送业主入参{}", JSON.toJSONString(request));
         if (listt.size() == 0) return;
         String url = "http://10.0.100.23:18080/sdata/rest/dataservice/rest/standard/a01fa438-65cf-4da3-9bad-88a7878d0910";
         HttpResponse execute = HttpRequest.put(url).body(JSON.toJSONString(request), "application/json").execute();
         String body1 = execute.body();
-        log.info("...返回值{}",JSON.toJSONString(body1));
+        log.info("...返回值{}", JSON.toJSONString(body1));
     }
 
-    private void fetchEventsRecursively(String start, String end,String name, int page) {
+    private void fetchEventsRecursively(String start, String end, String name, int page, String deviceCode) {
         JSONObject data = getObjects(end, start, name, page);
 
         if (data != null) {
@@ -166,7 +177,7 @@ public class Controller {
             JSONArray list = data.getJSONArray("list");
 
             if (list != null && !list.isEmpty()) {
-                pushHdy(list);
+                pushHdy(list, deviceCode);
             }
 
             log.info("当前页码: {}, 当前页事件数: {}, 总事件数: {}", page, list != null ? list.size() : 0, total);
@@ -175,14 +186,14 @@ public class Controller {
             if (total != null && total > page * 1000) {
 
                 // 递归调用下一页
-                fetchEventsRecursively(start, end, name,page + 1);
+                fetchEventsRecursively(start, end, name, page + 1, deviceCode);
             }
         } else {
             log.warn("未获取到有效的事件数据");
         }
     }
 
-    private static JSONObject getObjects(String end, String start,String name,Integer page) {
+    private static JSONObject getObjects(String end, String start, String name, Integer page) {
         DoorFunctionApi doorFunctionApi = new DoorFunctionApi();
         EventsRequest eventsRequest = new EventsRequest(); //查询门禁事件
         eventsRequest.setPageNo(page); // 显示最后一个人
@@ -190,21 +201,22 @@ public class Controller {
         eventsRequest.setStartTime(getISO8601TimestampFromDateStr(start));
         eventsRequest.setEndTime(getISO8601TimestampFromDateStr(end));
         eventsRequest.setPersonName(name);
-        log.info("...门禁事件入参{}",JSON.toJSONString(eventsRequest));
+        log.info("...门禁事件入参{}", JSON.toJSONString(eventsRequest));
         String doorcount = doorFunctionApi.events(eventsRequest);//查询门禁事件V2
         JSONObject jsonObject = JSONObject.parseObject(doorcount);
         JSONObject data = (JSONObject) jsonObject.get("data");
         return data;
     }
 
-    public static String getISO8601TimestampFromDateStr(String timestamp){
+    public static String getISO8601TimestampFromDateStr(String timestamp) {
         DateTimeFormatter dtf1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime ldt = LocalDateTime.parse(timestamp,dtf1);
+        LocalDateTime ldt = LocalDateTime.parse(timestamp, dtf1);
         ZoneOffset offset = ZoneOffset.of("+08:00");
-        OffsetDateTime date = OffsetDateTime.of(ldt ,offset);
+        OffsetDateTime date = OffsetDateTime.of(ldt, offset);
         DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
-        return date.format(dtf2 );
+        return date.format(dtf2);
     }
+
     public static String getDateStrFromISO8601Timestamp(String dateTimeStr) {
         // 检查并补全不完整的时间字符串
         if (dateTimeStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}\\+\\d{2}:\\d{2}$")) {
@@ -238,7 +250,7 @@ public class Controller {
     }
 
 
-    private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName,Device device) {
+    private SysWorkPeopleInoutLog insertInOutLog(JSONObject door, Map<String, Object> jsonObject, DateTime eventTime, String personName, Device device) {
         SysWorkPeopleInoutLog sysWorkPeopleInoutLog = new SysWorkPeopleInoutLog();
         String sn = door.get("devSerialNum").toString();
 //        if (!ALLOWED_SN.contains(sn)) {
@@ -264,7 +276,7 @@ public class Controller {
                         .eq(SysWorkPeopleInoutLog::getIdCard, jsonObject.get("id_card").toString())
                         .eq(SysWorkPeopleInoutLog::getLogTime, DateUtil.formatDateTime(eventTime))
         );
-        if (certNo>1){
+        if (certNo > 1) {
             return null;
         }
 
@@ -278,7 +290,7 @@ public class Controller {
         sysWorkPeopleInoutLog.setCreatedDate(new Date());
         sysWorkPeopleInoutLog.setModifyDate(new Date());
         sysWorkPeopleInoutLogMapper.insert(sysWorkPeopleInoutLog);
-        log.info("进行插入数据库操作：{}",sysWorkPeopleInoutLog);
+        log.info("进行插入数据库操作：{}", sysWorkPeopleInoutLog);
         return sysWorkPeopleInoutLog;
     }
 
@@ -312,8 +324,8 @@ public class Controller {
 
         JSONObject JSONObject = doorFunctionApi.search(rootMap);
         JSONArray objects = (JSONArray) ((JSONObject) JSONObject.get("data")).get("list");
-        if(objects==null || objects.isEmpty()) {
-            log.info("indexCode:{},找不到门禁信息.",devIndexCode);
+        if (objects == null || objects.isEmpty()) {
+            log.info("indexCode:{},找不到门禁信息.", devIndexCode);
             return null;
         }
         JSONObject door = (JSONObject) objects.get(0);

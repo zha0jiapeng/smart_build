@@ -220,6 +220,12 @@ public class MqttSubscriber {
         //反向有功总电量  Decimal 29
         valueMap.put("total_p_r_a_e", idValueMap.get(29));
         electricityMonitoring.setTotalPRAE(idValueMap.get(29));
+        //剩余电流
+        valueMap.put("leak_current", idValueMap.get(40));
+        //总视在功率
+        valueMap.put("total_kva", idValueMap.get(21));
+        //总有功功率
+        valueMap.put("total_kw", idValueMap.get(13));
         //ABC三项电压  Decimal 1+2+3
         String a_b_c_voltage = calculateAndFormatSum(idValueMap, 1, 2, 3);
         valueMap.put("a_b_c_voltage", a_b_c_voltage);
@@ -265,7 +271,10 @@ public class MqttSubscriber {
         //线缆N温度  Decimal 39
         valueMap.put("line_n_temperature", idValueMap.get(39));
         electricityMonitoring.setLineNTemperature(idValueMap.get(39));
-
+        //总无功功率
+        valueMap.put("total_kvarh", idValueMap.get(17));
+        //总功率因数
+        valueMap.put("power_factor", idValueMap.get(25));
         //总瞬时功率  Decimal
         valueMap.put("totalI_a_p", calculateTotalInstantaneousPower(idValueMap));
         //跳闸  String

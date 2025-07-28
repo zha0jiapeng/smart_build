@@ -55,6 +55,7 @@ public class PeopleLocationController {
 
     List<String> validTids = Arrays.asList("11250", "10867", "10985", "11076", "11585");
 
+
     @Scheduled(cron = "0 */1 * * * *")
     private void pushSwzkOut() {
         Map<String, Object> request = new HashMap();
@@ -82,6 +83,7 @@ public class PeopleLocationController {
 //            }
             deviceData.put("device_id", map.get("tid"));
             deviceData.put("sub_project_id", "1801194524869922817");
+            //14洞外
             deviceData.put("device_code", "3009f9b0bb24");
             deviceData.put("work_status", "1");
             deviceData.put("power_on_status", "1");

@@ -11,6 +11,7 @@ import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.iot.domain.QReceiveMoreMaterial;
 import com.ruoyi.iot.domain.QReceivePhoto;
+import com.ruoyi.iot.mapper.QReceiveMoreMaterialMapper;
 import com.ruoyi.iot.mapper.QReceivePhotoMapper;
 import com.ruoyi.iot.service.IQReceivePhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ import org.springframework.stereotype.Service;
 public class QReceivePhotoServiceImpl extends ServiceImpl<QReceivePhotoMapper, QReceivePhoto> implements IQReceivePhotoService {
     @Autowired(required = false)
     private QReceivePhotoMapper qReceivePhotoMapper;
+
+    @Autowired(required = false)
+    private QReceiveMoreMaterialMapper qReceiveMoreMaterialMapper;
 
     /**
      * 查询收料照片
@@ -96,13 +100,48 @@ public class QReceivePhotoServiceImpl extends ServiceImpl<QReceivePhotoMapper, Q
 
     @Override
     @DataSource(value = DataSourceType.SLAVE)
-    public Map<String, String>  selectQReceivePhotoOrderIdSLAVE(String orderId) {
+    public Map<String, String> selectQReceivePhotoOrderIdSLAVE(String orderId) {
         QueryWrapper<QReceivePhoto> queryWrapper = new QueryWrapper<>();
         // 使用in方法查询ID在列表中的记录
         queryWrapper.in("order_id", orderId);
         List<QReceivePhoto> list = qReceivePhotoMapper.selectList(queryWrapper);
         Map<String, String> map = mapPicture(list);
+        QueryWrapper<QReceiveMoreMaterial> qReceiveMoreMaterialQueryWrapper = new QueryWrapper<>();
+        List<QReceiveMoreMaterial> qReceiveMoreMaterials = qReceiveMoreMaterialMapper.selectList(qReceiveMoreMaterialQueryWrapper);
+        String materialName = qReceiveMoreMaterials.get(0).getMaterialName();
+        map.put("goodsType", goodsType(materialName));
         return map;
+    }
+
+    public String goodsType(String materialType) {
+        String key = "";
+        switch (materialType) {
+            case "粗骨料":
+                key = "粗骨料";
+                break;
+            case "细骨料":
+                key = "细骨料";
+                break;
+            case "水泥":
+                key = "水泥";
+                break;
+            case "外加剂":
+                key = "外加剂";
+                break;
+            case "掺和剂":
+                key = "掺和剂";
+                break;
+            case "钢筋":
+                key = "钢筋";
+                break;
+            case "型材":
+                key = "型材";
+                break;
+            default:
+                key = "其他";
+                break;
+        }
+        return key;
     }
 
     @Override
@@ -113,10 +152,14 @@ public class QReceivePhotoServiceImpl extends ServiceImpl<QReceivePhotoMapper, Q
         queryWrapper.in("order_id", orderId);
         List<QReceivePhoto> list = qReceivePhotoMapper.selectList(queryWrapper);
         Map<String, String> map = mapPicture(list);
+        QueryWrapper<QReceiveMoreMaterial> qReceiveMoreMaterialQueryWrapper = new QueryWrapper<>();
+        List<QReceiveMoreMaterial> qReceiveMoreMaterials = qReceiveMoreMaterialMapper.selectList(qReceiveMoreMaterialQueryWrapper);
+        String materialName = qReceiveMoreMaterials.get(0).getMaterialName();
+        map.put("goodsType", goodsType(materialName));
         return map;
     }
 
-    public Map<String, String> mapPicture(List<QReceivePhoto> list){
+    public Map<String, String> mapPicture(List<QReceivePhoto> list) {
         Map<String, String> map = new HashMap<>();
         for (QReceivePhoto value : list) {
             String photoType = value.getPhotoType();

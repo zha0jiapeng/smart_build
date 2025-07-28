@@ -207,7 +207,7 @@ public class WeighbridgeDataController extends BaseController {
         weighbridgeData.setOneWeightTime(qReceive.getEnterTime());
         valueMap.put("two_weight_time", qReceive.getExitTime());
         weighbridgeData.setTwoWeightTime(qReceive.getExitTime());
-        valueMap.put("goods_type", "");
+        valueMap.put("goods_type", map.get("goodsType"));
         valueMap.put("actual_weight", qReceiveMoreMaterial.getMainNetQuantity());
         weighbridgeData.setActualWeight(qReceiveMoreMaterial.getMainNetQuantity().toString());
         valueMap.put("deduct_weight", qReceive.getDeductQuantity());

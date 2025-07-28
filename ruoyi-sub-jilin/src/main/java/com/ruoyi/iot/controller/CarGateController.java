@@ -50,7 +50,7 @@ public class CarGateController {
 
     @PostMapping("/carAccess")
     public Map<String, Object> carAccess(@RequestBody Map<String, Object> request) {
-//        log.info("carAccess:{}", JSON.toJSONString(request));
+        log.info("14场区大门口：carAccess:{}", JSON.toJSONString(request));
         pushCarAccess(request);
         return request;
     }

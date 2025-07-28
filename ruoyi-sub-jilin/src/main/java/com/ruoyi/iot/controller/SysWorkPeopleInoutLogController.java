@@ -130,6 +130,7 @@ public class SysWorkPeopleInoutLogController extends BaseController {
                     new LambdaQueryWrapper<SysWorkPeople>().eq(SysWorkPeople::getIdCard, sysWorkPeopleInoutLog.getIdCard()), false);
             if (one != null) sysWorkPeopleInoutLog.setWorkType(one.getWorkType());
         }
-        return getDataTable(sysWorkPeopleInoutLogMapper.selectList(query));
+
+        return getDataTable(sysWorkPeopleInoutLogs);
     }
 }

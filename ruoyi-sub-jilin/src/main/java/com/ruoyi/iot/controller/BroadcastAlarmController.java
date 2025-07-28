@@ -1,5 +1,6 @@
 package com.ruoyi.iot.controller;
 
+import java.net.InetAddress;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -152,12 +153,16 @@ public class BroadcastAlarmController extends BaseController {
         log.info("============BroadcastAlarmController.queryScheduledTaskLogs================");
         if (isBroadcastingTime()) {
             broadcast15FieldArea();
+            broadcast14FieldArea();
             broadcast14Opening();
         }
     }
 
     //14支洞洞口广播
     public void broadcast14Opening() {
+        if (!ping("10.1.3.143",3000)){
+            return;
+        }
         IpBroadcast ipBroadcast = new IpBroadcast();
         // 获取当前日期
         LocalDate currentDate = LocalDate.now();
@@ -191,8 +196,49 @@ public class BroadcastAlarmController extends BaseController {
         processLogResult(ipBroadcast);
     }
 
+    //14支洞场区广播
+    public void broadcast14FieldArea() {
+        if (!ping("10.1.3.141",3000)){
+            return;
+        }
+        IpBroadcast ipBroadcast = new IpBroadcast();
+        // 获取当前日期
+        LocalDate currentDate = LocalDate.now();
+
+        if (isTimeBetween()) {
+            ipBroadcast.setTaskName("播放14支洞洞口DSW安全标语（上午）");
+            ipBroadcast.setTaskExecuteTime(currentDate.toString() + " 07:30:00");
+        }else {
+            ipBroadcast.setTaskName("播放14支洞洞口DSW安全标语（下午）");
+            ipBroadcast.setTaskExecuteTime(currentDate.toString() + " 14:00:00");
+        }
+
+
+        ipBroadcast.setTaskNo("1");
+        ipBroadcast.setTaskType("1");
+        ipBroadcast.setTaskEquipment("14#大门");
+        QueryWrapper<IpBroadcast> ipBroadcastQueryWrapper = new QueryWrapper<>();
+        ipBroadcastQueryWrapper.eq("equipment_no", "0201B1A1")
+                .orderByDesc("id")
+                .last("LIMIT 1");
+        IpBroadcast latestIpBroadcast = ipBroadcastService.getOne(ipBroadcastQueryWrapper);
+        int playTimes = 0;
+        if (latestIpBroadcast != null) {
+            playTimes = Integer.parseInt(latestIpBroadcast.getPlayTimes());
+        }
+        //音频文件1分22秒
+        playTimes = playTimes + 10;
+        ipBroadcast.setPlayTimes(String.valueOf(playTimes));
+        ipBroadcast.setEquipmentNo("0201B1A1");
+        ipBroadcast.setAudioType("1");
+        processLogResult(ipBroadcast);
+    }
+
     //15支洞场区广播
     public void broadcast15FieldArea() {
+        if (!ping("10.1.3.140",3000)){
+            return;
+        }
         IpBroadcast ipBroadcast = new IpBroadcast();
         // 获取当前日期
         LocalDate currentDate = LocalDate.now();
@@ -224,6 +270,15 @@ public class BroadcastAlarmController extends BaseController {
         ipBroadcast.setEquipmentNo("06FA10BB");
         ipBroadcast.setAudioType("1");
         processLogResult(ipBroadcast);
+    }
+
+
+    public static boolean ping(String ip, int timeoutMs) {
+        try {
+            return InetAddress.getByName(ip).isReachable(timeoutMs);
+        } catch (Exception e) {
+            return false; // 任何异常均视为不可达
+        }
     }
 
     public static boolean isTimeBetween() {

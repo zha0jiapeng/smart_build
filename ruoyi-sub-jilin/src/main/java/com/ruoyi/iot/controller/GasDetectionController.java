@@ -127,9 +127,9 @@ public class GasDetectionController {
             dataMap.put("no2", no2);
             dataMap.put("co", new BigDecimal(co.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
             dataMap.put("co2", co2);
-            dataMap.put("o2", o2);
+            dataMap.put("o2", new BigDecimal(o2.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
             dataMap.put("ch4", new BigDecimal(ch4.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
-            dataMap.put("h2s", h2s);
+            dataMap.put("h2s", new BigDecimal(h2s.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
             //dataMap.put("tvoc", "1");
             dataMap.put("nh3", new BigDecimal(nh3.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
             dataMap.put("dust", dust);

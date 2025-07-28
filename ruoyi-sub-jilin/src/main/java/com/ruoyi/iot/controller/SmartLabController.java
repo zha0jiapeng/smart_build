@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -206,6 +207,18 @@ public class SmartLabController {
                 valueMap.put("push_time", getNowTimeExtractor());
                 valueMap.put("other", "");
                 valueMap.put("curve", value.get("TestPoint"));
+
+                // 获取当前日期和时间
+                LocalDateTime now = LocalDateTime.now();
+
+                // 定义日期时间格式
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+                // 格式化当前日期时间
+                String formattedDateTime = now.format(formatter);
+
+
+                valueMap.put("create_date", formattedDateTime);
                 List<Map<String, Object>> values = new ArrayList<>();
                 values.add(valueMap);
                 Map<String, List<Map<String, Object>>> param = new HashMap<>();
@@ -224,35 +237,44 @@ public class SmartLabController {
     public void getConcreteCompressiveStrength() {
         //先下载文件
         FTPServer ftpServer = new FTPServer();
-        String localUrl = "/";
-        FTPServerConfig ftpServerConfig = new FTPServerConfig("10.1.3.151", 21, "yuancheng", "123456", localUrl, 1);
-        String localFilePath = "/home/mashir0/project/Normal.mdb";
-        ftpServer.processFTPServer(ftpServerConfig, localFilePath);
+//        String localUrl = "/";
+//        FTPServerConfig ftpServerConfig = new FTPServerConfig("10.1.3.151", 21, "yuancheng", "123456", localUrl, 1);
+        String localFilePath = "/home/mashir0/mdb/151/Normal.mdb";
+//        ftpServer.processFTPServer(ftpServerConfig, localFilePath);
         //然后读取
-        String[] columnsToPrint = {"wbbh"};
-        List<Map<String, String>> mapList = getAccess(localFilePath, columnsToPrint);
+        String[] columnsToPrint = {"wbbh","lq","xzxs","date_time","yxqd","sjgg","zhz1","qdz1"};
+        List<Map<String, String>> mapList = getAccessTestResult(localFilePath, columnsToPrint);
         //然后解析
         for (Map<String, String> value : mapList) {
             String dataTime = getNowTimeExtractor();
             Map<String, Object> valueMap = new HashMap<>();
             valueMap.put("portal_id", "1751847977770553345");
-            valueMap.put("date_time", dataTime);
-            valueMap.put("device_code ", "2405066");
-            valueMap.put("num_code ", value.get("wbbh"));
-            valueMap.put("test_piece_code ", " ");
-            valueMap.put("test_piece_seq ", " ");
-            valueMap.put("compressive_age ", " ");
-            valueMap.put("conversion_coefficient ", " ");
-            valueMap.put("test_day ", " ");
-            valueMap.put("compressive_avg ", " ");
-            valueMap.put("tester ", " ");
-            valueMap.put("checker ", " ");
-            valueMap.put("specimen_size ", " ");
-            valueMap.put("failure_load ", " ");
-            valueMap.put("compressive_strength ", " ");
-            valueMap.put("push_time ", " ");
-            valueMap.put("other ", " ");
-            valueMap.put("curve ", " ");
+            valueMap.put("data_time", dataTime);
+            valueMap.put("device_code", "2405066");
+            valueMap.put("num_code", value.get("wbbh"));
+            valueMap.put("test_piece_code", value.get("wbbh"));
+            valueMap.put("test_piece_seq", value.get("wbbh"));
+            valueMap.put("compressive_age", value.get("lq"));
+            valueMap.put("conversion_coefficient", value.get("xzxs"));
+            valueMap.put("test_day", value.get("date_time"));
+            valueMap.put("compressive_avg", value.get("yxqd"));
+            valueMap.put("tester", "无");
+            valueMap.put("checker", "无");
+            valueMap.put("specimen_size", value.get("sjgg"));
+            valueMap.put("failure_load", value.get("zhz1"));
+            valueMap.put("compressive_strength", value.get("qdz1"));
+            valueMap.put("push_time", getNowTimeExtractor());
+            valueMap.put("other", " ");
+            valueMap.put("curve", "[]");
+            // 获取当前日期和时间
+            LocalDateTime now = LocalDateTime.now();
+
+            // 定义日期时间格式
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            // 格式化当前日期时间
+            String formattedDateTime = now.format(formatter);
+            valueMap.put("create_date", formattedDateTime);
             List<Map<String, Object>> values = new ArrayList<>();
             values.add(valueMap);
             Map<String, List<Map<String, Object>>> param = new HashMap<>();
@@ -269,40 +291,50 @@ public class SmartLabController {
     public void getCementStrengthTestingInterface() {
         //先下载文件
 
-        FTPServer ftpServer = new FTPServer();
-        String localUrl = "/";
-        FTPServerConfig ftpServerConfig = new FTPServerConfig("10.1.3.150", 21, "yuancheng", "123456", localUrl, 1);
-        String localFilePath = "/home/mashir0/project/Normal.mdb";
-        ftpServer.processFTPServer(ftpServerConfig, localFilePath);
+//        FTPServer ftpServer = new FTPServer();
+//        String localUrl = "/";
+//        FTPServerConfig ftpServerConfig = new FTPServerConfig("10.1.3.150", 21, "yuancheng", "123456", localUrl, 1);
+        String localFilePath = "/home/mashir0/mdb/150/Normal.mdb";
+//        ftpServer.processFTPServer(ftpServerConfig, localFilePath);
         //然后读取
-        String[] columnsToPrint = {"wbbh"};
-        List<Map<String, String>> mapList = getAccess(localFilePath, columnsToPrint);
+        String[] columnsToPrint = {"wbbh","lq","xzxs","date_time","yxqd","sjgg","zhz1","qdz1","kj","yxqd"};
+        List<Map<String, String>> mapList = getAccessTestResult(localFilePath, columnsToPrint);
         //然后解析
         for (Map<String, String> value : mapList) {
             String dataTime = getNowTimeExtractor();
             Map<String, Object> valueMap = new HashMap<>();
             valueMap.put("portal_id", "1751847977770553345");
-            valueMap.put("date_time ", dataTime);
-            valueMap.put("device_code ", "2404129");
-            valueMap.put("num_code ", value.get("wbbh"));
-            valueMap.put("test_piece_code ", " ");
-            valueMap.put("test_piece_seq ", " ");
-            valueMap.put("molding_date_time ", " ");
-            valueMap.put("compressive_age ", " ");
-            valueMap.put("test_day ", " ");
-            valueMap.put("tester ", " ");
-            valueMap.put("checker ", " ");
-            valueMap.put("flexural_strength_at_side_len ", " ");
-            valueMap.put("flexural_strength_at_span ", " ");
-            valueMap.put("flexural_strength_at_load_failure ", " ");
-            valueMap.put("flexural_strength_at_single ", " ");
-            valueMap.put("flexural_strength_at_avg ", " ");
-            valueMap.put("compressive_strength_at_area ", " ");
-            valueMap.put("compressive_strength_at_load_failure ", " ");
-            valueMap.put("compressive_strength_at_single ", " ");
-            valueMap.put("compressive_strength_at_avg ", " ");
+            valueMap.put("data_time", dataTime);
+            valueMap.put("device_code", "2404129");
+            valueMap.put("num_code", value.get("wbbh"));
+            valueMap.put("test_piece_code", value.get("wbbh"));
+            valueMap.put("test_piece_seq", value.get("wbbh"));
+            valueMap.put("molding_date_time", value.get("date_time"));
+            valueMap.put("compressive_age", value.get("lq"));
+            valueMap.put("test_day", value.get("date_time"));
+            valueMap.put("tester", "无");
+            valueMap.put("checker", "无");
+            valueMap.put("flexural_strength_at_side_len", value.get("sjgg"));
+            valueMap.put("flexural_strength_at_span", value.get("kj"));
+            valueMap.put("flexural_strength_at_load_failure",  value.get("zhz1"));
+            valueMap.put("flexural_strength_at_single",  value.get("qdz1"));
+            valueMap.put("flexural_strength_at_avg", value.get("yxqd"));
+            valueMap.put("compressive_strength_at_area", " ");
+            valueMap.put("compressive_strength_at_load_failure",  value.get("zhz1"));
+            valueMap.put("compressive_strength_at_single", value.get("qdz1"));
+            valueMap.put("compressive_strength_at_avg", value.get("yxqd"));
             valueMap.put("push_time", getNowTimeExtractor());
             valueMap.put("other", "");
+            valueMap.put("curve", "[]");
+            // 获取当前日期和时间
+            LocalDateTime now = LocalDateTime.now();
+
+            // 定义日期时间格式
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            // 格式化当前日期时间
+            String formattedDateTime = now.format(formatter);
+            valueMap.put("create_date", formattedDateTime);
             List<Map<String, Object>> values = new ArrayList<>();
             values.add(valueMap);
             Map<String, List<Map<String, Object>>> param = new HashMap<>();
@@ -383,6 +415,42 @@ public class SmartLabController {
             statement = connection.createStatement();
 
             String query = "SELECT * FROM Normal";
+            resultSet = statement.executeQuery(query);
+            mapList = printSelectedColumns(resultSet,columnsToPrint);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return mapList;
+    }
+
+
+    /**
+     * 读取本地Access数据库并打印内容
+     */
+    public static List<Map<String, String>> getAccessTestResult(String databasePath, String[] columnsToPrint) {
+        String url = "jdbc:ucanaccess://" + databasePath + ";password=oke";
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        List<Map<String, String>> mapList = new ArrayList<>();
+
+        try {
+            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+            connection = DriverManager.getConnection(url);
+
+            statement = connection.createStatement();
+
+            String query = "SELECT * FROM test_result";
             resultSet = statement.executeQuery(query);
             mapList = printSelectedColumns(resultSet,columnsToPrint);
 

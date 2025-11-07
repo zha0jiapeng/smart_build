@@ -19,6 +19,7 @@ public class HdyHttpUtils {
         HttpResponse execute = HttpRequest.put("http://10.0.100.23:18080/sdata/rest/dataservice/rest/standard/" + rid)
                 .body(JSON.toJSONString(param, SerializerFeature.WriteMapNullValue), "application/json").execute();
         log.info("push hdy url:{} , response:{}", "http://10.0.100.23:18080/sdata/rest/dataservice/rest/standard/" + rid, execute.body());
+        log.info("push tcp hdy response value:{}", execute.body() + JSON.toJSONString(param, SerializerFeature.WriteMapNullValue));
         return execute.body();
     }
 

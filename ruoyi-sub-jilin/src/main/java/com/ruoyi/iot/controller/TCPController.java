@@ -324,6 +324,7 @@ public class TCPController {
             int lowByte = receivedBytes[4] & 0xFF;
             int humidity = (highByte << 8) | lowByte;
             double actualHumidity = humidity / 100.0;
+            actualHumidity = actualHumidity * 0.8;//客户要求，说数值太大了
             if (map.get("area") == 14) {
                 sendMap4322_4321.put("humidity", actualHumidity);
             } else {

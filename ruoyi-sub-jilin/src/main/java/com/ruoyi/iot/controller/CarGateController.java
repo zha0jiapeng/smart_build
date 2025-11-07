@@ -311,6 +311,20 @@ public class CarGateController {
         rootMap.put("entranceSyscode", "961940c71b254354911fe64ecaa60f6e");
         rootMap.put("deviceName", "15支洞支洞口车辆道闸设备");
         pushIOT(rootMap);
+
+        //13支洞大门口 暂时没有
+//        rootMap.put("out", "DS-TCG205-E 20220610AIK11586950");
+//        rootMap.put("in", "DS-TCG205-E 20220610AIK11586998");
+//        rootMap.put("entranceSyscode", "1b2f411776be4f83a1e5453a4f3215f4");
+//        rootMap.put("deviceName", "15支洞大门口车辆道闸设备");
+//        pushIOT(rootMap);
+
+        //13支洞隧道口
+        rootMap.put("out", "DS-TCG205-A 20210301AIF60001195");
+        rootMap.put("in", "DS-TCG205-A 20210221AIF56682850");
+        rootMap.put("entranceSyscode", "961940c71b254354911fe64ecaa60f6e");
+        rootMap.put("deviceName", "13支洞支洞口车辆道闸设备");
+        pushIOT(rootMap);
     }
 
 

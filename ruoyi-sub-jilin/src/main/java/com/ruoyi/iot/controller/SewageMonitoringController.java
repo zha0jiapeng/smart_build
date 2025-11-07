@@ -41,7 +41,7 @@ public class SewageMonitoringController extends BaseController {
     HdyHttpUtils hdyHttpUtils;
     private static final int MODBUS_TCP_PORT = 502;
     private static final String DEVICE_IP_14 = "10.1.3.80";
-    private static final String DEVICE_IP_15 = "10.1.3.90";
+    private static final String DEVICE_IP_15 = "10.1.23.32";
 
 
     /**
@@ -165,7 +165,7 @@ public class SewageMonitoringController extends BaseController {
      */
     public void checkRequestStatus(String filePath, String ph, String flotage) throws Exception {
         System.out.println("开始请求接口");
-        String result1 = HttpUtil.get("http://10.1.3.234:11478/eq2008/shangsheng?filePath=" + filePath + "&ph=" + ph + "&flotage=" + flotage);
+        String result1 = HttpUtil.get("http://10.1.3.208:11478/eq2008/shangsheng?filePath=" + filePath + "&ph=" + ph + "&flotage=" + flotage);
 
     }
 

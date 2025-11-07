@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,12 +96,25 @@ public class GasDetectionController {
         return JSON.parseObject(body, Map.class);
     }
 
+
+    public static boolean ping(String ipAddress) {
+        try {
+            InetAddress inet = InetAddress.getByName(ipAddress);
+            return inet.isReachable(2000);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @GetMapping("/pushSwzk")
     public void pushSwzk() {
         String now = DateUtil.now();
         List<Device> list = deviceService.list(new LambdaQueryWrapper<Device>().eq(Device::getDeviceType, "GASDETECTOR").eq(Device::getYn, 1));
         int i = 0;
         for (Device device : list) {
+            if (!ping(device.getDeviceIp())){
+                continue;
+            }
             ModbusMaster master = new ModbusTcpMaster().getSlave(device.getDeviceIp(), device.getDevicePort());
             Number temp = Modbus4jReadUtil.readHoldingRegister(master, 1, 0, DataType.TWO_BYTE_INT_UNSIGNED, "温度");
             Number humi = Modbus4jReadUtil.readHoldingRegister(master, 1, 1, DataType.TWO_BYTE_INT_UNSIGNED, "湿度");
@@ -116,12 +130,14 @@ public class GasDetectionController {
 
             master.destroy();
             Map<String, Object> dataMap = new HashMap<>();
-            if (i == 0) {
-                dataMap.put("device_code", "5414A7750BBF");
-                i++;
-            } else if (i == 1) {
-                dataMap.put("device_code", "5414A7750BBF123");
-            }
+            System.out.println("环境监测数据查看：" + device.toString() + "；" + device.getSn());
+//            if (i == 0) {
+//                dataMap.put("device_code", "5414A7750BBF");
+//                i++;
+//            } else if (i == 1) {
+//                dataMap.put("device_code", "5414A7750BBF123");
+//            }
+            dataMap.put("device_code", device.getSn());
             dataMap.put("status", "在线");
             dataMap.put("so2", new BigDecimal(so2.toString()).multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP));
             dataMap.put("no2", no2);

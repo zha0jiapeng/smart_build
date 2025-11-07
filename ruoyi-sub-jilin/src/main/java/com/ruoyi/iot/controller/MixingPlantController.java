@@ -1,6 +1,9 @@
 package com.ruoyi.iot.controller;
 
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
+import com.ruoyi.iot.enums.BuildingMaterial;
 import com.ruoyi.iot.scheduling.DeviceIpChecker;
 import com.ruoyi.iot.scheduling.access.FTPServer;
 import com.ruoyi.iot.scheduling.access.FTPServerConfig;
@@ -32,6 +35,9 @@ public class MixingPlantController {
     private static String databasePath = "/home/mashir0/mdb/BCS7.2.mdb";
 
 
+    //todo ftp地址：ftp://10.1.3.44/
+
+
     /**
      * 配合比信息  >>>生产任务单>>>生产运输单>>>单盘耗料
      */
@@ -55,11 +61,11 @@ public class MixingPlantController {
 
             Map<String, Object> valueMap = new HashMap<>();
 
-            valueMap.put("id", v.get("ID"));
-            valueMap.put("create_by", "");
-            valueMap.put("create_time", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));
-            valueMap.put("update_by", "");
-            valueMap.put("update_time", "");
+//            valueMap.put("id", v.get("ID"));
+//            valueMap.put("create_by", "");
+//            valueMap.put("create_time", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));
+//            valueMap.put("update_by", "");
+//            valueMap.put("update_time", "");
             valueMap.put("delete_flag", "0");
             //门户ID  String
             valueMap.put("portal_id", "1751847977770553345");
@@ -70,11 +76,11 @@ public class MixingPlantController {
             //任务单号
             String taskOrderNo = v.get("ID").toString();
 
-            valueMap.put("status", "");
-            valueMap.put("work_section", v.get("ConsPos"));
-            valueMap.put("design_amount", v.get("Mete"));
-            valueMap.put("finish_amount", v.get("Mete"));
-            valueMap.put("remain_amount", "");
+//            valueMap.put("status", "");
+//            valueMap.put("work_section", v.get("ConsPos"));
+            valueMap.put("design_amount", v.get("Mete")); //v
+//            valueMap.put("finish_amount", v.get("Mete"));
+//            valueMap.put("remain_amount", "");
 
             String strengthGrade = "无";
             // 检查强度等级
@@ -94,9 +100,9 @@ public class MixingPlantController {
                     strengthGrade = "C40";
                 }
             }
-            valueMap.put("intensity", strengthGrade);
-            valueMap.put("impermeability", "无");
-            valueMap.put("freeze_resistance_class", "无");
+            valueMap.put("intensity", strengthGrade); //v
+            valueMap.put("impermeability", "无"); //v
+            valueMap.put("freeze_resistance_class", "无"); //v
             String pouringMethod = v.get("Pour").toString();
             if (pouringMethod.equals("泵送")) {
                 valueMap.put("pouring_method", "0");
@@ -105,25 +111,25 @@ public class MixingPlantController {
             } else {
                 valueMap.put("pouring_method", "1");
             }
-            valueMap.put("special_item", "");
-            valueMap.put("shaping", "");
-            valueMap.put("report_id", v.get("Recipe"));//暂无数据
-            valueMap.put("apply_time", "");
-            valueMap.put("apply_name", "");
-            valueMap.put("construction_address", v.get("ProjAdr"));
-            valueMap.put("transportation_distance", v.get("Distance"));
-            valueMap.put("product_type", v.get("Variety"));
-            valueMap.put("slump", v.get("Lands"));
-            valueMap.put("estimated_pouring_time", v.get("BegTim"));
-            valueMap.put("technical_requirements", v.get("Request"));
+//            valueMap.put("special_item", "");
+//            valueMap.put("shaping", "");
+            valueMap.put("report_id", v.get("Recipe"));//暂无数据 v
+//            valueMap.put("apply_time", "");
+//            valueMap.put("apply_name", "");
+//            valueMap.put("construction_address", v.get("ProjAdr"));
+//            valueMap.put("transportation_distance", v.get("Distance"));
+//            valueMap.put("product_type", v.get("Variety"));
+//            valueMap.put("slump", v.get("Lands"));
+//            valueMap.put("estimated_pouring_time", v.get("BegTim"));
+//            valueMap.put("technical_requirements", v.get("Request"));
 
             valueMap.put("house_id", "MIX_3BID_15");//拌合站唯一编码 接口文档3.2拌合站字典
             //task_start_time配单时间（发起次任务单时间即派单时间）
-            valueMap.put("task_start_time", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));
+            valueMap.put("task_start_time", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));//v
             //working_procedure
-            valueMap.put("working_procedure", "2");
+            valueMap.put("working_procedure", "2"); //v
             //building_type
-            valueMap.put("building_type", "PR_OTHER");
+            valueMap.put("building_type", "PR_OTHER"); //v
             //stake_mark_start_kms
             valueMap.put("stake_mark_start_kms", "无");
 
@@ -138,10 +144,10 @@ public class MixingPlantController {
 
             valueMap.put("out_id", v.get("ID"));//此数据存入标段数据库的id(不明白)
 
-            valueMap.put("area_name", "AR_3BID_OTHER");//接收本车次混凝土的工区 3.3工区字典
+            valueMap.put("area_name", "AR_3BID_OTHER");//接收本车次混凝土的工区 3.3工区字典 v
 
             System.out.println(valueMap.toString());
-            send(valueMap,"25696542-559b-4f95-b598-875e2ce30b76");
+            send(valueMap, "25696542-559b-4f95-b598-875e2ce30b76");
 
 
             //生产运输单
@@ -174,12 +180,12 @@ public class MixingPlantController {
         valueMap.put("driver_name", v.get("Driver"));
         valueMap.put("area_name", "AR_3BID_OTHER");
         send(valueMap, "2b9477bd-0384-4d8a-9b3e-1a3ad5f4eb93");
-
     }
 
     //单盘耗料
     public void vehicleConsumables(String taskOrderNo) {
-        List<Map<String, Object>> maps = getAccessPiece(databasePath, taskOrderNo);
+        List<Map<String, Object>> maps = getAccessProduce(databasePath, taskOrderNo);
+        System.out.println("单盘好聊：" + maps.toString());
         for (Map<String, Object> v : maps) {
             Map<String, Object> valueMap = new HashMap<>();
             valueMap.put("delete_flag", "0");
@@ -197,11 +203,17 @@ public class MixingPlantController {
             valueMap.put("departure_time", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));
             valueMap.put("mix_duration", "0");
             valueMap.put("outlet_temperature", "-1");
-            valueMap.put("materials_json_value", "[]");
+            List<Map<String, Object>> mapsCode = getAccessRecipeCode(databasePath, v.get("Recipe").toString());
+
+            String id = "";
+            for (Map<String, Object> value : mapsCode) {
+                id = value.get("ID").toString();
+            }
+
+            Map<String, Object> map = calculateMaterialAmounts(id, "85a87435-0bbe-4b80-a343-d20b39dbd25c");
+            valueMap.put("materials_json_value", map.get("quotedResult"));
             send(valueMap, "85a87435-0bbe-4b80-a343-d20b39dbd25c");
         }
-
-
     }
 
     //配合比
@@ -223,26 +235,26 @@ public class MixingPlantController {
             valueMap.put("build_mixture_no", "");
             valueMap.put("intensity", "无");
             valueMap.put("impermeability", "无");
-            valueMap.put("freeze_resistance_class", "无");
-            valueMap.put("pouring_method", "无");
+            valueMap.put("freeze_resistance_class", "无");  //v
+            valueMap.put("pouring_method", "无"); //v
             valueMap.put("enable", "0");
             valueMap.put("effective_time", convertSerialNumberToDate(Double.valueOf(v.get("DatTim").toString())));
             valueMap.put("specific_gravity", "0");
-            Map<String, Object> map = calculateMaterialAmounts(recipe);
+            Map<String, Object> map = calculateMaterialAmounts(recipe, "4b4feb42-4b82-49db-b36e-7e96436b2d07");
             valueMap.put("sand_rate", map.get("sand_rate"));
             valueMap.put("slump", v.get("Lands"));
             valueMap.put("water_cem_ratio", map.get("water_cem_ratio"));
             valueMap.put("require_date", "0");
             valueMap.put("mixture_report", "无");
-            valueMap.put("materials_json_value", "[]");
+            valueMap.put("materials_json_value", map.get("quotedResult"));
             send(valueMap, "4b4feb42-4b82-49db-b36e-7e96436b2d07");
         }
     }
 
 
-    public Map<String, Object> calculateMaterialAmounts(String recipe) {
+    public Map<String, Object> calculateMaterialAmounts(String value, String type) {
         // 获取材料列表
-        List<Map<String, Object>> maps = getAccessRecipeLst(databasePath, recipe);
+        List<Map<String, Object>> maps = getAccessRecipeLst(databasePath, value);
 
         // 定义所需变量
         double sha = 0.0;   // 砂
@@ -256,61 +268,103 @@ public class MixingPlantController {
         double fmh2 = 0.0;  // 粉煤灰2
         double s = 0.0;     // 水
 
+
+        JSONArray jsonArray = new JSONArray();
+
+
         // 遍历材料列表
         for (Map<String, Object> v : maps) {
             String mater = v.get("Mater").toString();
             double amount = Double.parseDouble(v.get("Amount").toString());
+            JSONObject item = new JSONObject();
 
             // 根据原材料编号赋值
             switch (mater) {
                 case "1011": // 砂
+                    item.put("type", BuildingMaterial.findByKeyword("砂"));
+                    item.put("name", "砂");
                     sha = amount;
                     break;
                 case "1021": // 骨料2
+                    item.put("type", BuildingMaterial.findByKeyword("骨料2"));
+                    item.put("name", "骨料2");
                     gl2 = amount;
                     break;
                 case "1031": // 骨料3
+                    item.put("type", BuildingMaterial.findByKeyword("骨料3"));
+                    item.put("name", "骨科3");
                     gl3 = amount;
                     break;
                 case "1041": // 骨料4
+                    item.put("type", BuildingMaterial.findByKeyword("骨料4"));
+                    item.put("name", "骨科4");
                     gl4 = amount;
                     break;
                 case "3051": // 水泥1
+                    item.put("type", BuildingMaterial.findByKeyword("水泥1"));
+                    item.put("name", "水泥1");
                     sn1 = amount;
                     break;
                 case "3052": // 水泥2
+                    item.put("type", BuildingMaterial.findByKeyword("水泥2"));
+                    item.put("name", "水泥2");
                     sn2 = amount;
                     break;
                 case "3053": // 水泥3
+                    item.put("type", BuildingMaterial.findByKeyword("水泥3"));
+                    item.put("name", "水泥3");
                     sn3 = amount;
                     break;
                 case "4061": // 粉煤灰1
+                    item.put("type", BuildingMaterial.findByKeyword("粉煤灰1"));
+                    item.put("name", "粉煤灰1");
                     fmh1 = amount;
                     break;
                 case "4062": // 粉煤灰2
+                    item.put("type", BuildingMaterial.findByKeyword("粉煤灰2"));
+                    item.put("name", "粉煤灰2");
                     fmh2 = amount;
                     break;
                 case "5071": // 水
+                    item.put("type","MAR_WATER_1");
+                    item.put("name","自来水");
                     s = amount;
                     break;
             }
+            if (!item.containsKey("type")) {
+                continue;
+            }
+            if ("4b4feb42-4b82-49db-b36e-7e96436b2d07".equals(type)){
+                item.remove("name");
+            }
+
+            item.put("value", String.valueOf(amount));
+            jsonArray.add(item);
         }
 
-        // 计算砂率
-        double totalAggregate = sha + gl2 + gl3 + gl4; // 骨料总量
-        double sandRate = (sha / totalAggregate) * 100; // 砂率公式
-
-        // 计算水胶比
-        double totalCementitiousMaterials = sn1 + sn2 + sn3 + fmh1 + fmh2; // 胶凝材料总量
-        double waterBinderRatio = s / totalCementitiousMaterials; // 水胶比公式
-
-        // 保留两位小数
-        BigDecimal sandRateFormatted = new BigDecimal(sandRate).setScale(2, BigDecimal.ROUND_HALF_UP);
-        BigDecimal waterBinderRatioFormatted = new BigDecimal(waterBinderRatio).setScale(2, BigDecimal.ROUND_HALF_UP);
+        String result = jsonArray.toJSONString();
+//        String quotedResult = result.replace("\"", "");
 
         Map<String, Object> map = new HashMap<>();
-        map.put("sand_rate", sandRateFormatted);
-        map.put("water_cem_ratio", waterBinderRatioFormatted);
+        if (!"85a87435-0bbe-4b80-a343-d20b39dbd25c".equals(type)) {
+            // 计算砂率
+            double totalAggregate = sha + gl2 + gl3 + gl4; // 骨料总量
+            double sandRate = (sha / totalAggregate) * 100; // 砂率公式
+
+            // 计算水胶比
+            double totalCementitiousMaterials = sn1 + sn2 + sn3 + fmh1 + fmh2; // 胶凝材料总量
+            double waterBinderRatio = s / totalCementitiousMaterials; // 水胶比公式
+
+            // 保留两位小数
+            BigDecimal sandRateFormatted = new BigDecimal(sandRate).setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal waterBinderRatioFormatted = new BigDecimal(waterBinderRatio).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+
+            map.put("sand_rate", sandRateFormatted);
+            map.put("water_cem_ratio", waterBinderRatioFormatted);
+        }
+
+        map.put("quotedResult", jsonArray);
         return map;
     }
 
@@ -434,7 +488,7 @@ public class MixingPlantController {
             statement = connection.createStatement();
 
             // 获取最后50条数据
-            String query = "SELECT * FROM (SELECT TOP 1 * FROM Produce ORDER BY DatTim DESC) ORDER BY id ASC";
+            String query = "SELECT * FROM (SELECT TOP 500 * FROM Produce ORDER BY DatTim DESC) ORDER BY id ASC";
             resultSet = statement.executeQuery(query);
             mapList = printAllColumns(resultSet);
 
@@ -457,7 +511,7 @@ public class MixingPlantController {
     /**
      * 读取本地Access数据库
      */
-    public static List<Map<String, Object>> getAccessPiece(String databasePath, String produce) {
+    public static List<Map<String, Object>> getAccessProduce(String databasePath, String produce) {
         String url = "jdbc:ucanaccess://" + databasePath + ";password=BCS7.2_SDBS";
 
         Connection connection = null;
@@ -534,6 +588,45 @@ public class MixingPlantController {
     /**
      * 读取本地Access数据库
      */
+    public static List<Map<String, Object>> getAccessRecipeCode(String databasePath, String code) {
+        String url = "jdbc:ucanaccess://" + databasePath + ";password=BCS7.2_SDBS";
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        List<Map<String, Object>> mapList = new ArrayList<>();
+
+        try {
+            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+            connection = DriverManager.getConnection(url);
+
+            statement = connection.createStatement();
+
+            // 获取最后50条数据
+//            String query = "SELECT * FROM (SELECT TOP 10 * FROM Produce ORDER BY DatTim DESC) ORDER BY id ASC";
+            String query = "SELECT * FROM Recipe WHERE Code = '" + code + "'";
+            resultSet = statement.executeQuery(query);
+            mapList = printAllColumns(resultSet);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return mapList;
+
+    }
+
+
+    /**
+     * 读取本地Access数据库
+     */
     public static List<Map<String, Object>> getAccessRecipeLst(String databasePath, String recipe) {
         String url = "jdbc:ucanaccess://" + databasePath + ";password=BCS7.2_SDBS";
 
@@ -551,6 +644,44 @@ public class MixingPlantController {
             // 获取最后50条数据
 //            String query = "SELECT * FROM (SELECT TOP 10 * FROM Produce ORDER BY DatTim DESC) ORDER BY id ASC";
             String query = "SELECT * FROM RecipeLst WHERE Recipe = '" + recipe + "'";
+            resultSet = statement.executeQuery(query);
+            mapList = printAllColumns(resultSet);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return mapList;
+
+    }
+
+    /**
+     * 读取本地Access数据库
+     */
+    public static List<Map<String, Object>> getAccessRecipeListID(String databasePath, String ID) {
+        String url = "jdbc:ucanaccess://" + databasePath + ";password=BCS7.2_SDBS";
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        List<Map<String, Object>> mapList = new ArrayList<>();
+
+        try {
+            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+            connection = DriverManager.getConnection(url);
+
+            statement = connection.createStatement();
+
+            // 获取最后50条数据
+//            String query = "SELECT * FROM (SELECT TOP 10 * FROM Produce ORDER BY DatTim DESC) ORDER BY id ASC";
+            String query = "SELECT * FROM RecipeLst WHERE ID = '" + ID + "'";
             resultSet = statement.executeQuery(query);
             mapList = printAllColumns(resultSet);
 

@@ -275,7 +275,10 @@ public class CarGateController {
     }
 
     /**
-     * 14号洞口、15号大门口海康道闸
+     * 13、14号洞口、15号大门口海康道闸
+     *
+     * 首先获取停车库列表：https://10.1.3.2:443/artemis/api/resource/v1/park/parkList
+     * 然后获取出入口列表：https://10.1.3.2:443/artemis/api/resource/v1/entrance/entranceList
      *
      * @return
      */
@@ -299,8 +302,8 @@ public class CarGateController {
         pushIOT(rootMap);
 
         //15支洞大门口
-        rootMap.put("out", "DS-TCG205-E 20220610AIK11586950");
-        rootMap.put("in", "DS-TCG205-E 20220610AIK11586998");
+        rootMap.put("out", "DS-TCG205-E 20220610AIK11586950-15");
+        rootMap.put("in", "DS-TCG205-E 20220610AIK11586998-15");
         rootMap.put("entranceSyscode", "1b2f411776be4f83a1e5453a4f3215f4");
         rootMap.put("deviceName", "15支洞大门口车辆道闸设备");
         pushIOT(rootMap);
@@ -320,9 +323,9 @@ public class CarGateController {
 //        pushIOT(rootMap);
 
         //13支洞隧道口
-        rootMap.put("out", "DS-TCG205-A 20210301AIF60001195");
-        rootMap.put("in", "DS-TCG205-A 20210221AIF56682850");
-        rootMap.put("entranceSyscode", "961940c71b254354911fe64ecaa60f6e");
+        rootMap.put("out", "DS-TCG205-E 20220610AIK11586950");
+        rootMap.put("in", "DS-TCG205-E 20220610AIK11586998");
+        rootMap.put("entranceSyscode", "b6e24bcb5eb7486a85adfd66ac201626");
         rootMap.put("deviceName", "13支洞支洞口车辆道闸设备");
         pushIOT(rootMap);
     }

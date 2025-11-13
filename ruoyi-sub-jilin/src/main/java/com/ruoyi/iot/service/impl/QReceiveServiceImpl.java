@@ -112,6 +112,7 @@ public class QReceiveServiceImpl extends ServiceImpl<QReceiveMapper, QReceive> i
         Map<String, List<QReceive>> listMap = new HashMap<>();
         listMap.put("SLAVE", qReceiveService.selectQReceiveListSLAVE(queryWrapper));
         listMap.put("SLAVEDATA", qReceiveService.selectQReceiveListSLAVEDATA(queryWrapper));
+        listMap.put("SLAVEDATA13", qReceiveService.selectQReceiveListSLAVEDATA(queryWrapper));
         return listMap;
     }
 
@@ -124,6 +125,12 @@ public class QReceiveServiceImpl extends ServiceImpl<QReceiveMapper, QReceive> i
     @Override
     @DataSource(value = DataSourceType.SLAVEDATA)
     public List<QReceive> selectQReceiveListSLAVEDATA(QueryWrapper<QReceive> queryWrapper) {
+        return qReceiveMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    @DataSource(value = DataSourceType.SLAVEDATA13)
+    public List<QReceive> selectQReceiveListSLAVEDATA13(QueryWrapper<QReceive> queryWrapper) {
         return qReceiveMapper.selectList(queryWrapper);
     }
 }

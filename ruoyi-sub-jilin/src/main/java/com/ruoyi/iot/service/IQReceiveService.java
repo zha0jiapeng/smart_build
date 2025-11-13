@@ -74,4 +74,7 @@ public interface IQReceiveService extends IService<QReceive>
 
     @DataSource(value = DataSourceType.SLAVEDATA)
     List<QReceive> selectQReceiveListSLAVEDATA(QueryWrapper<QReceive> queryWrapper);
+
+    @DataSource(value = DataSourceType.SLAVEDATA13)
+    List<QReceive> selectQReceiveListSLAVEDATA13(QueryWrapper<QReceive> queryWrapper);
 }

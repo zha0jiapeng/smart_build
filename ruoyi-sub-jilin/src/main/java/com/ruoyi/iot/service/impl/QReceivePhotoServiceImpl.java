@@ -159,6 +159,22 @@ public class QReceivePhotoServiceImpl extends ServiceImpl<QReceivePhotoMapper, Q
         return map;
     }
 
+    @Override
+    @DataSource(value = DataSourceType.SLAVEDATA13)
+    public Map<String, String> selectQReceivePhotoOrderIdSLAVEDATA13(String orderId) {
+        QueryWrapper<QReceivePhoto> queryWrapper = new QueryWrapper<>();
+        // 使用in方法查询ID在列表中的记录
+        queryWrapper.in("order_id", orderId);
+        List<QReceivePhoto> list = qReceivePhotoMapper.selectList(queryWrapper);
+        Map<String, String> map = mapPicture(list);
+        QueryWrapper<QReceiveMoreMaterial> qReceiveMoreMaterialQueryWrapper = new QueryWrapper<>();
+        List<QReceiveMoreMaterial> qReceiveMoreMaterials = qReceiveMoreMaterialMapper.selectList(qReceiveMoreMaterialQueryWrapper);
+        String materialName = qReceiveMoreMaterials.get(0).getMaterialName();
+        map.put("goodsType", goodsType(materialName));
+        return map;
+    }
+
+
     public Map<String, String> mapPicture(List<QReceivePhoto> list) {
         Map<String, String> map = new HashMap<>();
         for (QReceivePhoto value : list) {

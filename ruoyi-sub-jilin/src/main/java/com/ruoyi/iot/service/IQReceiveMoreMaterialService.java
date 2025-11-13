@@ -73,4 +73,7 @@ public interface IQReceiveMoreMaterialService  extends IService<QReceiveMoreMate
 
     @DataSource(value = DataSourceType.SLAVEDATA)
     List<QReceiveMoreMaterial> selectQReceiveMoreMaterialListSLAVEDATA(List<String> idList);
+
+    @DataSource(value = DataSourceType.SLAVEDATA13)
+    List<QReceiveMoreMaterial> selectQReceiveMoreMaterialListSLAVEDATA13(List<String> idList);
 }

@@ -20,5 +20,10 @@ public enum DataSourceType
     /**
      * 从库2
      */
-    SLAVEDATA
+    SLAVEDATA,
+
+    /**
+     * 从库3
+     */
+    SLAVEDATA13
 }

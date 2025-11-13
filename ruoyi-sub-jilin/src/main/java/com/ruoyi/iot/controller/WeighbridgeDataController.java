@@ -160,8 +160,10 @@ public class WeighbridgeDataController extends BaseController {
         Map<String, List<QReceiveMoreMaterial>> selectQReceiveMoreMaterialList = qReceiveMoreMaterialService.selectQReceiveMoreMaterialList(listMap);
         List<QReceive> SLAVEselectQReceiveList = listMap.get("SLAVE");
         List<QReceive> SLAVEDATAselectQReceiveList = listMap.get("SLAVEDATA");
+        List<QReceive> SLAVEDATA13selectQReceiveList = listMap.get("SLAVEDATA13");
         List<QReceiveMoreMaterial> SLAVEselectQReceiveMoreMaterialList = selectQReceiveMoreMaterialList.get("SLAVE");
         List<QReceiveMoreMaterial> SLAVEDATAselectQReceiveMoreMaterialList = selectQReceiveMoreMaterialList.get("SLAVEDATA");
+        List<QReceiveMoreMaterial> SLAVEDATA13selectQReceiveMoreMaterialList = selectQReceiveMoreMaterialList.get("SLAVEDATA13");
         if (SLAVEselectQReceiveList != null && SLAVEselectQReceiveList.size() != 0) {
             for (int i = 0; i < SLAVEselectQReceiveList.size(); i++) {
                 QReceive qReceive = SLAVEselectQReceiveList.get(i);
@@ -178,6 +180,15 @@ public class WeighbridgeDataController extends BaseController {
                 upload("SLAVEDATA", qReceive, qReceiveMoreMaterial, map);
             }
         }
+
+        if (SLAVEDATA13selectQReceiveList != null && SLAVEDATA13selectQReceiveList.size() != 0) {
+            for (int i = 0; i < SLAVEDATA13selectQReceiveList.size(); i++) {
+                QReceive qReceive = SLAVEDATA13selectQReceiveList.get(i);
+                QReceiveMoreMaterial qReceiveMoreMaterial = SLAVEDATA13selectQReceiveMoreMaterialList.get(i);
+                Map<String, String> map = iqReceivePhotoService.selectQReceivePhotoOrderIdSLAVEDATA13(qReceiveMoreMaterial.getOrderId());
+                upload("SLAVEDATA13", qReceive, qReceiveMoreMaterial, map);
+            }
+        }
     }
 
     public void upload(String region, QReceive qReceive, QReceiveMoreMaterial qReceiveMoreMaterial, Map<String, String> map) throws FileNotFoundException {
@@ -191,9 +202,12 @@ public class WeighbridgeDataController extends BaseController {
         if (region.equals("SLAVE")) {
             valueMap.put("device_code", "DS-7804N-F1(D)0420240822CCRRFM5850847WVU");
             weighbridgeData.setDeviceCode("DS-7804N-F1(D)0420240822CCRRFM5850847WVU");
-        } else {
+        } else if (region.equals("SLAVEDATA")) {
             valueMap.put("device_code", "DS-7804N-F1(D)0420240416CCRRFD0327551WVU");
             weighbridgeData.setDeviceCode("DS-7804N-F1(D)0420240416CCRRFD0327551WVU");
+        } else if (region.equals("SLAVEDATA13")) {
+            valueMap.put("device_code", "DS-7804N-G10420250422CCRRFZ1386506WVU");
+            weighbridgeData.setDeviceCode("DS-7804N-G10420250422CCRRFZ1386506WVU");
         }
 
 
@@ -273,8 +287,10 @@ public class WeighbridgeDataController extends BaseController {
         }
         if (region.equals("SLAVE")) {
             ftpServerConfig = new FTPServerConfig("10.1.3.175", 21, "yuancheng15", "123456", localUrl, 1);
-        } else {
+        } else if (region.equals("SLAVEDATA")) {
             ftpServerConfig = new FTPServerConfig("10.1.3.181", 21, "yuancheng14", "123456", localUrl, 1);
+        } else if (region.equals("SLAVEDATA13")) {
+            ftpServerConfig = new FTPServerConfig("10.1.3.187", 21, "yuancheng13", "123456", localUrl, 1);
         }
         //下载图片
         FTPServer comprehensiveApp = new FTPServer();
@@ -325,12 +341,15 @@ public class WeighbridgeDataController extends BaseController {
                 .filter(qReceive -> !keysIn.contains(qReceive.getOrderId() + "_" + "SLAVEDATA"))
                 .collect(Collectors.toList());
 
+        List<QReceive> filteredSlaveData13 = listMap.get("SLAVEDATA13").stream()
+                .filter(qReceive -> !keysIn.contains(qReceive.getOrderId() + "_" + "SLAVEDATA13"))
+                .collect(Collectors.toList());
+
         // 构建结果
         Map<String, List<QReceive>> filteredListMap = new HashMap<>();
         filteredListMap.put("SLAVE", filteredSlave);
         filteredListMap.put("SLAVEDATA", filteredSlaveData);
-
-
+        filteredListMap.put("SLAVEDATA13", filteredSlaveData13);
         return filteredListMap;
     }
 
@@ -363,6 +382,15 @@ public class WeighbridgeDataController extends BaseController {
     public AjaxResult getLatestWeighbridgeData14() {
         QueryWrapper<WeighbridgeData> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("device_code", "DS-7804N-F1(D)0420240416CCRRFD0327551WVU");
+        queryWrapper.orderByDesc("id").last("limit 1");
+        WeighbridgeData latestWeighbridgeData = weighbridgeDataMapper.selectOne(queryWrapper);
+        return success(latestWeighbridgeData);
+    }
+
+    @GetMapping("/getLatestWeighbridgeData/13")
+    public AjaxResult getLatestWeighbridgeData13() {
+        QueryWrapper<WeighbridgeData> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("device_code", "DS-7804N-G10420250422CCRRFZ1386506WVU");
         queryWrapper.orderByDesc("id").last("limit 1");
         WeighbridgeData latestWeighbridgeData = weighbridgeDataMapper.selectOne(queryWrapper);
         return success(latestWeighbridgeData);

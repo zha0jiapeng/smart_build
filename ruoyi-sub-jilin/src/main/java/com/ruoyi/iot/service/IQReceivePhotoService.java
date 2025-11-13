@@ -71,4 +71,7 @@ public interface IQReceivePhotoService  extends IService<QReceivePhoto>
 
     @DataSource(value = DataSourceType.SLAVEDATA)
     Map<String, String> selectQReceivePhotoOrderIdSLAVEDATA(String orderId);
+
+    @DataSource(value = DataSourceType.SLAVEDATA13)
+    Map<String, String> selectQReceivePhotoOrderIdSLAVEDATA13(String orderId);
 }

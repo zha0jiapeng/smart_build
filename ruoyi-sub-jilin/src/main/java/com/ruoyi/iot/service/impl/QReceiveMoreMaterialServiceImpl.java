@@ -124,6 +124,15 @@ public class QReceiveMoreMaterialServiceImpl extends ServiceImpl<QReceiveMoreMat
         }else {
             listMap.put("SLAVEDATA",new ArrayList<>());
         }
+        List<QReceive> qReceiveSLAVEDATA13List = qreceiveMap.get("SLAVEDATA13");
+        if (qReceiveSLAVEDATA13List.size() != 0) {
+            List<String> idSLAVEDATA13List = qReceiveSLAVEDATA13List.stream()
+                    .map(QReceive::getOrderId)
+                    .collect(Collectors.toList());
+            listMap.put("SLAVEDATA13", qReceiveMoreMaterialService.selectQReceiveMoreMaterialListSLAVEDATA(idSLAVEDATA13List));
+        }else {
+            listMap.put("SLAVEDATA13",new ArrayList<>());
+        }
         return listMap;
     }
 
@@ -139,6 +148,15 @@ public class QReceiveMoreMaterialServiceImpl extends ServiceImpl<QReceiveMoreMat
     @Override
     @DataSource(value = DataSourceType.SLAVEDATA)
     public List<QReceiveMoreMaterial> selectQReceiveMoreMaterialListSLAVEDATA(List<String> idList) {
+        QueryWrapper<QReceiveMoreMaterial> queryWrapper = new QueryWrapper<>();
+        // 使用in方法查询ID在列表中的记录
+        queryWrapper.in("order_id", idList);
+        return qReceiveMoreMaterialMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    @DataSource(value = DataSourceType.SLAVEDATA13)
+    public List<QReceiveMoreMaterial> selectQReceiveMoreMaterialListSLAVEDATA13(List<String> idList) {
         QueryWrapper<QReceiveMoreMaterial> queryWrapper = new QueryWrapper<>();
         // 使用in方法查询ID在列表中的记录
         queryWrapper.in("order_id", idList);

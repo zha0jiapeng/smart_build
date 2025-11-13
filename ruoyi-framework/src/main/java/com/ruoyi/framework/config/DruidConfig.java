@@ -66,6 +66,7 @@ public class DruidConfig
         targetDataSources.put(DataSourceType.MASTER.name(), masterDataSource);
         setDataSource(targetDataSources, DataSourceType.SLAVE.name(), "slaveDataSource");
         setDataSource(targetDataSources, DataSourceType.SLAVEDATA.name(), "slaveData");
+        setDataSource(targetDataSources, DataSourceType.SLAVEDATA13.name(), "slaveData13");
         return new DynamicDataSource(masterDataSource, targetDataSources);
     }
     

@@ -70,6 +70,13 @@ public class SyncTask {
     }
 
     /**
+     * 污水显示屏推送
+     */
+    public void sendCheckStatus(){
+        String result1 = HttpUtil.get("http://127.0.0.1:8097/SewageMonitoring/checkStatus");
+    }
+
+    /**
      * 指定设备在线状态检测
      */
     public void sendOfflinePolicy(){

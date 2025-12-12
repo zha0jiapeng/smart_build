@@ -43,6 +43,44 @@ public class SewageMonitoringController extends BaseController {
     private static final String DEVICE_IP_14 = "10.1.3.80";
     private static final String DEVICE_IP_15 = "10.1.23.32";
 
+    /**
+     * 推送接口
+     *
+     * @return
+     */
+    @GetMapping("/getList")
+    public AjaxResult getList() throws Exception {
+        String m14 = master14();
+        String m15 = master15();
+        return AjaxResult.success(m14 + m15);
+    }
+
+    public String master14() {
+        if (!isIpReachable(DEVICE_IP_14)) {
+            return "";
+        }
+        ModbusMaster master = new ModbusTcpMaster().getSlave(DEVICE_IP_14, MODBUS_TCP_PORT);
+        Number mA1 = Modbus4jReadUtil.readHoldingRegister(master, 1, 16, DataType.TWO_BYTE_INT_UNSIGNED, "mA1");
+        Number mA2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 17, DataType.TWO_BYTE_INT_UNSIGNED, "mA2");
+        String deviceCode = "sewage_14";
+        double current1 = mA1.doubleValue() * 0.01;
+        double current2 = mA2.doubleValue() * 0.01;
+        return deviceCode + ":" + current1 + ";" + current2 + ";";
+    }
+
+    public String master15() {
+        if (!isIpReachable(DEVICE_IP_15)) {
+            return "";
+        }
+        ModbusMaster master = new ModbusTcpMaster().getSlave(DEVICE_IP_15, MODBUS_TCP_PORT);
+        Number mA1 = Modbus4jReadUtil.readHoldingRegister(master, 1, 16, DataType.TWO_BYTE_INT_UNSIGNED, "mA1");
+        Number mA2 = Modbus4jReadUtil.readHoldingRegister(master, 1, 17, DataType.TWO_BYTE_INT_UNSIGNED, "mA2");
+        String deviceCode = "sewage_15";
+        double current1 = mA1.doubleValue() * 0.01;
+        double current2 = mA2.doubleValue() * 0.01;
+        return deviceCode + ":" + current1 + ";" + current2;
+    }
+
 
     /**
      * 推送接口
@@ -204,10 +242,10 @@ public class SewageMonitoringController extends BaseController {
             //流量
             valueMap.put("waste_water_flow", current1);
             //ph值 是
-            valueMap.put("ph", calculatePH(current2));
+            valueMap.put("ph", calculatePH(current1));
             String number = deviceCode.replaceAll(".*_", "");
             //漂浮物 （单位：mg/L）是
-            valueMap.put("flotage", calculateSS(current1));
+            valueMap.put("flotage", calculateSS(current2));
             checkRequestStatus(number, String.valueOf(valueMap.get("ph")), String.valueOf(valueMap.get("flotage")));
         }
     }

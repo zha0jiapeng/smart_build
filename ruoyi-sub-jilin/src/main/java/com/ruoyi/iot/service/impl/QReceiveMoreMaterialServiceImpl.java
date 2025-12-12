@@ -129,7 +129,7 @@ public class QReceiveMoreMaterialServiceImpl extends ServiceImpl<QReceiveMoreMat
             List<String> idSLAVEDATA13List = qReceiveSLAVEDATA13List.stream()
                     .map(QReceive::getOrderId)
                     .collect(Collectors.toList());
-            listMap.put("SLAVEDATA13", qReceiveMoreMaterialService.selectQReceiveMoreMaterialListSLAVEDATA(idSLAVEDATA13List));
+            listMap.put("SLAVEDATA13", qReceiveMoreMaterialService.selectQReceiveMoreMaterialListSLAVEDATA13(idSLAVEDATA13List));
         }else {
             listMap.put("SLAVEDATA13",new ArrayList<>());
         }

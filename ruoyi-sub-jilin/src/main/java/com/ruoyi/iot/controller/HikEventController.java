@@ -141,7 +141,7 @@ public class HikEventController extends BaseController {
         map.put(34, 65L);
         //14支洞洞口101
         map.put(33, 76L);
-        //14支洞进厂路02
+        //14支洞进厂路102
         map.put(35, 115L);
     }
 
